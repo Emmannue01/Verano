@@ -6,19 +6,6 @@
     <title>Gym Dashboard - Control de Membresías</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyD...Xw",
-            authDomain: "gymrats-d16eb.firebaseapp.com",
-            projectId: "gymrats-d16eb",
-            storageBucket: "gymrats-d16eb.appspot.com",
-            messagingSenderId: "106526343668278361492",
-            appId: "1:106526343668278361492:web:abcd1234efgh5678"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
     <style>
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
@@ -642,40 +629,6 @@
         }
     });
 
-    // Function to fetch members data from Firebase
-    async function fetchMembersData() {
-        try {
-            const querySnapshot = await getDocs(collection(db, "usuarios"));
-            const members = [];
-            querySnapshot.forEach((doc) => {
-                members.push(doc.data());
-            });
-            
-            // Update dashboard stats
-            document.getElementById('totalMembers').textContent = members.length;
-            document.getElementById('activeMemberships').textContent = members.filter(m => 
-                new Date(m.SuscripcionHasta) >= new Date()
-            ).length;
-            document.getElementById('expiringSoon').textContent = members.filter(m => {
-                const expiryDate = new Date(m.SuscripcionHasta);
-                const today = new Date();
-                const diffTime = expiryDate - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays <= 7 && diffDays >= 0;
-            }).length;
-            
-            // Calculate monthly revenue (example: $50 per active member)
-            document.getElementById('monthlyRevenue').textContent = 
-                (members.filter(m => new Date(m.SuscripcionHasta) >= new Date()).length * 50)
-                .toLocaleString();
-                
-            return members;
-        } catch (error) {
-            console.error("Error fetching members:", error);
-            return [];
-        }
-    }
-
     // Animated counter for stats cards
     function animateValue(obj, start, end, duration) {
         let startTimestamp = null;
@@ -691,12 +644,7 @@
     }
 
     // Start animations once the elements are visible
-    document.addEventListener('DOMContentLoaded', async function() {
-        // Fetch initial data
-        const members = await fetchMembersData();
-        
-        // Update members table with real data
-        updateMembersTable(members);
+    document.addEventListener('DOMContentLoaded', function() {
         const options = {
             root: null,
             threshold: 0.1
@@ -729,59 +677,6 @@
             }
         });
     });
-
-    // Function to update members table with real data
-    function updateMembersTable(members) {
-        const tbody = document.querySelector('tbody');
-        tbody.innerHTML = ''; // Clear existing rows
-        
-        members.slice(0, 5).forEach(member => { // Show first 5 members
-            const expiryDate = new Date(member.SuscripcionHasta);
-            const today = new Date();
-            const isActive = expiryDate >= today;
-            const isExpiringSoon = isActive && 
-                ((expiryDate - today) / (1000 * 60 * 60 * 24)) <= 7;
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 h-10 w-10">
-                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
-                        </div>
-                        <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">${member.Nombre}</div>
-                            <div class="text-sm text-gray-500">${member.UID.toLowerCase()}@gympro.com</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">${isActive ? 'Activa' : 'Inactiva'}</div>
-                    <div class="text-sm text-gray-500">${member.SuscripcionHasta}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${member.SuscripcionHasta}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        isActive ? 
-                            (isExpiringSoon ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800') : 
-                            'bg-red-100 text-red-800'
-                    }">
-                        ${isActive ? 
-                            (isExpiringSoon ? 'Por vencer' : 'Activa') : 
-                            'Expirada'}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></a>
-                    <a href="#" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></a>
-                    <a href="#" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></a>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-    }
 
     // Sample data for random notifications
     setInterval(() => {
