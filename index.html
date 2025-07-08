@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Control de Acceso - Gimnasio</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #0077cc;
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #estado {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: green;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Usuario</h1>
+  <form id="registro-form">
+    <label for="uid">ID:</label>
+    <input type="text" id="uid" required />
+
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" required />
+
+    <label for="dias">Días de suscripción:</label>
+    <input type="number" id="dias" required />
+
+    <button type="submit">Registrar / Renovar</button>
+  </form>
+
+  <div id="estado">Esperando...</div>
+
+  
+  <script type="module">
+    
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD...Xw",
+        authDomain: "gymrats-d16eb.firebaseapp.com",
+        projectId: "gymrats-d16eb",
+        storageBucket: "gymrats-d16eb.appspot.com",
+        messagingSenderId: "106526343668278361492",
+        appId: "1:106526343668278361492:web:abcd1234efgh5678"
+  };
+
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    
+    const form = document.getElementById('registro-form');
+    const estadoDiv = document.getElementById('estado');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const uid = document.getElementById('uid').value.trim().toUpperCase();
+      const nombre = document.getElementById('nombre').value.trim();
+      const dias = parseInt(document.getElementById('dias').value.trim());
+
+      if (!uid || !nombre || isNaN(dias)) {
+        alert("Todos los campos deben estar completos y válidos.");
+        return;
+      }
+
+      
+      const fechaHoy = new Date();
+      const fechaVencimiento = new Date(fechaHoy.getTime() + dias * 24 * 60 * 60 * 1000);
+      const fechaFormateada = fechaVencimiento.toISOString().split("T")[0];
+
+      try {
+        await setDoc(doc(db, "usuarios", uid), {
+          UID: uid,
+          Nombre: nombre,
+          SuscripcionHasta: fechaFormateada
+        });
+
+        estadoDiv.textContent = `Usuario ${nombre} registrado hasta ${fechaFormateada}`;
+        estadoDiv.style.color = 'green';
+        form.reset();
+      } catch (error) {
+        console.error("Error al registrar:", error);
+        estadoDiv.textContent = "Error al registrar en Firebase";
+        estadoDiv.style.color = 'red';
+      }
+    });
+  </script>
+</body>
+</html>
