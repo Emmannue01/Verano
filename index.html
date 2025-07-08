@@ -1,121 +1,810 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Control de Acceso - Gimnasio</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-      background-color: #f5f5f5;
-    }
-    h1 {
-      color: #0077cc;
-      text-align: center;
-    }
-    label {
-      font-weight: bold;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin: 5px 0 15px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 10px 15px;
-      background-color: #0077cc;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #estado {
-      margin-top: 20px;
-      font-size: 18px;
-      font-weight: bold;
-      color: green;
-      text-align: center;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Dashboard - Control de Membresías</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyD...Xw",
+            authDomain: "gymrats-d16eb.firebaseapp.com",
+            projectId: "gymrats-d16eb",
+            storageBucket: "gymrats-d16eb.appspot.com",
+            messagingSenderId: "106526343668278361492",
+            appId: "1:106526343668278361492:web:abcd1234efgh5678"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .chart-container {
+            height: 300px;
+            width: 100%;
+        }
+        @key fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+    </style>
 </head>
-<body>
-  <h1>Usuario</h1>
-  <form id="registro-form">
-    <label for="uid">ID:</label>
-    <input type="text" id="uid" required />
+<body class="bg-gray-100">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="hidden md:flex md:flex-shrink-0">
+            <div class="flex flex-col w-64 bg-indigo-900 text-white">
+                <div class="flex items-center justify-center h-16 px-4 border-b border-indigo-800">
+                    <div class="flex items-center">
+                        <i class="fas fa-dumbbell text-2xl text-yellow-400 mr-2"></i>
+                        <span class="text-xl font-bold">GYM PRO</span>
+                    </div>
+                </div>
+                <div class="flex flex-col flex-grow px-4 py-4 overflow-y-auto custom-scrollbar">
+                    <div class="space-y-2">
+                        <div class="flex items-center px-4 py-3 bg-indigo-800 rounded-lg">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            <span>Dashboard</span>
+                        </div>
+                        <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                            <i class="fas fa-users mr-3"></i>
+                            <span>Miembros</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                            <i class="fas fa-id-card mr-3"></i>
+                            <span>Membresías</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                            <i class="fas fa-calendar-check mr-3"></i>
+                            <span>Asistencia</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            <span>Reportes</span>
+                        </a>
+                        <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                            <i class="fas fa-cog mr-3"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </div>
+                    <div class="mt-auto mb-4 px-4 py-3 bg-indigo-800 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm">Soporte 24/7</p>
+                                <p class="text-xs text-gray-400">contacto@gympro.com</p>
+                            </div>
+                            <i class="fas fa-headset text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <label for="nombre">Nombre:</label>
-    <input type="text" id="nombre" required />
+        <!-- Main content -->
+        <div class="flex-1 overflow-x-hidden overflow-y-auto">
+            <!-- Top navbar -->
+            <div class="bg-white shadow-sm">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div class="flex items-center">
+                        <button id="sidebarToggle" class="md:hidden mr-4 text-gray-600 hover:text-gray-900">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h1 class="text-xl font-semibold text-gray-800">Panel de Control</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button class="text-gray-600 hover:text-gray-900">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">
+                                <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User profile">
+                                <span class="hidden md:block">Admin</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <!-- Dropdown menu -->
+                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Perfil</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configuración</a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <label for="dias">Días de suscripción:</label>
-    <input type="number" id="dias" required />
+            <!-- Mobile sidebar (hidden by default) -->
+            <div id="mobileSidebar" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden">
+                <div class="fixed inset-y-0 left-0 w-64 bg-indigo-900 text-white transform -translate-x-full transition duration-300 ease-in-out" id="sidebar">
+                    <div class="flex items-center justify-between h-16 px-4 border-b border-indigo-800">
+                        <div class="flex items-center">
+                            <i class="fas fa-dumbbell text-2xl text-yellow-400 mr-2"></i>
+                            <span class="text-xl font-bold">GYM PRO</span>
+                        </div>
+                        <button id="closeSidebar" class="text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="flex flex-col h-full px-4 py-4 overflow-y-auto">
+                        <div class="space-y-2">
+                            <div class="flex items-center px-4 py-3 bg-indigo-800 rounded-lg">
+                                <i class="fas fa-tachometer-alt mr-3"></i>
+                                <span>Dashboard</span>
+                            </div>
+                            <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                                <i class="fas fa-users mr-3"></i>
+                                <span>Miembros</span>
+                            </a>
+                            <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                                <i class="fas fa-id-card mr-3"></i>
+                                <span>Membresías</span>
+                            </a>
+                            <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                                <i class="fas fa-calendar-check mr-3"></i>
+                                <span>Asistencia</span>
+                            </a>
+                            <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                                <i class="fas fa-chart-bar mr-3"></i>
+                                <span>Reportes</span>
+                            </a>
+                            <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                                <i class="fas fa-cog mr-3"></i>
+                                <span>Configuración</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <button type="submit">Registrar / Renovar</button>
-  </form>
+            <!-- Main content area -->
+            <div class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <!-- Total Members -->
+                    <div class="bg-white rounded-lg shadow p-6 flex items-center fade-in">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                            <i class="fas fa-users text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Miembros Activos</p>
+                            <h3 class="text-2xl font-bold" id="totalMembers">342</h3>
+                            <p class="text-green-500 text-sm"><i class="fas fa-arrow-up mr-1"></i>12% este mes</p>
+                        </div>
+                    </div>
 
-  <div id="estado">Esperando...</div>
+                    <!-- Active Memberships -->
+                    <div class="bg-white rounded-lg shadow p-6 flex items-center fade-in">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                            <i class="fas fa-id-card text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Membresías Activas</p>
+                            <h3 class="text-2xl font-bold" id="activeMemberships">298</h3>
+                            <p class="text-green-500 text-sm"><i class="fas fa-arrow-up mr-1"></i>8% este mes</p>
+                        </div>
+                    </div>
 
-  
-  <script type="module">
-    
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, setDoc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+                    <!-- Expiring Soon -->
+                    <div class="bg-white rounded-lg shadow p-6 flex items-center fade-in">
+                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                            <i class="fas fa-exclamation-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Por Vencer</p>
+                            <h3 class="text-2xl font-bold" id="expiringSoon">24</h3>
+                            <p class="text-red-500 text-sm"><i class="fas fa-arrow-up mr-1"></i>3% este mes</p>
+                        </div>
+                    </div>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyD...Xw",
-        authDomain: "gymrats-d16eb.firebaseapp.com",
-        projectId: "gymrats-d16eb",
-        storageBucket: "gymrats-d16eb.appspot.com",
-        messagingSenderId: "106526343668278361492",
-        appId: "1:106526343668278361492:web:abcd1234efgh5678"
-  };
+                    <!-- Monthly Revenue -->
+                    <div class="bg-white rounded-lg shadow p-6 flex items-center fade-in">
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                            <i class="fas fa-dollar-sign text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Ingresos Mensuales</p>
+                            <h3 class="text-2xl font-bold">$<span id="monthlyRevenue">12,480</span></h3>
+                            <p class="text-green-500 text-sm"><i class="fas fa-arrow-up mr-1"></i>15% este mes</p>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Charts and Tables Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- Membership Types Chart -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow p-6 fade-in">
+                        <h3 class="text-lg font-semibold mb-4">Distribución de Membresías</h3>
+                        <div class="chart-container">
+                            <canvas id="membershipChart"></canvas>
+                        </div>
+                    </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+                    <!-- Recent Activities -->
+                    <div class="bg-white rounded-lg shadow p-6 fade-in">
+                        <h3 class="text-lg font-semibold mb-4">Actividad Reciente</h3>
+                        <div class="space-y-4 h-64 overflow-y-auto custom-scrollbar">
+                            <div class="flex items-start">
+                                <div class="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Nuevo miembro registrado</p>
+                                    <p class="text-xs text-gray-500">Juan Pérez ha adquirido la membresía PREMIUM</p>
+                                    <p class="text-xs text-gray-400 mt-1">Hace 15 minutos</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="p-2 rounded-full bg-green-100 text-green-600 mr-3">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Pago recibido</p>
+                                    <p class="text-xs text-gray-500">Ana Gómez ha renovado su membresía</p>
+                                    <p class="text-xs text-gray-400 mt-1">Hace 1 hora</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="p-2 rounded-full bg-yellow-100 text-yellow-600 mr-3">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Membresía por expirar</p>
+                                    <p class="text-xs text-gray-500">La membresía de Carlos Ruiz expira en 2 días</p>
+                                    <p class="text-xs text-gray-400 mt-1">Hace 3 horas</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="p-2 rounded-full bg-indigo-100 text-indigo-600 mr-3">
+                                    <i class="fas fa-dumbbell"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Asistencia registrada</p>
+                                    <p class="text-xs text-gray-500">María López ha ingresado al gimnasio</p>
+                                    <p class="text-xs text-gray-400 mt-1">Hoy a las 8:30 AM</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="p-2 rounded-full bg-red-100 text-red-600 mr-3">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Membresía cancelada</p>
+                                    <p class="text-xs text-gray-500">Luis Martínez ha cancelado su membresía</p>
+                                    <p class="text-xs text-gray-400 mt-1">Ayer a las 5:45 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    
-    const form = document.getElementById('registro-form');
-    const estadoDiv = document.getElementById('estado');
+                <!-- Members Table -->
+                <div class="bg-white rounded-lg shadow overflow-hidden mb-6 fade-in">
+                    <div class="flex items-center justify-between px-6 py-4 border-b">
+                        <h3 class="text-lg font-semibold">Últimos Miembros</h3>
+                        <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">Ver todos</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Membresía</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Inicio</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Fin</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/44.jpg" alt="">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Laura Martínez</div>
+                                                <div class="text-sm text-gray-500">laura.m@gmail.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">Premium</div>
+                                        <div class="text-sm text-gray-500">12 meses</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        15 Jun 2023
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        15 Jun 2024
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Activa
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></a>
+                                        <a href="#" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></a>
+                                        <a href="#" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Carlos Gutiérrez</div>
+                                                <div class="text-sm text-gray-500">carlos.g@gmail.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">Estándar</div>
+                                        <div class="text-sm text-gray-500">6 meses</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        25 May 2023
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        25 Nov 2023
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            Por vencer
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></a>
+                                        <a href="#" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></a>
+                                        <a href="#" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/68.jpg" alt="">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">Ana Rodríguez</div>
+                                        <div class="text-sm text-gray-500">ana.r@gmail.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Básica</div>
+                                <div class="text-sm text-gray-500">3 meses</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                10 Jul 2023
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                10 Oct 2023
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Activa
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/men/75.jpg" alt="">
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">Miguel Sánchez</div>
+                                        <div class="text-sm text-gray-500">miguel.s@gmail.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Premium</div>
+                                <div class="text-sm text-gray-500">12 meses</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                22 Mar 2023
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                22 Mar 2024
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Activa
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/33.jpg" alt="">
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">Patricia López</div>
+                                        <div class="text-sm text-gray-500">patricia.l@gmail.com</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Estándar</div>
+                                <div class="text-sm text-gray-500">1 mes</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                30 Jul 2023
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                30 Ago 2023
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Expirada
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></a>
+                                <a href="#" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></a>
+                                <a href="#" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-6 py-4 border-t flex items-center justify-between">
+                <div class="text-sm text-gray-500">
+                    Mostrando <span class="font-medium">1</span> a <span class="font-medium">5</span> de <span class="font-medium">28</span> miembros
+                </div>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"><i class="fas fa-chevron-left"></i></button>
+                    <button class="px-3 py-1 rounded-md bg-indigo-600 text-white">1</button>
+                    <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">2</button>
+                    <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">3</button>
+                    <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+<!-- Modal (hidden by default) -->
+<div id="addMemberModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center pb-4 border-b">
+            <h3 class="text-xl font-semibold">Agregar Nuevo Miembro</h3>
+            <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mt-4">
+            <form>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                        <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                        <input type="tel" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
+                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option>Seleccione una opción</option>
+                            <option>Básica (1 mes)</option>
+                            <option>Estándar (3 meses)</option>
+                            <option>Premium (6 meses)</option>
+                            <option>VIP (12 meses)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio</label>
+                        <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Foto (Opcional)</label>
+                    <div class="mt-1 flex items-center">
+                        <span class="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
+                            <svg class="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </span>
+                        <button type="button" class="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Cambiar
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end">
+                    <button type="button" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Guardar Miembro
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-      const uid = document.getElementById('uid').value.trim().toUpperCase();
-      const nombre = document.getElementById('nombre').value.trim();
-      const dias = parseInt(document.getElementById('dias').value.trim());
-
-      if (!uid || !nombre || isNaN(dias)) {
-        alert("Todos los campos deben estar completos y válidos.");
-        return;
-      }
-
-      
-      const fechaHoy = new Date();
-      const fechaVencimiento = new Date(fechaHoy.getTime() + dias * 24 * 60 * 60 * 1000);
-      const fechaFormateada = fechaVencimiento.toISOString().split("T")[0];
-
-      try {
-        await setDoc(doc(db, "usuarios", uid), {
-          UID: uid,
-          Nombre: nombre,
-          SuscripcionHasta: fechaFormateada
-        });
-
-        estadoDiv.textContent = `Usuario ${nombre} registrado hasta ${fechaFormateada}`;
-        estadoDiv.style.color = 'green';
-        form.reset();
-      } catch (error) {
-        console.error("Error al registrar:", error);
-        estadoDiv.textContent = "Error al registrar en Firebase";
-        estadoDiv.style.color = 'red';
-      }
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Mobile sidebar toggle
+    document.getElementById('sidebarToggle').addEventListener('click', function() {
+        document.getElementById('mobileSidebar').classList.remove('hidden');
+        document.getElementById('sidebar').classList.remove('-translate-x-full');
     });
-  </script>
+
+    document.getElementById('closeSidebar').addEventListener('click', function() {
+        document.getElementById('sidebar').classList.add('-translate-x-full');
+        setTimeout(() => {
+            document.getElementById('mobileSidebar').classList.add('hidden');
+        }, 300);
+    });
+
+    // User dropdown menu
+    document.getElementById('userMenuButton').addEventListener('click', function() {
+        document.getElementById('userMenu').classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    window.addEventListener('click', function(e) {
+        if (!e.target.closest('#userMenuButton') && !e.target.closest('#userMenu')) {
+            document.getElementById('userMenu').classList.add('hidden');
+        }
+    });
+
+    // Modal close button
+    document.getElementById('closeModal').addEventListener('click', function() {
+        document.getElementById('addMemberModal').classList.add('hidden');
+    });
+
+    // Membership types chart
+    const membershipCtx = document.getElementById('membershipChart').getContext('2d');
+    const membershipChart = new Chart(membershipCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Básica', 'Estándar', 'Premium', 'VIP'],
+            datasets: [{
+                data: [45, 90, 132, 75],
+                backgroundColor: [
+                    '#3B82F6', // Blue
+                    '#10B981', // Green
+                    '#F59E0B', // Yellow
+                    '#8B5CF6'  // Purple
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.raw + ' miembros';
+                            return label;
+                        }
+                    }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+
+    // Function to fetch members data from Firebase
+    async function fetchMembersData() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "usuarios"));
+            const members = [];
+            querySnapshot.forEach((doc) => {
+                members.push(doc.data());
+            });
+            
+            // Update dashboard stats
+            document.getElementById('totalMembers').textContent = members.length;
+            document.getElementById('activeMemberships').textContent = members.filter(m => 
+                new Date(m.SuscripcionHasta) >= new Date()
+            ).length;
+            document.getElementById('expiringSoon').textContent = members.filter(m => {
+                const expiryDate = new Date(m.SuscripcionHasta);
+                const today = new Date();
+                const diffTime = expiryDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays <= 7 && diffDays >= 0;
+            }).length;
+            
+            // Calculate monthly revenue (example: $50 per active member)
+            document.getElementById('monthlyRevenue').textContent = 
+                (members.filter(m => new Date(m.SuscripcionHasta) >= new Date()).length * 50)
+                .toLocaleString();
+                
+            return members;
+        } catch (error) {
+            console.error("Error fetching members:", error);
+            return [];
+        }
+    }
+
+    // Animated counter for stats cards
+    function animateValue(obj, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Start animations once the elements are visible
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Fetch initial data
+        const members = await fetchMembersData();
+        
+        // Update members table with real data
+        updateMembersTable(members);
+        const options = {
+            root: null,
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = entry.target;
+                    const id = target.id;
+                    const value = parseInt(target.textContent.replace(/,/g, ''));
+                    
+                    // Reset to 0 before animation
+                    target.textContent = '0';
+                    
+                    animateValue(document.getElementById(id), 0, value, 2000);
+                    
+                    // Unobserve after animation starts to prevent repeating
+                    observer.unobserve(target);
+                }
+            });
+        }, options);
+
+        // Observe counter elements
+        const counters = ['totalMembers', 'activeMemberships', 'expiringSoon', 'monthlyRevenue'];
+        counters.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                observer.observe(element);
+            }
+        });
+    });
+
+    // Function to update members table with real data
+    function updateMembersTable(members) {
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = ''; // Clear existing rows
+        
+        members.slice(0, 5).forEach(member => { // Show first 5 members
+            const expiryDate = new Date(member.SuscripcionHasta);
+            const today = new Date();
+            const isActive = expiryDate >= today;
+            const isExpiringSoon = isActive && 
+                ((expiryDate - today) / (1000 * 60 * 60 * 24)) <= 7;
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10">
+                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${Math.random() > 0.5 ? 'men' : 'women'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${member.Nombre}</div>
+                            <div class="text-sm text-gray-500">${member.UID.toLowerCase()}@gympro.com</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">${isActive ? 'Activa' : 'Inactiva'}</div>
+                    <div class="text-sm text-gray-500">${member.SuscripcionHasta}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${member.SuscripcionHasta}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        isActive ? 
+                            (isExpiringSoon ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800') : 
+                            'bg-red-100 text-red-800'
+                    }">
+                        ${isActive ? 
+                            (isExpiringSoon ? 'Por vencer' : 'Activa') : 
+                            'Expirada'}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></a>
+                    <a href="#" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></a>
+                    <a href="#" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></a>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Sample data for random notifications
+    setInterval(() => {
+        const messages = [
+            'Nuevo miembro registrado',
+            'Pago de membresía recibido',
+            'Membresía por expirar',
+            'Asistencia registrada',
+            'Membresía cancelada'
+        ];
+        
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        const notificationCount = document.querySelector('.bg-red-500');
+        
+        if (notificationCount) {
+            notificationCount.classList.add('animate-ping');
+            setTimeout(() => {
+                notificationCount.classList.remove('animate-ping');
+            }, 1000);
+        }
+        
+        console.log('Notificación:', randomMessage); // In a real app, you'd show this to the user
+    }, 10000); // Every 10 seconds
+</script>
 </body>
 </html>
