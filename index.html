@@ -274,7 +274,77 @@
     </div>
 </div>
 
-<!-- Modal (hidden by default) -->
+<!-- Members Modal (hidden by default) -->
+<div id="membersModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-4 mx-auto p-5 border w-11/12 md:w-5/6 lg:w-4/5 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center pb-4 border-b">
+            <h3 class="text-xl font-semibold">Gestión de Miembros</h3>
+            <button id="closeMembersModal" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mt-4">
+            <div class="flex flex-col md:flex-row justify-between mb-6 gap-4">
+                <div class="relative w-full md:w-1/3">
+                    <input type="text" placeholder="Buscar miembros..." class="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                <div class="flex gap-2">
+                    <select class="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option>Todos los estados</option>
+                        <option>Activos</option>
+                        <option>Expirados</option>
+                        <option>Por vencer</option>
+                    </select>
+                    <select class="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option>Todos los tipos</option>
+                        <option>Básica</option>
+                        <option>Estándar</option>
+                        <option>Premium</option>
+                        <option>VIP</option>
+                    </select>
+                    <button class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
+                        <i class="fas fa-plus mr-2"></i>Nuevo Miembro
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Membresía</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Fin</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="membersModalBody">
+                            <!-- Aquí se llenará dinámicamente con JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="px-6 py-4 border-t flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">124</span> miembros
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"><i class="fas fa-chevron-left"></i></button>
+                        <button class="px-3 py-1 rounded-md bg-indigo-600 text-white">1</button>
+                        <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">2</button>
+                        <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">3</button>
+                        <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal (hidden by default) -->
 <div id="addMemberModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
         <div class="flex justify-between items-center pb-4 border-b">
@@ -331,10 +401,10 @@
                     </div>
                 </div>
                 <div class="mt-8 flex justify-end">
-                    <button type="button" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="button" onclick="document.getElementById('addMemberModal').classList.add('hidden')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Cancelar
                     </button>
-                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="button" onclick="guardarNuevoMiembro()" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Guardar Miembro
                     </button>
                 </div>
@@ -342,6 +412,240 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Members modal toggle
+    document.querySelector('a[href="#"]:has(i.fa-users)').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('membersModal').classList.remove('hidden');
+        cargarMiembrosModal();
+    });
+
+    document.getElementById('closeMembersModal').addEventListener('click', function() {
+        document.getElementById('membersModal').classList.add('hidden');
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(e) {
+        if (e.target === document.getElementById('membersModal')) {
+            document.getElementById('membersModal').classList.add('hidden');
+        }
+    });
+
+    // Funcionalidades del modal de miembros
+    let currentPage = 1;
+    const membersPerPage = 10;
+    let allMembers = [];
+    let filteredMembers = [];
+
+    async function cargarMiembrosModal() {
+        try {
+            const q = query(collection(db, "usuarios"), orderBy("nombre"));
+            const snapshot = await getDocs(q);
+            
+            allMembers = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                data.id = doc.id;
+                // Asegurarse que los campos básicos existan
+                data.nombre = data.nombre || "Sin nombre";
+                data.email = data.email || "Sin email";
+                data.telefono = data.telefono || "Sin teléfono";
+                data.tipo = data.tipo || "Básica";
+                data.fechaFin = data.fechaFin || new Date();
+                allMembers.push(data);
+            });
+            
+            filteredMembers = [...allMembers];
+            mostrarMiembros();
+            actualizarPaginacion();
+        } catch (err) {
+            console.error("Error al cargar miembros:", err);
+            alert("Error al cargar miembros. Verifica la consola para más detalles.");
+        }
+    }
+
+    function mostrarMiembros() {
+        const startIndex = (currentPage - 1) * membersPerPage;
+        const endIndex = startIndex + membersPerPage;
+        const membersToShow = filteredMembers.slice(startIndex, endIndex);
+        
+        const tbody = document.getElementById('membersModalBody');
+        tbody.innerHTML = '';
+        
+        membersToShow.forEach(member => {
+            const fechaFin = member.fechaFin instanceof Date ? member.fechaFin : new Date(member.fechaFin);
+            const hoy = new Date();
+            const estado = fechaFin >= hoy ? 'Activo' : 'Expirado';
+            const estadoClass = fechaFin >= hoy ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${member.Genero === 'Femenino' ? 'women' : 'men'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${member.Nombre}</div>
+                                <div class="text-sm text-gray-500">${member.Email || 'Sin email'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${member.Telefono || 'Sin teléfono'}</div>
+                        <div class="text-sm text-gray-500">${member.Email || 'Sin email'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${member.Tipo || 'Básica'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${fechaFin.toLocaleDateString('es-ES')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${estadoClass}">
+                            ${estado}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="editarMiembro('${member.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></button>
+                        <button onclick="eliminarMiembro('${member.id}')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Búsqueda y filtrado
+    document.querySelector('#membersModal input[type="text"]').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        filtrarMiembros(searchTerm);
+    });
+
+    document.querySelectorAll('#membersModal select').forEach(select => {
+        select.addEventListener('change', function() {
+            filtrarMiembros();
+        });
+    });
+
+    function filtrarMiembros(searchTerm = '') {
+        const estadoFilter = document.querySelector('#membersModal select:first-of-type').value;
+        const tipoFilter = document.querySelector('#membersModal select:last-of-type').value;
+        
+        filteredMembers = allMembers.filter(member => {
+            const matchesSearch = member.Nombre.toLowerCase().includes(searchTerm) || 
+                                member.Email?.toLowerCase().includes(searchTerm) ||
+                                member.Telefono?.includes(searchTerm);
+            
+            const hoy = new Date();
+            const fechaFin = member.fechaFin instanceof Date ? member.fechaFin : new Date(member.fechaFin);
+            let matchesEstado = true;
+            let matchesTipo = true;
+            
+            if (estadoFilter !== 'Todos los estados') {
+                if (estadoFilter === 'Activos') matchesEstado = fechaFin >= hoy;
+                if (estadoFilter === 'Expirados') matchesEstado = fechaFin < hoy;
+                if (estadoFilter === 'Por vencer') {
+                    const cincoDiasDespues = new Date();
+                    cincoDiasDespues.setDate(hoy.getDate() + 5);
+                    matchesEstado = fechaFin > hoy && fechaFin <= cincoDiasDespues;
+                }
+            }
+            
+            if (tipoFilter !== 'Todos los tipos') {
+                matchesTipo = member.Tipo === tipoFilter;
+            }
+            
+            return matchesSearch && matchesEstado && matchesTipo;
+        });
+        
+        currentPage = 1;
+        mostrarMiembros();
+        actualizarPaginacion();
+    }
+
+    // Paginación
+    function actualizarPaginacion() {
+        const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+        const paginationInfo = document.querySelector('#membersModal .text-sm.text-gray-500');
+        const paginationButtons = document.querySelectorAll('#membersModal .flex.space-x-2 button');
+        
+        const startItem = (currentPage - 1) * membersPerPage + 1;
+        const endItem = Math.min(currentPage * membersPerPage, filteredMembers.length);
+        
+        paginationInfo.innerHTML = `Mostrando <span class="font-medium">${startItem}</span> a <span class="font-medium">${endItem}</span> de <span class="font-medium">${filteredMembers.length}</span> miembros`;
+        
+        // Actualizar botones de paginación
+        paginationButtons.forEach((button, index) => {
+            if (index === 0) { // Anterior
+                button.disabled = currentPage === 1;
+                button.classList.toggle('bg-gray-200', !button.disabled);
+                button.classList.toggle('bg-gray-100', button.disabled);
+            } else if (index === paginationButtons.length - 1) { // Siguiente
+                button.disabled = currentPage === totalPages;
+                button.classList.toggle('bg-gray-200', !button.disabled);
+                button.classList.toggle('bg-gray-100', button.disabled);
+            } else { // Números de página
+                const pageNumber = index;
+                button.textContent = pageNumber;
+                button.classList.toggle('bg-indigo-600', pageNumber === currentPage);
+                button.classList.toggle('text-white', pageNumber === currentPage);
+                button.classList.toggle('bg-gray-200', pageNumber !== currentPage);
+                button.style.display = pageNumber <= totalPages ? '' : 'none';
+            }
+        });
+    }
+
+    // Manejar clics en botones de paginación
+    document.querySelector('#membersModal .flex.space-x-2').addEventListener('click', function(e) {
+        const target = e.target.closest('button');
+        if (!target) return;
+        
+        const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+        
+        if (target.innerHTML.includes('chevron-left')) {
+            if (currentPage > 1) {
+                currentPage--;
+                mostrarMiembros();
+                actualizarPaginacion();
+            }
+        } else if (target.innerHTML.includes('chevron-right')) {
+            if (currentPage < totalPages) {
+                currentPage++;
+                mostrarMiembros();
+                actualizarPaginacion();
+            }
+        } else if (!isNaN(parseInt(target.textContent))) {
+            currentPage = parseInt(target.textContent);
+            mostrarMiembros();
+            actualizarPaginacion();
+        }
+    });
+
+    // Funciones para editar y eliminar
+    function editarMiembro(id) {
+        const member = allMembers.find(m => m.id === id);
+        if (!member) return;
+        
+        // Llenar el formulario de edición (similar al de agregar)
+        console.log("Editar miembro:", member);
+        // Aquí podrías abrir el modal de edición con los datos precargados
+    }
+
+    function eliminarMiembro(id) {
+        if (confirm('¿Estás seguro de eliminar este miembro?')) {
+            console.log("Eliminar miembro con ID:", id);
+            // Aquí iría el código para eliminar de Firebase
+            // Luego recargar la lista:
+            cargarMiembrosModal();
+        }
+    }
+
+    // Botón "Nuevo Miembro"
+    document.querySelector('#membersModal button.bg-indigo-600').addEventListener('click', function() {
+        document.getElementById('addMemberModal').classList.remove('hidden');
+    });
+</script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -563,6 +867,51 @@
           cutout: '70%'
       }
   });
+
+  // Guardar nuevo miembro
+  async function guardarNuevoMiembro() {
+    const nombre = document.querySelector('#addMemberModal input:nth-of-type(1)').value;
+    const apellido = document.querySelector('#addMemberModal input:nth-of-type(2)').value;
+    const email = document.querySelector('#addMemberModal input[type="email"]').value;
+    const telefono = document.querySelector('#addMemberModal input[type="tel"]').value;
+    const tipo = document.querySelector('#addMemberModal select').value.split(' ')[0];
+    const fechaInicio = document.querySelector('#addMemberModal input[type="date"]').value;
+    
+    if (!nombre || !email || !fechaInicio) {
+      alert('Por favor complete los campos obligatorios: Nombre, Email y Fecha de Inicio');
+      return;
+    }
+    
+    try {
+      // Calcular fecha de fin basada en el tipo de membresía
+      const fechaFin = new Date(fechaInicio);
+      if (tipo === 'Estándar') fechaFin.setMonth(fechaFin.getMonth() + 3);
+      else if (tipo === 'Premium') fechaFin.setMonth(fechaFin.getMonth() + 6);
+      else if (tipo === 'VIP') fechaFin.setMonth(fechaFin.getMonth() + 12);
+      else fechaFin.setMonth(fechaFin.getMonth() + 1); // Básica
+      
+      // Aquí iría el código para guardar en Firebase
+      console.log("Guardando nuevo miembro:", {
+        Nombre: nombre + ' ' + apellido,
+        Email: email,
+        Telefono: telefono,
+        Tipo: tipo,
+        Creado: new Date(),
+        SuscripcionHasta: fechaFin
+      });
+      
+      alert('Miembro guardado exitosamente');
+      document.getElementById('addMemberModal').classList.add('hidden');
+      cargarMiembrosModal();
+      cargarUsuarios(); // Actualizar dashboard
+      
+      // Limpiar formulario
+      document.querySelector('#addMemberModal form').reset();
+    } catch (err) {
+      console.error("Error al guardar miembro:", err);
+      alert('Error al guardar miembro');
+    }
+  }
 
   // Animated counter for stats cards
   function animateValue(obj, start, end, duration) {
