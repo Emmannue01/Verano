@@ -56,7 +56,7 @@
     }
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
     }
     .card {
@@ -74,10 +74,11 @@
       font-size: 24px;
       font-weight: bold;
     }
-    .recent-activity, .membership-chart, .distribution-chart {
+    .recent-activity, .membership-chart {
       background-color: white;
       border-radius: 10px;
       padding: 20px;
+      flex: 1;
     }
     .recent-activity ul {
       list-style: none;
@@ -86,6 +87,10 @@
     .recent-activity li {
       margin-bottom: 10px;
       font-size: 14px;
+    }
+    .chart-row {
+      display: flex;
+      gap: 20px;
     }
     .top-bar {
       display: flex;
@@ -100,6 +105,21 @@
     }
     canvas {
       max-width: 100%;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    table th, table td {
+      padding: 8px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .distribution-chart {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -150,7 +170,7 @@
         </div>
       </div>
 
-      <div class="stats">
+      <div class="chart-row">
         <div class="recent-activity">
           <h4>Actividad Reciente</h4>
           <ul id="actividad-reciente"></ul>
