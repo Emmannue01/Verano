@@ -177,7 +177,6 @@
                         <div>
                             <p class="text-gray-500">Miembros Activos</p>
                             <h3 class="text-2xl font-bold" id="totalMembers">342</h3>
-                            <p class="text-green-500 text-sm"><i class="fas fa-arrow-up mr-1"></i>12% este mes</p>
                         </div>
                     </div>
 
@@ -189,7 +188,6 @@
                         <div>
                             <p class="text-gray-500">Membresías Activas</p>
                             <h3 class="text-2xl font-bold" id="activeMemberships">298</h3>
-                            <p class="text-green-500 text-sm"><i class="fas fa-arrow-up mr-1"></i>8% este mes</p>
                         </div>
                     </div>
 
@@ -201,7 +199,6 @@
                         <div>
                             <p class="text-gray-500">Por Vencer</p>
                             <h3 class="text-2xl font-bold" id="expiringSoon">24</h3>
-                            <p class="text-red-500 text-sm"><i class="fas fa-arrow-up mr-1"></i>3% este mes</p>
                         </div>
                     </div>
 
@@ -213,7 +210,6 @@
                         <div>
                             <p class="text-gray-500">Ingresos Mensuales</p>
                             <h3 class="text-2xl font-bold">$<span id="monthlyRevenue">12,480</span></h3>
-                            <p class="text-green-500 text-sm"><i class="fas fa-arrow-up mr-1"></i>15% este mes</p>
                         </div>
                     </div>
                 </div>
@@ -370,12 +366,16 @@
   async function cargarUsuarios() {
     const totalActivos = document.getElementById('totalMembers');
     const nuevosUsuarios = document.getElementById('activeMemberships');
+    const expiringSoon = document.getElementById('expiringSoon');
     const miembrosTableBody = document.querySelector('tbody');
     const actividadReciente = document.querySelector('.space-y-4');
     
     let activos = 0;
     let nuevos = 0;
+    let porVencer = 0;
     const hoy = new Date();
+    const cincoDiasDespues = new Date();
+    cincoDiasDespues.setDate(hoy.getDate() + 5);
 
     try {
       const q = query(collection(db, "usuarios"), orderBy("Creado", "desc"), limit(5));
@@ -393,6 +393,11 @@
 
         if (fechaFin >= hoy) activos++;
         nuevos++;
+
+        // Calcular membresías por vencer en <= 5 días
+        if (fechaFin > hoy && fechaFin <= cincoDiasDespues) {
+          porVencer++;
+        }
 
         // Formatear fechas
         const fechaFinStr = fechaFin.toLocaleDateString('es-ES');
@@ -463,10 +468,12 @@
 
       totalActivos.textContent = activos;
       nuevosUsuarios.textContent = nuevos;
+      expiringSoon.textContent = porVencer;
       
       // Animate the counters
       animateValue(document.getElementById('totalMembers'), 0, activos, 2000);
       animateValue(document.getElementById('activeMemberships'), 0, nuevos, 2000);
+      animateValue(document.getElementById('expiringSoon'), 0, porVencer, 2000);
 
       // Actualizar gráfico de membresías
       actualizarGraficoMembresias();
