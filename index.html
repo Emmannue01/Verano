@@ -77,8 +77,8 @@
                     <div class="mt-auto mb-4 px-4 py-3 bg-indigo-800 rounded-lg">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm">Soporte 24/7</p>
-                                <p class="text-xs text-gray-400">contacto@gympro.com</p>
+                                <p class="text-sm">Soporte</p>
+                                <p class="text-xs text-gray-400">18459681@gmail.com</p>
                             </div>
                             <i class="fas fa-headset text-xl"></i>
                         </div>
@@ -205,11 +205,11 @@
                     <!-- Monthly Revenue -->
                     <div class="bg-white rounded-lg shadow p-6 flex items-center fade-in">
                         <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                            <i class="fas fa-dollar-sign text-xl"></i>
+                            <i class="fas fa-wallet text-xl"></i>
                         </div>
                         <div>
-                            <p class="text-gray-500">Ingresos Mensuales</p>
-                            <h3 class="text-2xl font-bold">$<span id="monthlyRevenue">12,480</span></h3>
+                            <p class="text-gray-500">Cuentas Totales</p>
+                            <h3 class="text-2xl font-bold" id="totalAccounts">0</h3>
                         </div>
                     </div>
                 </div>
@@ -256,10 +256,10 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="text-sm text-gray-500 px-6 py-4">
+                        Mostrando <span class="font-medium">1</span> a <span class="font-medium">5</span> de <span class="font-medium">28</span> miembros
                     <div class="px-6 py-4 border-t flex items-center justify-between">
-                        <div class="text-sm text-gray-500">
-                            Mostrando <span class="font-medium">1</span> a <span class="font-medium">5</span> de <span class="font-medium">28</span> miembros
-                        </div>
+                        
                         <div class="flex space-x-2">
                             <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"><i class="fas fa-chevron-left"></i></button>
                             <button class="px-3 py-1 rounded-md bg-indigo-600 text-white">1</button>
@@ -298,8 +298,8 @@
                     </select>
                     <select class="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <option>Todos los tipos</option>
-                        <option>Básica</option>
-                        <option>Estándar</option>
+                        <option>Basica</option>
+                        <option>Estandar</option>
                         <option>Premium</option>
                         <option>VIP</option>
                     </select>
@@ -325,12 +325,13 @@
                         <tbody class="bg-white divide-y divide-gray-200" id="membersModalBody">
                             
                         </tbody>
+                        <div class="text-sm text-gray-500">
+                        Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">124</span> miembros
+                    </div>
                     </table>
                 </div>
                 <div class="px-6 py-4 border-t flex items-center justify-between">
-                    <div class="text-sm text-gray-500">
-                        Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">124</span> miembros
-                    </div>
+                    
                     <div class="flex space-x-2">
                         <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"><i class="fas fa-chevron-left"></i></button>
                         <button class="px-3 py-1 rounded-md bg-indigo-600 text-white">1</button>
@@ -344,7 +345,7 @@
     </div>
 </div>
 
-<!-- Add Member Modal (hidden by default) -->
+
 <div id="addMemberModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
         <div class="flex justify-between items-center pb-4 border-b">
@@ -386,6 +387,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio</label>
                         <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
+                    
                 </div>
                 <div class="mt-6">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Foto (Opcional)</label>
@@ -434,17 +436,21 @@
     const membersPerPage = 10;
     let allMembers = [];
     let filteredMembers = [];
+    let cuentasTotales = 0;
 
     async function cargarMiembrosModal() {
         try {
             const q = query(collection(db, "usuarios"), orderBy("Creado", "desc"));
             const snapshot = await getDocs(q);
+            const allSnapshot = await getDocs(collection(db, "usuarios"));
+            cuentasTotales = allSnapshot.size;
             allMembers = [];
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 allMembers.push({
                     id: doc.id,
                     Nombre: data.Nombre || "Sin nombre",
+                    Apellido: data.Apellido || "",
                     Email: data.Email || "Sin email",
                     Telefono: data.Telefono || "Sin teléfono",
                     Tipo: data.Tipo || "Básica",
@@ -455,6 +461,7 @@
             filteredMembers = [...allMembers];
             mostrarMiembros();
             actualizarPaginacion();
+            document.getElementById('totalAccounts').textContent = cuentasTotales;
         } catch (err) {
             console.error("Error al cargar miembros:", err);
             alert("Error al cargar miembros. Verifica la consola para más detalles.");
@@ -480,7 +487,7 @@
                                 <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${member.Genero === 'Femenino' ? 'women' : 'men'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
                             </div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">${member.Nombre}</div>
+                                <div class="text-sm font-medium text-gray-900">${member.Nombre} ${member.Apellido}</div>
                                 <div class="text-sm text-gray-500">${member.Email}</div>
                             </div>
                         </div>
@@ -611,22 +618,184 @@
         }
     });
 
-    function editarMiembro(id) {
-        const member = allMembers.find(m => m.id === id);
-        if (!member) return;
-        console.log("Editar miembro:", member);
+    async function eliminarMiembro(id) {
+  if (confirm('¿Estás seguro de eliminar este miembro?')) {
+    try {
+      const { deleteDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+      await deleteDoc(doc(db, 'usuarios', id));
+      alert('Miembro eliminado correctamente');
+      cargarMiembrosModal();
+      cargarUsuarios();
+    } catch (err) {
+      
     }
+  }
+}
 
-    function eliminarMiembro(id) {
-        if (confirm('¿Estás seguro de eliminar este miembro?')) {
-            console.log("Eliminar miembro con ID:", id);
-            cargarMiembrosModal();
+async function editarMiembro(id) {
+  const member = allMembers.find(m => m.id === id);
+  if (!member) return;
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+  modal.innerHTML = `
+    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
+      <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeEditModal"><i class="fas fa-times"></i></button>
+      <h3 class="text-xl font-semibold mb-4">Editar Miembro</h3>
+      <form id="editMemberForm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+            <input type="text" name="nombre" value="${member.Nombre}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+            <input type="text" name="apellido" value="${member.Apellido}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+            <input type="email" name="email" value="${member.Email}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+            <input type="tel" name="telefono" value="${member.Telefono}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
+            <select name="tipo" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option${member.Tipo==='Básica'||member.Tipo==='Basica'?' selected':''}>Básica</option>
+              <option${member.Tipo==='Estándar'||member.Tipo==='Estandar'?' selected':''}>Estándar</option>
+              <option${member.Tipo==='Premium'?' selected':''}>Premium</option>
+              <option${member.Tipo==='VIP'?' selected':''}>VIP</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
+            <input type="date" name="suscripcionHasta" value="${member.SuscripcionHasta.toISOString().slice(0,10)}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+        <div class="mt-8 flex justify-end">
+          <button type="button" id="cancelEditMember" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancelar</button>
+          <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('closeEditModal').onclick = () => modal.remove();
+  document.getElementById('cancelEditMember').onclick = () => modal.remove();
+  document.getElementById('editMemberForm').onsubmit = async function(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const nombre = formData.get('nombre').trim();
+    const apellido = formData.get('apellido').trim();
+    const email = formData.get('email').trim();
+    const telefono = formData.get('telefono').trim();
+    const tipo = formData.get('tipo');
+    const suscripcionHasta = formData.get('suscripcionHasta');
+    try {
+      const { updateDoc, doc, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+      await updateDoc(doc(db, 'usuarios', id), {
+        Nombre: nombre,
+        Apellido: apellido,
+        Email: email,
+        Telefono: telefono,
+        Tipo: tipo,
+        SuscripcionHasta: Timestamp.fromDate(new Date(suscripcionHasta))
+      });
+      alert('Miembro actualizado correctamente');
+      modal.remove();
+      cargarMiembrosModal();
+      cargarUsuarios();
+    } catch (err) {
+      
+    }
+  };
+}
+
+// Mostrar modal de agregar miembro desde el botón en el modal de gestión de miembros
+document.querySelector('#membersModal button.bg-indigo-600').addEventListener('click', function() {
+    document.getElementById('addMemberModal').classList.remove('hidden');
+});
+
+function verMiembro(id) {
+  let member = null;
+  // Buscar en allMembers si está cargado, si no, buscar en Firestore
+  if (typeof allMembers !== 'undefined' && Array.isArray(allMembers)) {
+    member = allMembers.find(m => m.id === id);
+  }
+  if (!member) {
+    // Buscar en Firestore si no está en allMembers
+    getDocs(query(collection(db, "usuarios"))).then(snapshot => {
+      snapshot.forEach(doc => {
+        if (doc.id === id) {
+          const data = doc.data();
+          member = {
+            id: doc.id,
+            Nombre: data.Nombre || "Sin nombre",
+            Apellido: data.Apellido || "",
+            Email: data.Email || "Sin email",
+            Telefono: data.Telefono || "Sin teléfono",
+            Tipo: data.Tipo || "Básica",
+            SuscripcionHasta: data.SuscripcionHasta ? data.SuscripcionHasta.toDate() : new Date(),
+            Creado: data.Creado ? data.Creado.toDate() : new Date(),
+            Genero: data.Genero || "Masculino"
+          };
         }
-    }
-
-    document.querySelector('#membersModal button.bg-indigo-600').addEventListener('click', function() {
-        document.getElementById('addMemberModal').classList.remove('hidden');
+      });
+      if (member) mostrarModalVerMiembro(member);
     });
+  } else {
+    mostrarModalVerMiembro(member);
+  }
+}
+
+function mostrarModalVerMiembro(member) {
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+  modal.innerHTML = `
+    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
+      <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeViewModal"><i class="fas fa-times"></i></button>
+      <h3 class="text-xl font-semibold mb-4">Detalle del Miembro</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+          <div class="text-gray-900">${member.Nombre}</div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+          <div class="text-gray-900">${member.Apellido}</div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+          <div class="text-gray-900">${member.Email}</div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+          <div class="text-gray-900">${member.Telefono}</div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
+          <div class="text-gray-900">${member.Tipo}</div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio</label>
+          <div class="text-gray-900">${member.Creado ? new Date(member.Creado).toLocaleDateString('es-ES') : ''}</div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
+          <div class="text-gray-900">${member.SuscripcionHasta ? new Date(member.SuscripcionHasta).toLocaleDateString('es-ES') : ''}</div>
+        </div>
+      </div>
+      <div class="mt-8 flex justify-end">
+        <button type="button" id="closeViewMember" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cerrar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('closeViewModal').onclick = () => modal.remove();
+  document.getElementById('closeViewMember').onclick = () => modal.remove();
+}
+window.verMiembro = verMiembro;
 </script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -646,7 +815,7 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  let conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
+  let conteoTipos = { Basica: 0, Estándar: 0, Premium: 0, VIP: 0 };
 
   async function cargarUsuarios() {
     const totalActivos = document.getElementById('totalMembers');
@@ -665,6 +834,8 @@
     try {
       const q = query(collection(db, "usuarios"), orderBy("Creado", "desc"), limit(5));
       const snapshot = await getDocs(q);
+      const allSnapshot = await getDocs(collection(db, "usuarios"));
+      cuentasTotales = allSnapshot.size;
 
       miembrosTableBody.innerHTML = '';
       actividadReciente.innerHTML = '';
@@ -704,14 +875,13 @@
                   <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${data.Genero === 'Femenino' ? 'women' : 'men'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
                 </div>
                 <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">${data.Nombre}</div>
+                  <div class="text-sm font-medium text-gray-900">${data.Nombre} ${data.Apellido || ''}</div>
                   <div class="text-sm text-gray-500">${data.Email || 'Sin email'}</div>
                 </div>
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-900">${tipo}</div>
-              <div class="text-sm text-gray-500">${data.Duracion || '1 mes'}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
               ${fechaInicioStr}
@@ -725,9 +895,9 @@
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></a>
-              <a href="#" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></a>
-              <a href="#" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></a>
+              <button onclick="verMiembro('${doc.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3"><i class="fas fa-eye"></i></button>
+              <button onclick="editarMiembro('${doc.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></button>
+              <button onclick="eliminarMiembro('${doc.id}')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></button>
             </td>
           </tr>
         `;
@@ -739,7 +909,7 @@
             </div>
             <div>
               <p class="text-sm font-medium">Nuevo miembro registrado</p>
-              <p class="text-xs text-gray-500">${data.Nombre} ha adquirido la membresía ${tipo}</p>
+              <p class="text-xs text-gray-500">${data.Nombre} ${data.Apellido || ''} ha adquirido la membresía ${tipo}</p>
               <p class="text-xs text-gray-400 mt-1">${fechaInicio.toLocaleString('es-ES')}</p>
             </div>
           </div>
@@ -749,10 +919,12 @@
       totalActivos.textContent = activos;
       nuevosUsuarios.textContent = nuevos;
       expiringSoon.textContent = porVencer;
+      document.getElementById('totalAccounts').textContent = cuentasTotales;
       
       animateValue(document.getElementById('totalMembers'), 0, activos, 2000);
       animateValue(document.getElementById('activeMemberships'), 0, nuevos, 2000);
       animateValue(document.getElementById('expiringSoon'), 0, porVencer, 2000);
+      animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
 
       actualizarGraficoMembresias();
 
@@ -840,10 +1012,15 @@
   async function guardarNuevoMiembro() {
     const form = document.querySelector('#addMemberModal form');
     const nombre = form.querySelector('input[type="text"]:nth-of-type(1)')?.value.trim();
-    const apellido = form.querySelector('input[type="text"]:nth-of-type(2)')?.value.trim();
+    const apellido = form.querySelectorAll('input[type="text"]')[1]?.value.trim() || "";
     const email = form.querySelector('input[type="email"]')?.value.trim();
     const telefono = form.querySelector('input[type="tel"]')?.value.trim();
-    const tipo = form.querySelector('select')?.value.split(' ')[0];
+    const tipoSelect = form.querySelector('select')?.value;
+    let tipo = "Basica";
+    if (tipoSelect.includes('Básica')) tipo = "Basica";
+    else if (tipoSelect.includes('Estándar') || tipoSelect.includes('Estandar')) tipo = "Estandar";
+    else if (tipoSelect.includes('Premium')) tipo = "Premium";
+    else if (tipoSelect.includes('VIP')) tipo = "VIP";
     const fechaInicio = form.querySelector('input[type="date"]')?.value;
     const genero = "Masculino";
     if (!nombre || !email || !fechaInicio) {
@@ -852,13 +1029,13 @@
     }
     try {
       const fechaFin = new Date(fechaInicio);
-      if (tipo === 'Estándar') fechaFin.setMonth(fechaFin.getMonth() + 3);
+      if (tipo === 'Estandar') fechaFin.setMonth(fechaFin.getMonth() + 3);
       else if (tipo === 'Premium') fechaFin.setMonth(fechaFin.getMonth() + 6);
       else if (tipo === 'VIP') fechaFin.setMonth(fechaFin.getMonth() + 12);
       else fechaFin.setMonth(fechaFin.getMonth() + 1);
-      
       await addDoc(collection(db,"usuarios"), {
-        Nombre: nombre + ' ' + apellido,
+        Nombre: nombre,
+        Apellido: apellido,
         Email: email,
         Telefono: telefono,
         Tipo: tipo,
