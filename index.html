@@ -69,10 +69,7 @@
                             <i class="fas fa-chart-bar mr-3"></i>
                             <span>Reportes</span>
                         </a>
-                        <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                            <i class="fas fa-cog mr-3"></i>
-                            <span>Configuración</span>
-                        </a>
+                        <!-- Ícono de configuración eliminado del sidebar -->
                     </div>
                     <div class="mt-auto mb-4 px-4 py-3 bg-indigo-800 rounded-lg">
                         <div class="flex items-center justify-between">
@@ -157,8 +154,7 @@
                                 <span>Reportes</span>
                             </a>
                             <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                                <i class="fas fa-cog mr-3"></i>
-                                <span>Configuración</span>
+                                <!-- Ícono de configuración eliminado del sidebar móvil -->
                             </a>
                         </div>
                     </div>
@@ -416,11 +412,422 @@
 </div>
 
 <script>
+
+    // Funcionalidad para abrir el modal de Miembros
     document.querySelector('a[href="#"]:has(i.fa-users)').addEventListener('click', function(e) {
         e.preventDefault();
         document.getElementById('membersModal').classList.remove('hidden');
         cargarMiembrosModal();
     });
+
+    // Funcionalidad para abrir el modal de Membresías
+    document.querySelector('a[href="#"]:has(i.fa-id-card)').addEventListener('click', function(e) {
+        e.preventDefault();
+        mostrarModalMembresias();
+    });
+
+    // Modal específico para gestionar costos de membresías
+    function mostrarModalMembresias() {
+        // Puedes cargar estos valores desde una base de datos si lo deseas
+        let costos = {
+            Basica: 200,
+            Estandar: 500,
+            Premium: 900,
+            VIP: 1500
+        };
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
+                <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeMembresiasModal"><i class="fas fa-times"></i></button>
+                <h3 class="text-xl font-semibold mb-4">Gestión de Membresías</h3>
+                <form id="formCostosMembresias">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Costo Básica (1 mes)</label>
+                        <input type="number" min="0" step="1" name="Basica" value="${costos.Basica}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Costo Estándar (3 meses)</label>
+                        <input type="number" min="0" step="1" name="Estandar" value="${costos.Estandar}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Costo Premium (6 meses)</label>
+                        <input type="number" min="0" step="1" name="Premium" value="${costos.Premium}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Costo VIP (12 meses)</label>
+                        <input type="number" min="0" step="1" name="VIP" value="${costos.VIP}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    </div>
+                    <div class="flex justify-end gap-2">
+                        <button type="button" id="closeMembresiasModalBtn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancelar</button>
+                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById('closeMembresiasModal').onclick = () => modal.remove();
+        document.getElementById('closeMembresiasModalBtn').onclick = () => modal.remove();
+        document.getElementById('formCostosMembresias').onsubmit = function(e) {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            costos.Basica = parseInt(data.get('Basica'));
+            costos.Estandar = parseInt(data.get('Estandar'));
+            costos.Premium = parseInt(data.get('Premium'));
+            costos.VIP = parseInt(data.get('VIP'));
+            alert('Costos actualizados correctamente. (Solo local, implementar guardado en base de datos si es necesario)');
+            modal.remove();
+        };
+    }
+
+    // Funcionalidad para abrir el modal de Asistencias
+    document.querySelector('a[href="#"]:has(i.fa-calendar-check)').addEventListener('click', function(e) {
+        e.preventDefault();
+        mostrarModalAsistencias();
+    });
+
+    // Modal específico para mostrar asistencias en tiempo real
+    function mostrarModalAsistencias() {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-4xl relative">
+                <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeAsistenciasModal"><i class="fas fa-times"></i></button>
+                <h3 class="text-xl font-semibold mb-4">Asistencias en Tiempo Real</h3>
+                <div class="overflow-x-auto max-h-96">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UID</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora de Entrada</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora de Salida</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="asistenciasBody" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById('closeAsistenciasModal').onclick = () => modal.remove();
+
+        // Cargar datos en tiempo real desde Realtime Database y usuarios
+        cargarAsistenciasRealtimeRTDB(document.getElementById('asistenciasBody'));
+    }
+
+    // Función para escuchar en tiempo real la colección "lecturas" de Realtime Database
+    async function cargarAsistenciasRealtimeRTDB(tbody) {
+        try {
+            // 1. Obtener el mapeo UID → Nombre
+            let uidToName = {};
+            try {
+                const { getDocs, collection } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+                const usuariosSnap = await getDocs(collection(db, 'usuarios'));
+                usuariosSnap.forEach(doc => {
+                    const d = doc.data();
+                    const nombreCompleto = d.Nombre ? d.Nombre + (d.Apellido ? ' ' + d.Apellido : '') : doc.id;
+                    // Mapear por doc.id
+                    uidToName[doc.id] = nombreCompleto;
+                    // Mapear por campo uid si existe
+                    if (d.uid) {
+                        uidToName[d.uid] = nombreCompleto;
+                    }
+                });
+            } catch (e) {
+                // Si falla, solo muestra UID
+            }
+
+            // 2. Escuchar lecturas en tiempo real
+            const { getDatabase, ref, onValue } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+            const dbRTDB = getDatabase();
+            const lecturasRef = ref(dbRTDB, 'lecturas');
+            onValue(lecturasRef, (snapshot) => {
+                tbody.innerHTML = '';
+                const data = snapshot.val();
+                if (!data) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">Sin registros</td></tr>';
+                    return;
+                }
+                // Agrupar por UID
+                const registros = Object.values(data);
+                const porUid = {};
+                registros.forEach(reg => {
+                    const uid = reg.uid || reg.id;
+                    if (!uid) return;
+                    if (!porUid[uid]) porUid[uid] = [];
+                    porUid[uid].push(reg);
+                });
+                // Para cada UID, buscar última entrada y última salida
+                Object.entries(porUid).forEach(([uid, lista]) => {
+                    // Ordenar por timestamp ascendente (más antiguo primero)
+                    lista.sort((a, b) => {
+                        const tA = extraerTimestamp(a.horaEntrada || a.hora || a.horaSalida || a.timestamp);
+                        const tB = extraerTimestamp(b.horaEntrada || b.hora || b.horaSalida || b.timestamp);
+                        return tA - tB;
+                    });
+                    let horaEntrada = '-';
+                    let horaSalida = '-';
+                    let dentro = '-';
+                    if (lista.length === 1) {
+                        // Solo un registro: mostrar como entrada, sin salida
+                        const reg = lista[0];
+                        horaEntrada = formatearFecha(reg.horaEntrada || reg.hora || reg.timestamp);
+                        horaSalida = '-';
+                        dentro = 'Sí';
+                    } else if (lista.length > 1) {
+                        // Más de un registro: el más antiguo es entrada, el más reciente es salida
+                        const regEntrada = lista[0];
+                        const regSalida = lista[lista.length - 1];
+                        horaEntrada = formatearFecha(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp);
+                        horaSalida = formatearFecha(regSalida.horaSalida || regSalida.hora || regSalida.timestamp);
+                        // Si la hora de salida es mayor o igual a la de entrada, está fuera
+                        dentro = extraerTimestamp(regSalida.horaSalida || regSalida.hora || regSalida.timestamp) > extraerTimestamp(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp) ? 'No' : 'Sí';
+                    }
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="px-4 py-4 whitespace-nowrap">${uid}</td>
+                            <td class="px-4 py-4 whitespace-nowrap">${horaEntrada}</td>
+                            <td class="px-4 py-4 whitespace-nowrap">${horaSalida}</td>
+                            <td class="px-4 py-4 whitespace-nowrap">${dentro}</td>
+                        </tr>
+                    `;
+                });
+            }, (err) => {
+                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-400">Error al cargar asistencias</td></tr>';
+            });
+        } catch (err) {
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-400">Error al cargar asistencias</td></tr>';
+        }
+    }
+
+    // Función auxiliar para extraer el timestamp en milisegundos
+    function extraerTimestamp(hora) {
+        if (!hora) return 0;
+        if (typeof hora === 'number') return hora;
+        if (typeof hora === 'string') {
+            // Soporte para formato personalizado 'YYYY-M-D_HH:mm:ss'
+            if (/^\d{4}-\d{1,2}-\d{1,2}_\d{2}:\d{2}:\d{2}$/.test(hora)) {
+                const [fecha, tiempo] = hora.split('_');
+                const [anio, mes, dia] = fecha.split('-').map(Number);
+                const [h, m, s] = tiempo.split(':').map(Number);
+                // Mes en JS es 0-indexado
+                return new Date(anio, mes - 1, dia, h, m, s).getTime();
+            }
+            if (!isNaN(Date.parse(hora))) return Date.parse(hora);
+        }
+        if (typeof hora === 'object' && hora.seconds) return hora.seconds * 1000;
+        return 0;
+    }
+
+    // Función auxiliar para formatear la fecha
+    function formatearFecha(hora) {
+        if (!hora) return '-';
+        let fecha = null;
+        if (typeof hora === 'number') {
+            fecha = new Date(hora);
+        } else if (typeof hora === 'string') {
+            // Soporte para formato personalizado 'YYYY-M-D_HH:mm:ss'
+            if (/^\d{4}-\d{1,2}-\d{1,2}_\d{2}:\d{2}:\d{2}$/.test(hora)) {
+                const [f, t] = hora.split('_');
+                const [anio, mes, dia] = f.split('-').map(Number);
+                const [h, m, s] = t.split(':').map(Number);
+                fecha = new Date(anio, mes - 1, dia, h, m, s);
+            } else if (!isNaN(Date.parse(hora))) {
+                fecha = new Date(hora);
+            }
+        } else if (typeof hora === 'object' && hora.seconds) {
+            fecha = new Date(hora.seconds * 1000);
+        }
+        return fecha ? fecha.toLocaleString('es-ES') : '-';
+    }
+
+    // Funcionalidad para abrir el modal de Reportes
+    document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('click', function(e) {
+        e.preventDefault();
+        mostrarModalGenerico('Reportes', 'Aquí puedes ver y generar reportes.');
+    });
+
+
+    // Función genérica para mostrar modales simples
+    function mostrarModalGenerico(titulo, contenido) {
+        // Si es la sección de reportes, mostrar UI especial
+        if (titulo === 'Reportes') {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-3xl relative">
+                    <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeGenericModal"><i class="fas fa-times"></i></button>
+                    <h3 class="text-xl font-semibold mb-4">Reportes del Gimnasio</h3>
+                    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 rounded-lg p-4 shadow">
+                            <h4 class="font-semibold mb-2 text-indigo-700"><i class="fas fa-users mr-2"></i>Reporte General de Usuarios</h4>
+                            <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 w-full" onclick="generarReporteUsuarios()">Descargar Excel</button>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4 shadow">
+                            <h4 class="font-semibold mb-2 text-green-700"><i class="fas fa-calendar-check mr-2"></i>Reporte de Asistencias</h4>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full" onclick="generarReporteAsistencias()">Descargar Excel</button>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4 shadow">
+                            <h4 class="font-semibold mb-2 text-yellow-700"><i class="fas fa-id-card mr-2"></i>Reporte de Membresías</h4>
+                            <button class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 w-full" onclick="generarReporteMembresias()">Descargar Excel</button>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4 shadow">
+                            <h4 class="font-semibold mb-2 text-purple-700"><i class="fas fa-wallet mr-2"></i>Reporte de Ingresos</h4>
+                            <button class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 w-full" onclick="generarReporteIngresos()">Descargar Excel</button>
+                        </div>
+                    </div>
+                    <!-- Formatos específicos eliminados -->
+                    <div class="flex justify-end">
+                        <button type="button" id="closeGenericModalBtn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cerrar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('closeGenericModal').onclick = () => modal.remove();
+            document.getElementById('closeGenericModalBtn').onclick = () => modal.remove();
+        } else {
+            // Modal genérico por defecto
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
+                    <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeGenericModal"><i class="fas fa-times"></i></button>
+                    <h3 class="text-xl font-semibold mb-4">${titulo}</h3>
+                    <div class="mb-8 text-gray-700">${contenido}</div>
+                    <div class="flex justify-end">
+                        <button type="button" id="closeGenericModalBtn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cerrar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('closeGenericModal').onclick = () => modal.remove();
+            document.getElementById('closeGenericModalBtn').onclick = () => modal.remove();
+        }
+    }
+// Cargar SheetJS para exportar a Excel
+let sheetjsLoaded = false;
+async function loadSheetJS() {
+    if (!sheetjsLoaded) {
+        await import('https://cdn.sheetjs.com/xlsx-latest/package/xlsx.mjs');
+        sheetjsLoaded = true;
+    }
+}
+
+// Reporte General de Usuarios
+async function generarReporteUsuarios() {
+    await loadSheetJS();
+    const { getDocs, collection } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const usuariosSnap = await getDocs(collection(db, 'usuarios'));
+    const rows = [];
+    usuariosSnap.forEach(doc => {
+        const d = doc.data();
+        let fechaCreacion = '-';
+        if (d.Creado) {
+            if (typeof d.Creado.toDate === 'function') {
+                fechaCreacion = d.Creado.toDate().toLocaleDateString('es-ES');
+            } else if (typeof d.Creado === 'string' || typeof d.Creado === 'number') {
+                fechaCreacion = new Date(d.Creado).toLocaleDateString('es-ES');
+            }
+        }
+        rows.push({
+            UID: d.uid || doc.id,
+            Nombre: d.Nombre || '',
+            Apellido: d.Apellido || '',
+            Email: d.Email || '',
+            Teléfono: d.Telefono || '',
+            Tipo: d.Tipo || '',
+            'Fecha de Creación': fechaCreacion,
+            'Fecha Fin': d.SuscripcionHasta ? (d.SuscripcionHasta.toDate ? d.SuscripcionHasta.toDate().toLocaleDateString('es-ES') : '-') : '-',
+            Estado: d.Estado || '-',
+        });
+    });
+    if (rows.length === 0) return alert('No hay usuarios para exportar.');
+    exportarExcel(rows, 'Usuarios.xlsx');
+}
+
+// Reporte de Asistencias
+async function generarReporteAsistencias() {
+    await loadSheetJS();
+    const { getDatabase, ref, get } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+    const dbRTDB = getDatabase();
+    const lecturasRef = ref(dbRTDB, 'lecturas');
+    const snap = await get(lecturasRef);
+    const data = snap.val();
+    if (!data) return alert('No hay asistencias para exportar.');
+    const rows = Object.values(data).map(reg => ({
+        UID: reg.uid || reg.id || '-',
+        Nombre: reg.nombre || '-',
+        'Hora': reg.horaEntrada || reg.hora || reg.timestamp || '-',
+    }));
+    exportarExcel(rows, 'Asistencias.xlsx');
+}
+
+// Reporte de Membresías
+async function generarReporteMembresias() {
+    await loadSheetJS();
+    const { getDocs, collection } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const usuariosSnap = await getDocs(collection(db, 'usuarios'));
+    const rows = [];
+    usuariosSnap.forEach(doc => {
+        const d = doc.data();
+        let fechaCreacion = '-';
+        if (d.Creado) {
+            if (typeof d.Creado.toDate === 'function') {
+                fechaCreacion = d.Creado.toDate().toLocaleDateString('es-ES');
+            } else if (typeof d.Creado === 'string' || typeof d.Creado === 'number') {
+                fechaCreacion = new Date(d.Creado).toLocaleDateString('es-ES');
+            }
+        }
+        rows.push({
+            UID: d.uid || doc.id,
+            Nombre: d.Nombre || '',
+            Apellido: d.Apellido || '',
+            Tipo: d.Tipo || '',
+            'Fecha de Creación': fechaCreacion,
+            'Fecha Fin': d.SuscripcionHasta ? (d.SuscripcionHasta.toDate ? d.SuscripcionHasta.toDate().toLocaleDateString('es-ES') : '-') : '-',
+            Estado: d.Estado || '-',
+        });
+    });
+    if (rows.length === 0) return alert('No hay membresías para exportar.');
+    exportarExcel(rows, 'Membresias.xlsx');
+}
+
+// Reporte de Ingresos (requiere campo de pagos o ingresos en la BD)
+async function generarReporteIngresos() {
+    await loadSheetJS();
+    const { getDocs, collection } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    try {
+        const pagosSnap = await getDocs(collection(db, 'pagos'));
+        const rows = [];
+        pagosSnap.forEach(doc => {
+            const d = doc.data();
+            rows.push({
+                UID: d.uid || '-',
+                Nombre: d.Nombre || '-',
+                Monto: d.Monto || d.monto || '-',
+                Fecha: d.Fecha ? (d.Fecha.toDate ? d.Fecha.toDate().toLocaleDateString('es-ES') : d.Fecha) : '-',
+                Concepto: d.Concepto || '-',
+            });
+        });
+        if (rows.length === 0) return alert('No hay ingresos registrados en la colección "pagos". Si no existe, crea la colección o avísame para ajustar el reporte.');
+        exportarExcel(rows, 'Ingresos.xlsx');
+    } catch (e) {
+        alert('No se encontró la colección "pagos" en la base de datos. Por favor, crea la colección o avísame para ajustar el reporte.');
+    }
+}
+
+
+async function exportarExcel(rows, nombreArchivo) {
+   
+    const XLSX = await import('https://cdn.sheetjs.com/xlsx-latest/package/xlsx.mjs');
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
+    XLSX.writeFile(wb, nombreArchivo);
+}
 
     document.getElementById('closeMembersModal').addEventListener('click', function() {
         document.getElementById('membersModal').classList.add('hidden');
