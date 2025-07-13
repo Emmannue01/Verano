@@ -137,25 +137,23 @@
                                 <i class="fas fa-tachometer-alt mr-3"></i>
                                 <span>Dashboard</span>
                             </div>
-                            <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                            <a href="#" id="mobileMiembros" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
                                 <i class="fas fa-users mr-3"></i>
                                 <span>Miembros</span>
                             </a>
-                            <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                            <a href="#" id="mobileMembresias" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
                                 <i class="fas fa-id-card mr-3"></i>
                                 <span>Membresías</span>
                             </a>
-                            <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                            <a href="#" id="mobileAsistencia" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
                                 <i class="fas fa-calendar-check mr-3"></i>
                                 <span>Asistencia</span>
                             </a>
-                            <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
+                            <a href="#" id="mobileReportes" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
                                 <i class="fas fa-chart-bar mr-3"></i>
                                 <span>Reportes</span>
                             </a>
-                            <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                                <!-- Ícono de configuración eliminado del sidebar móvil -->
-                            </a>
+                            <!-- Ícono de configuración eliminado del sidebar móvil -->
                         </div>
                     </div>
                 </div>
@@ -576,7 +574,7 @@
                         const reg = lista[0];
                         horaEntrada = formatearFecha(reg.horaEntrada || reg.hora || reg.timestamp);
                         horaSalida = '-';
-                        dentro = 'Sí';
+                        dentro = 'Entrenando';
                     } else if (lista.length > 1) {
                         // Más de un registro: el más antiguo es entrada, el más reciente es salida
                         const regEntrada = lista[0];
@@ -584,7 +582,7 @@
                         horaEntrada = formatearFecha(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp);
                         horaSalida = formatearFecha(regSalida.horaSalida || regSalida.hora || regSalida.timestamp);
                         // Si la hora de salida es mayor o igual a la de entrada, está fuera
-                        dentro = extraerTimestamp(regSalida.horaSalida || regSalida.hora || regSalida.timestamp) > extraerTimestamp(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp) ? 'No' : 'Sí';
+                        dentro = extraerTimestamp(regSalida.horaSalida || regSalida.hora || regSalida.timestamp) > extraerTimestamp(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp) ? 'BREAK' : 'Entrenando';
                     }
                     tbody.innerHTML += `
                         <tr>
