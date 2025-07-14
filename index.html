@@ -558,7 +558,7 @@
                     if (!porUid[uid]) porUid[uid] = [];
                     porUid[uid].push(reg);
                 });
-                // Para cada UID, buscar última entrada y última salida
+                // Para cada UID, procesar de dos en dos desde la lectura más antigua
                 Object.entries(porUid).forEach(([uid, lista]) => {
                     // Ordenar por timestamp ascendente (más antiguo primero)
                     lista.sort((a, b) => {
@@ -566,32 +566,31 @@
                         const tB = extraerTimestamp(b.horaEntrada || b.hora || b.horaSalida || b.timestamp);
                         return tA - tB;
                     });
-                    let horaEntrada = '-';
-                    let horaSalida = '-';
-                    let dentro = '-';
-                    if (lista.length === 1) {
-                        // Solo un registro: mostrar como entrada, sin salida
-                        const reg = lista[0];
-                        horaEntrada = formatearFecha(reg.horaEntrada || reg.hora || reg.timestamp);
-                        horaSalida = '-';
-                        dentro = 'Entrenando';
-                    } else if (lista.length > 1) {
-                        // Más de un registro: el más antiguo es entrada, el más reciente es salida
-                        const regEntrada = lista[0];
-                        const regSalida = lista[lista.length - 1];
-                        horaEntrada = formatearFecha(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp);
-                        horaSalida = formatearFecha(regSalida.horaSalida || regSalida.hora || regSalida.timestamp);
-                        // Si la hora de salida es mayor o igual a la de entrada, está fuera
-                        dentro = extraerTimestamp(regSalida.horaSalida || regSalida.hora || regSalida.timestamp) > extraerTimestamp(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp) ? 'BREAK' : 'Entrenando';
+                    for (let i = 0; i < lista.length; i += 2) {
+                        let horaEntrada = '-';
+                        let horaSalida = '-';
+                        let dentro = '-';
+                        const regEntrada = lista[i];
+                        horaEntrada = formatearFecha24(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp);
+                        if (i + 1 < lista.length) {
+                            // Hay salida
+                            const regSalida = lista[i + 1];
+                            horaSalida = formatearFecha24(regSalida.horaSalida || regSalida.hora || regSalida.timestamp);
+                            dentro = extraerTimestamp(regSalida.horaSalida || regSalida.hora || regSalida.timestamp) > extraerTimestamp(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp) ? 'BREAK' : 'Entrenando';
+                        } else {
+                            // Último registro impar: entrenando
+                            horaSalida = '-';
+                            dentro = 'Entrenando';
+                        }
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="px-4 py-4 whitespace-nowrap">${uid}</td>
+                                <td class="px-4 py-4 whitespace-nowrap">${horaEntrada}</td>
+                                <td class="px-4 py-4 whitespace-nowrap">${horaSalida}</td>
+                                <td class="px-4 py-4 whitespace-nowrap">${dentro}</td>
+                            </tr>
+                        `;
                     }
-                    tbody.innerHTML += `
-                        <tr>
-                            <td class="px-4 py-4 whitespace-nowrap">${uid}</td>
-                            <td class="px-4 py-4 whitespace-nowrap">${horaEntrada}</td>
-                            <td class="px-4 py-4 whitespace-nowrap">${horaSalida}</td>
-                            <td class="px-4 py-4 whitespace-nowrap">${dentro}</td>
-                        </tr>
-                    `;
                 });
             }, (err) => {
                 tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-400">Error al cargar asistencias</td></tr>';
@@ -620,8 +619,8 @@
         return 0;
     }
 
-    // Función auxiliar para formatear la fecha
-    function formatearFecha(hora) {
+    // Función auxiliar para formatear la fecha en formato 24 horas
+    function formatearFecha24(hora) {
         if (!hora) return '-';
         let fecha = null;
         if (typeof hora === 'number') {
@@ -639,7 +638,15 @@
         } else if (typeof hora === 'object' && hora.seconds) {
             fecha = new Date(hora.seconds * 1000);
         }
-        return fecha ? fecha.toLocaleString('es-ES') : '-';
+        if (!fecha) return '-';
+        // Formato 24 horas: dd/mm/yyyy HH:mm:ss
+        const dia = fecha.getDate().toString().padStart(2, '0');
+        const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+        const anio = fecha.getFullYear();
+        const horas = fecha.getHours().toString().padStart(2, '0');
+        const minutos = fecha.getMinutes().toString().padStart(2, '0');
+        const segundos = fecha.getSeconds().toString().padStart(2, '0');
+        return `${dia}/${mes}/${anio} ${horas}:${minutos}:${segundos}`;
     }
 
     // Funcionalidad para abrir el modal de Reportes
