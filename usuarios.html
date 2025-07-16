@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyGym - Portal de Clientes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .animate-pulse-slow {
+            animation: pulse 3s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="bg-indigo-900 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-dumbbell text-2xl text-yellow-400"></i>
+                <h1 class="text-2xl font-bold">My<span class="text-yellow-400">Gym</span></h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="notificationsBtn" class="relative text-white hover:text-yellow-400 transition">
+                    <i class="fas fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                </button>
+                <div class="relative group">
+                    <button id="profileBtn" class="flex items-center space-x-2 focus:outline-none">
+                        <div class="h-10 w-10 rounded-full bg-indigo-700 flex items-center justify-center text-white font-semibold">JD</div>
+                        <span class="hidden md:inline">John Doe</span>
+                        <i class="fas fa-chevron-down text-xs hidden md:inline"></i>
+                    </button>
+                    <div id="profileDropdown" class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Mi perfil</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Configuración</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Cerrar sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-6">
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg p-6 mb-6 text-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">¡Bienvenido de nuevo, John!</h2>
+                    <p class="mb-4">Tu membresía está activa hasta el 15/12/2023</p>
+                    <div class="flex space-x-2">
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Entrenador: Carlos</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Plan: Premium</span>
+                    </div>
+                </div>
+                <button class="mt-4 md:mt-0 bg-yellow-400 hover:bg-yellow-500 text-indigo-900 font-semibold px-6 py-2 rounded-lg transition flex items-center">
+                    <i class="fas fa-calendar-plus mr-2"></i> Reservar clase
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <!-- Progress Card -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold text-lg">Tu progreso</h3>
+                    <span class="text-sm text-gray-500">Esta semana</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="relative w-32 h-32 mb-4">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" />
+                            <circle class="text-yellow-400 progress-ring__circle" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" 
+                                    stroke-dasharray="251.2" stroke-dashoffset="calc(251.2 - (251.2 * 75) / 100)" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <span class="text-2xl font-bold">75%</span>
+                        </div>
+                    </div>
+                    <div class="w-full">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>Objetivo: 5 días</span>
+                            <span>3/5</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-indigo-600 h-2 rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Class Card -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold text-lg">Próxima clase</h3>
+                    <span class="text-sm text-gray-500">Hoy</span>
+                </div>
+                <div class="bg-indigo-50 rounded-lg p-4 mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-indigo-100 p-3 rounded-full">
+                            <i class="fas fa-heartbeat text-indigo-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium">HIIT Intenso</h4>
+                            <p class="text-sm text-gray-600">17:30 - 18:30</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <div class="flex -space-x-2">
+                        <img class="w-8 h-8 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/32.jpg" alt="">
+                        <img class="w-8 h-8 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/75.jpg" alt="">
+                        <img class="w-8 h-8 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/63.jpg" alt="">
+                        <div class="w-8 h-8 rounded-full border-2 border-white bg-indigo-100 flex items-center justify-center text-xs font-medium">+5</div>
+                    </div>
+                    <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center">
+                        Ver detalles <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Metrics Card -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold text-lg">Tus métricas</h3>
+                    <span class="text-sm text-gray-500">Último mes</span>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-600">Peso</span>
+                            <span class="font-medium">-2.5kg</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 80%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-600">Grasa corporal</span>
+                            <span class="font-medium">-3.1%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-600">Músculo</span>
+                            <span class="font-medium">+1.8kg</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-500 h-2 rounded-full" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="mt-4 w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-medium py-2 px-4 rounded-lg transition flex items-center justify-center">
+                    <i class="fas fa-chart-line mr-2"></i> Ver estadísticas completas
+                </button>
+            </div>
+        </div>
+
+        <!-- Personal Trainer Section -->
+        <div class="bg-gradient-to-r from-indigo-800 to-purple-700 rounded-xl shadow-lg p-6 mb-6 text-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-xl font-bold mb-2">¿Necesitas un entrenador personal?</h2>
+                    <p class="mb-4">Obtén un plan personalizado y alcanza tus objetivos más rápido</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex -space-x-2">
+                            <img class="w-10 h-10 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+                            <img class="w-10 h-10 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/44.jpg" alt="">
+                            <img class="w-10 h-10 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/75.jpg" alt="">
+                        </div>
+                        <span class="text-sm">+5 entrenadores disponibles</span>
+                    </div>
+                </div>
+                <button class="bg-white hover:bg-gray-100 text-indigo-800 font-semibold px-6 py-3 rounded-lg transition flex items-center animate-pulse-slow">
+                    <i class="fas fa-dumbbell mr-2"></i> Reservar ahora
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
+        <div class="flex justify-around">
+            <a href="#" class="flex flex-col items-center py-3 px-4 text-indigo-600">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs mt-1">Inicio</span>
+            </a>
+            <a href="#" class="flex flex-col items-center py-3 px-4 text-gray-500">
+                <i class="fas fa-calendar-alt text-xl"></i>
+                <span class="text-xs mt-1">Clases</span>
+            </a>
+            <a href="#" class="flex flex-col items-center py-3 px-4 text-gray-500">
+                <i class="fas fa-chart-line text-xl"></i>
+                <span class="text-xs mt-1">Progreso</span>
+            </a>
+            <a href="#" class="flex flex-col items-center py-3 px-4 text-gray-500">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs mt-1">Perfil</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // Toggle profile dropdown
+        document.getElementById('profileBtn').addEventListener('click', function() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileBtn = document.getElementById('profileBtn');
+            const dropdown = document.getElementById('profileDropdown');
+            
+            if (!profileBtn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Simulate notification click
+        document.getElementById('notificationsBtn').addEventListener('click', function() {
+            alert('Tienes 3 notificaciones nuevas');
+        });
+
+        // Sample class booking functionality
+        const bookButtons = document.querySelectorAll('button:contains("Reservar")');
+        bookButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const className = this.closest('.border').querySelector('h3').textContent;
+                alert(`Has reservado la clase: ${className}`);
+            });
+        });
+    </script>
+</body>
+</html>

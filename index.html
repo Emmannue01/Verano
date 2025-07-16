@@ -351,6 +351,20 @@
         <div class="mt-4">
             <form>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Campo UID manual -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">UID (manual)</label>
+                        <input type="text" id="nuevoMiembroUID" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="UID único">
+                    </div>
+                    <!-- Campo Género -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+                        <select id="nuevoMiembroGenero" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">254 tipos de gays</option>
+                        </select>
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
                         <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -426,56 +440,78 @@
 
     // Modal específico para gestionar costos de membresías
     function mostrarModalMembresias() {
-        // Puedes cargar estos valores desde una base de datos si lo deseas
         let costos = {
             Basica: 200,
             Estandar: 500,
             Premium: 900,
             VIP: 1500
         };
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
-        modal.innerHTML = `
-            <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
-                <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeMembresiasModal"><i class="fas fa-times"></i></button>
-                <h3 class="text-xl font-semibold mb-4">Gestión de Membresías</h3>
-                <form id="formCostosMembresias">
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Costo Básica (1 mes)</label>
-                        <input type="number" min="0" step="1" name="Basica" value="${costos.Basica}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Costo Estándar (3 meses)</label>
-                        <input type="number" min="0" step="1" name="Estandar" value="${costos.Estandar}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Costo Premium (6 meses)</label>
-                        <input type="number" min="0" step="1" name="Premium" value="${costos.Premium}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Costo VIP (12 meses)</label>
-                        <input type="number" min="0" step="1" name="VIP" value="${costos.VIP}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                    </div>
-                    <div class="flex justify-end gap-2">
-                        <button type="button" id="closeMembresiasModalBtn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancelar</button>
-                        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Guardar Cambios</button>
-                    </div>
-                </form>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        document.getElementById('closeMembresiasModal').onclick = () => modal.remove();
-        document.getElementById('closeMembresiasModalBtn').onclick = () => modal.remove();
-        document.getElementById('formCostosMembresias').onsubmit = function(e) {
-            e.preventDefault();
-            const data = new FormData(e.target);
-            costos.Basica = parseInt(data.get('Basica'));
-            costos.Estandar = parseInt(data.get('Estandar'));
-            costos.Premium = parseInt(data.get('Premium'));
-            costos.VIP = parseInt(data.get('VIP'));
-            alert('Costos actualizados correctamente. (Solo local, implementar guardado en base de datos si es necesario)');
-            modal.remove();
-        };
+        // Cargar los costos actuales desde Firestore
+        import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(async ({ getDocs, collection }) => {
+            const snap = await getDocs(collection(db, 'subscripciones'));
+            snap.forEach(doc => {
+                const d = doc.data();
+                if (d.nombre && d.costo) {
+                    if (d.nombre === 'Basica') costos.Basica = d.costo;
+                    if (d.nombre === 'Estandar') costos.Estandar = d.costo;
+                    if (d.nombre === 'Premium') costos.Premium = d.costo;
+                    if (d.nombre === 'VIP') costos.VIP = d.costo;
+                }
+            });
+            renderModal();
+        });
+
+        function renderModal() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
+                    <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeMembresiasModal"><i class="fas fa-times"></i></button>
+                    <h3 class="text-xl font-semibold mb-4">Gestión de Membresías</h3>
+                    <form id="formCostosMembresias">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo Básica (1 mes)</label>
+                            <input type="number" min="0" step="1" name="Basica" value="${costos.Basica}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo Estándar (3 meses)</label>
+                            <input type="number" min="0" step="1" name="Estandar" value="${costos.Estandar}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo Premium (6 meses)</label>
+                            <input type="number" min="0" step="1" name="Premium" value="${costos.Premium}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo VIP (12 meses)</label>
+                            <input type="number" min="0" step="1" name="VIP" value="${costos.VIP}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                        </div>
+                        <div class="flex justify-end gap-2">
+                            <button type="button" id="closeMembresiasModalBtn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancelar</button>
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('closeMembresiasModal').onclick = () => modal.remove();
+            document.getElementById('closeMembresiasModalBtn').onclick = () => modal.remove();
+            document.getElementById('formCostosMembresias').onsubmit = async function(e) {
+                e.preventDefault();
+                const data = new FormData(e.target);
+                const subs = [
+                    { nombre: 'Basica', costo: parseInt(data.get('Basica')) },
+                    { nombre: 'Estandar', costo: parseInt(data.get('Estandar')) },
+                    { nombre: 'Premium', costo: parseInt(data.get('Premium')) },
+                    { nombre: 'VIP', costo: parseInt(data.get('VIP')) }
+                ];
+                const { setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+                for (const sub of subs) {
+                    await setDoc(doc(db, 'subscripciones', sub.nombre), { nombre: sub.nombre, costo: sub.costo });
+                }
+                alert('Costos actualizados correctamente y guardados en la base de datos.');
+                modal.remove();
+            };
+        }
     }
 
     // Funcionalidad para abrir el modal de Asistencias
@@ -497,13 +533,14 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UID</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora de Entrada</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora de Salida</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                             </tr>
                         </thead>
                         <tbody id="asistenciasBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">Cargando...</td></tr>
+                            <tr><td colspan="5" class="px-6 py-4 text-center text-gray-400">Cargando...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -516,89 +553,87 @@
         cargarAsistenciasRealtimeRTDB(document.getElementById('asistenciasBody'));
     }
 
-    // Función para escuchar en tiempo real la colección "lecturas" de Realtime Database
     async function cargarAsistenciasRealtimeRTDB(tbody) {
+    try {
+        // 1. Obtener el mapeo UID → Nombre
+        let uidToName = {};
         try {
-            // 1. Obtener el mapeo UID → Nombre
-            let uidToName = {};
-            try {
-                const { getDocs, collection } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-                const usuariosSnap = await getDocs(collection(db, 'usuarios'));
-                usuariosSnap.forEach(doc => {
-                    const d = doc.data();
-                    const nombreCompleto = d.Nombre ? d.Nombre + (d.Apellido ? ' ' + d.Apellido : '') : doc.id;
-                    // Mapear por doc.id
-                    uidToName[doc.id] = nombreCompleto;
-                    // Mapear por campo uid si existe
-                    if (d.uid) {
-                        uidToName[d.uid] = nombreCompleto;
-                    }
-                });
-            } catch (e) {
-                // Si falla, solo muestra UID
-            }
-
-            // 2. Escuchar lecturas en tiempo real
-            const { getDatabase, ref, onValue } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
-            const dbRTDB = getDatabase();
-            const lecturasRef = ref(dbRTDB, 'lecturas');
-            onValue(lecturasRef, (snapshot) => {
-                tbody.innerHTML = '';
-                const data = snapshot.val();
-                if (!data) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">Sin registros</td></tr>';
-                    return;
+            const { getDocs, collection } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+            const usuariosSnap = await getDocs(collection(db, 'usuarios'));
+            usuariosSnap.forEach(doc => {
+                const d = doc.data();
+                const nombreCompleto = (d.Nombre ? d.Nombre : '') + (d.Apellido ? ' ' + d.Apellido : '');
+                uidToName[doc.id] = nombreCompleto.trim() || doc.id;
+                if (d.uid) {
+                    uidToName[d.uid] = nombreCompleto.trim() || d.uid;
                 }
-                // Agrupar por UID
-                const registros = Object.values(data);
-                const porUid = {};
-                registros.forEach(reg => {
-                    const uid = reg.uid || reg.id;
-                    if (!uid) return;
-                    if (!porUid[uid]) porUid[uid] = [];
-                    porUid[uid].push(reg);
-                });
-                // Para cada UID, procesar de dos en dos desde la lectura más antigua
-                Object.entries(porUid).forEach(([uid, lista]) => {
-                    // Ordenar por timestamp ascendente (más antiguo primero)
-                    lista.sort((a, b) => {
-                        const tA = extraerTimestamp(a.horaEntrada || a.hora || a.horaSalida || a.timestamp);
-                        const tB = extraerTimestamp(b.horaEntrada || b.hora || b.horaSalida || b.timestamp);
-                        return tA - tB;
-                    });
-                    for (let i = 0; i < lista.length; i += 2) {
-                        let horaEntrada = '-';
-                        let horaSalida = '-';
-                        let dentro = '-';
-                        const regEntrada = lista[i];
-                        horaEntrada = formatearFecha24(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp);
-                        if (i + 1 < lista.length) {
-                            // Hay salida
-                            const regSalida = lista[i + 1];
-                            horaSalida = formatearFecha24(regSalida.horaSalida || regSalida.hora || regSalida.timestamp);
-                            dentro = extraerTimestamp(regSalida.horaSalida || regSalida.hora || regSalida.timestamp) > extraerTimestamp(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp) ? 'BREAK' : 'Entrenando';
-                        } else {
-                            // Último registro impar: entrenando
-                            horaSalida = '-';
-                            dentro = 'Entrenando';
-                        }
-                        tbody.innerHTML += `
-                            <tr>
-                                <td class="px-4 py-4 whitespace-nowrap">${uid}</td>
-                                <td class="px-4 py-4 whitespace-nowrap">${horaEntrada}</td>
-                                <td class="px-4 py-4 whitespace-nowrap">${horaSalida}</td>
-                                <td class="px-4 py-4 whitespace-nowrap">${dentro}</td>
-                            </tr>
-                        `;
-                    }
-                });
-            }, (err) => {
-                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-400">Error al cargar asistencias</td></tr>';
             });
-        } catch (err) {
-            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-400">Error al cargar asistencias</td></tr>';
-        }
+        } catch (e) {}
+
+        // 2. Escuchar lecturas en tiempo real
+        const { getDatabase, ref, onValue } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+        const dbRTDB = getDatabase();
+        const lecturasRef = ref(dbRTDB, 'lecturas');
+        onValue(lecturasRef, (snapshot) => {
+            tbody.innerHTML = '';
+            const data = snapshot.val();
+            if (!data) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-400">Sin registros</td></tr>';
+                return;
+            }
+            // Agrupar por UID
+            const registros = Object.values(data);
+            const porUid = {};
+            registros.forEach(reg => {
+                const uid = reg.uid || reg.id;
+                if (!uid) return;
+                if (!porUid[uid]) porUid[uid] = [];
+                porUid[uid].push(reg);
+            });
+            Object.entries(porUid).forEach(([uid, lista]) => {
+                // Ordenar por timestamp ascendente
+                lista.sort((a, b) => {
+                    const tA = extraerTimestamp(a.horaEntrada || a.hora || a.horaSalida || a.timestamp);
+                    const tB = extraerTimestamp(b.horaEntrada || b.hora || b.horaSalida || b.timestamp);
+                    return tA - tB;
+                });
+                let horaEntrada = '-';
+                let horaSalida = '-';
+                let dentro = '-';
+                // Si hay al menos dos lecturas, mostrar entrada y salida
+                if (lista.length >= 2) {
+                    const regEntrada = lista[0];
+                    const regSalida = lista[lista.length - 1];
+                    horaEntrada = formatearFecha24(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp);
+                    horaSalida = formatearFecha24(regSalida.horaSalida || regSalida.hora || regSalida.timestamp);
+                    // Si la hora de salida es mayor que la de entrada, mostrar "Fuera", si no, "Entrenando"
+                    dentro = extraerTimestamp(regSalida.horaSalida || regSalida.hora || regSalida.timestamp) > extraerTimestamp(regEntrada.horaEntrada || regEntrada.hora || regEntrada.timestamp)
+                        ? 'Fuera'
+                        : 'Entrenando';
+                } else if (lista.length === 1) {
+                    const reg = lista[0];
+                    horaEntrada = formatearFecha24(reg.horaEntrada || reg.hora || reg.timestamp);
+                    horaSalida = '-';
+                    dentro = 'Entrenando';
+                }
+                const nombre = uidToName[uid] || uid;
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="px-4 py-4 whitespace-nowrap">${uid}</td>
+                        <td class="px-4 py-4 whitespace-nowrap">${nombre}</td>
+                        <td class="px-4 py-4 whitespace-nowrap">${horaEntrada}</td>
+                        <td class="px-4 py-4 whitespace-nowrap">${horaSalida}</td>
+                        <td class="px-4 py-4 whitespace-nowrap">${dentro}</td>
+                    </tr>
+                `;
+            });
+        }, (err) => {
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-400">Error al cargar asistencias</td></tr>';
+        });
+    } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-400">Error al cargar asistencias</td></tr>';
     }
+}
 
     // Función auxiliar para extraer el timestamp en milisegundos
     function extraerTimestamp(hora) {
@@ -676,15 +711,6 @@
                             <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full" onclick="generarReporteAsistencias()">Descargar Excel</button>
                         </div>
                         <div class="bg-gray-50 rounded-lg p-4 shadow">
-                            <h4 class="font-semibold mb-2 text-yellow-700"><i class="fas fa-id-card mr-2"></i>Reporte de Membresías</h4>
-                            <button class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 w-full" onclick="generarReporteMembresias()">Descargar Excel</button>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-4 shadow">
-                            <h4 class="font-semibold mb-2 text-purple-700"><i class="fas fa-wallet mr-2"></i>Reporte de Ingresos</h4>
-                            <button class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 w-full" onclick="generarReporteIngresos()">Descargar Excel</button>
-                        </div>
-                    </div>
-                    <!-- Formatos específicos eliminados -->
                     <div class="flex justify-end">
                         <button type="button" id="closeGenericModalBtn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cerrar</button>
                     </div>
@@ -786,11 +812,17 @@ async function generarReporteMembresias() {
                 fechaCreacion = new Date(d.Creado).toLocaleDateString('es-ES');
             }
         }
+        // Normalizar tipo para el reporte
+        let tipo = (d.Tipo || "Basica").toLowerCase();
+        if (tipo.includes("básica") || tipo.includes("basica")) tipo = "Básica";
+        else if (tipo.includes("estándar") || tipo.includes("estandar")) tipo = "Estandar";
+        else if (tipo.includes("premium")) tipo = "Premium";
+        else if (tipo.includes("vip")) tipo = "VIP";
         rows.push({
             UID: d.uid || doc.id,
             Nombre: d.Nombre || '',
             Apellido: d.Apellido || '',
-            Tipo: d.Tipo || '',
+            Tipo: tipo,
             'Fecha de Creación': fechaCreacion,
             'Fecha Fin': d.SuscripcionHasta ? (d.SuscripcionHasta.toDate ? d.SuscripcionHasta.toDate().toLocaleDateString('es-ES') : '-') : '-',
             Estado: d.Estado || '-',
@@ -861,6 +893,7 @@ async function exportarExcel(rows, nombreArchivo) {
                 const data = doc.data();
                 allMembers.push({
                     id: doc.id,
+                    UID: data.uid || doc.id, // <-- Agregar UID
                     Nombre: data.Nombre || "Sin nombre",
                     Apellido: data.Apellido || "",
                     Email: data.Email || "Sin email",
@@ -901,6 +934,7 @@ async function exportarExcel(rows, nombreArchivo) {
                             <div class="ml-4">
                                 <div class="text-sm font-medium text-gray-900">${member.Nombre} ${member.Apellido}</div>
                                 <div class="text-sm text-gray-500">${member.Email}</div>
+                                <div class="text-xs text-gray-400">UID: ${member.UID || member.id}</div> <!-- Mostrar UID -->
                             </div>
                         </div>
                     </td>
@@ -1056,6 +1090,18 @@ async function editarMiembro(id) {
       <form id="editMemberForm">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">UID</label>
+            <input type="text" name="uid" value="${member.UID || member.id}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+            <select name="genero" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="Masculino"${member.Genero === 'Masculino' ? ' selected' : ''}>Masculino</option>
+              <option value="Femenino"${member.Genero === 'Femenino' ? ' selected' : ''}>Femenino</option>
+              <option value="Otro"${member.Genero === 'Otro' ? ' selected' : ''}>254 tipos de gays</option>
+            </select>
+          </div>
+          <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
             <input type="text" name="nombre" value="${member.Nombre}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
@@ -1098,6 +1144,8 @@ async function editarMiembro(id) {
   document.getElementById('editMemberForm').onsubmit = async function(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
+    const uid = formData.get('uid').trim();
+    const genero = formData.get('genero');
     const nombre = formData.get('nombre').trim();
     const apellido = formData.get('apellido').trim();
     const email = formData.get('email').trim();
@@ -1107,6 +1155,8 @@ async function editarMiembro(id) {
     try {
       const { updateDoc, doc, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
       await updateDoc(doc(db, 'usuarios', id), {
+        uid: uid,
+        Genero: genero,
         Nombre: nombre,
         Apellido: apellido,
         Email: email,
@@ -1114,12 +1164,12 @@ async function editarMiembro(id) {
         Tipo: tipo,
         SuscripcionHasta: Timestamp.fromDate(new Date(suscripcionHasta))
       });
-      alert('Miembro actualizado correctamente');
+      alert('Miembro actualizado correctamente\nUID: ' + uid);
       modal.remove();
       cargarMiembrosModal();
       cargarUsuarios();
     } catch (err) {
-      
+     
     }
   };
 }
@@ -1143,6 +1193,7 @@ function verMiembro(id) {
           const data = doc.data();
           member = {
             id: doc.id,
+            UID: data.uid || doc.id, // <-- Agregar UID
             Nombre: data.Nombre || "Sin nombre",
             Apellido: data.Apellido || "",
             Email: data.Email || "Sin email",
@@ -1150,7 +1201,7 @@ function verMiembro(id) {
             Tipo: data.Tipo || "Básica",
             SuscripcionHasta: data.SuscripcionHasta ? data.SuscripcionHasta.toDate() : new Date(),
             Creado: data.Creado ? data.Creado.toDate() : new Date(),
-            Genero: data.Genero || "Masculino"
+            Genero: data.UID || ""
           };
         }
       });
@@ -1168,6 +1219,10 @@ function mostrarModalVerMiembro(member) {
     <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
       <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeViewModal"><i class="fas fa-times"></i></button>
       <h3 class="text-xl font-semibold mb-4">Detalle del Miembro</h3>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">UID</label>
+        <div class="text-xs text-gray-500">${member.UID || member.id}</div>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
@@ -1227,11 +1282,11 @@ window.verMiembro = verMiembro;
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  let conteoTipos = { Basica: 0, Estándar: 0, Premium: 0, VIP: 0 };
+  let conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
 
   async function cargarUsuarios() {
     const totalActivos = document.getElementById('totalMembers');
-    const nuevosUsuarios = document.getElementById('activeMemberships');
+       const nuevosUsuarios = document.getElementById('activeMemberships');
     const expiringSoon = document.getElementById('expiringSoon');
     const miembrosTableBody = document.querySelector('tbody');
     const actividadReciente = document.querySelector('.space-y-4');
@@ -1252,12 +1307,21 @@ window.verMiembro = verMiembro;
       miembrosTableBody.innerHTML = '';
       actividadReciente.innerHTML = '';
 
+      // Reiniciar conteoTipos antes de contar
+      conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
+
       snapshot.forEach((doc) => {
         const data = doc.data();
         const fechaFin = data.SuscripcionHasta.toDate();
         const fechaInicio = data.Creado.toDate();
-        const tipo = data.Tipo || "Basica";
-        conteoTipos[tipo] = (conteoTipos[tipo] || 0) + 1;
+        // Normalizar tipo para evitar errores de escritura
+        let tipo = (data.Tipo || "Basica").toLowerCase();
+        if (tipo.includes("básica") || tipo.includes("basica")) tipo = "Basica";
+        else if (tipo.includes("estándar") || tipo.includes("estandar")) tipo = "Estandar";
+        // Sumar correctamente cada tipo
+        if (conteoTipos.hasOwnProperty(tipo)) {
+          conteoTipos[tipo]++;
+        }
 
         if (fechaFin >= hoy) activos++;
         nuevos++;
@@ -1274,7 +1338,7 @@ window.verMiembro = verMiembro;
         if (fechaFin >= hoy) {
           estado = 'Activa';
           estadoClass = 'bg-green-100 text-green-800';
-        } else {
+               } else {
           estado = 'Expirada';
           estadoClass = 'bg-red-100 text-red-800';
         }
@@ -1344,11 +1408,12 @@ window.verMiembro = verMiembro;
   }
 
   function actualizarGraficoMembresias() {
+    // Asegura que los datos sean números y no undefined
     membershipChart.data.datasets[0].data = [
-      conteoTipos.Basica,
-      conteoTipos.Estandar,
-      conteoTipos.Premium,
-      conteoTipos.VIP
+      conteoTipos.Basica || 0,
+      conteoTipos.Estandar || 0,
+      conteoTipos.Premium || 0,
+      conteoTipos.VIP || 0
     ];
     membershipChart.update();
   }
@@ -1421,6 +1486,7 @@ window.verMiembro = verMiembro;
 
   async function guardarNuevoMiembro() {
     const form = document.querySelector('#addMemberModal form');
+    const uidManual = form.querySelector('#nuevoMiembroUID')?.value.trim();
     const nombre = form.querySelector('input[type="text"]:nth-of-type(1)')?.value.trim();
     const apellido = form.querySelectorAll('input[type="text"]')[1]?.value.trim() || "";
     const email = form.querySelector('input[type="email"]')?.value.trim();
@@ -1433,8 +1499,8 @@ window.verMiembro = verMiembro;
     else if (tipoSelect.includes('VIP')) tipo = "VIP";
     const fechaInicio = form.querySelector('input[type="date"]')?.value;
     const genero = "Masculino";
-    if (!nombre || !email || !fechaInicio) {
-      alert('Por favor complete los campos obligatorios: Nombre, Email y Fecha de Inicio');
+    if (!nombre || !email || !fechaInicio || !uidManual) {
+      alert('Por favor complete los campos obligatorios: Nombre, Email, Fecha de Inicio y UID');
       return;
     }
     try {
@@ -1443,7 +1509,7 @@ window.verMiembro = verMiembro;
       else if (tipo === 'Premium') fechaFin.setMonth(fechaFin.getMonth() + 6);
       else if (tipo === 'VIP') fechaFin.setMonth(fechaFin.getMonth() + 12);
       else fechaFin.setMonth(fechaFin.getMonth() + 1);
-      await addDoc(collection(db,"usuarios"), {
+      const docRef = await addDoc(collection(db,"usuarios"), {
         Nombre: nombre,
         Apellido: apellido,
         Email: email,
@@ -1451,7 +1517,11 @@ window.verMiembro = verMiembro;
         Tipo: tipo,
         Genero: genero,
         Creado: Timestamp.fromDate(new Date(fechaInicio)),
-        SuscripcionHasta: Timestamp.fromDate(fechaFin)
+        SuscripcionHasta: Timestamp.fromDate(fechaFin),
+        uid: uidManual // Usar el UID manual
+      });
+      await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(async ({ updateDoc, doc }) => {
+        await updateDoc(doc(db, "usuarios", docRef.id), { uid: uidManual });
       });
       alert('Miembro guardado exitosamente');
       document.getElementById('addMemberModal').classList.add('hidden');
@@ -1459,8 +1529,7 @@ window.verMiembro = verMiembro;
       cargarUsuarios();
       form.reset();
     } catch (err) {
-      console.error("Error al guardar miembro:", err);
-      alert('Error al guardar miembro');
+      
     }
   }
   window.guardarNuevoMiembro = guardarNuevoMiembro;
@@ -1515,5 +1584,28 @@ window.verMiembro = verMiembro;
   window.orderBy = orderBy;
   window.addDoc = addDoc;
 </script>
+</body>
+</html>
+      }
+    });
+
+    cargarUsuarios();
+  });
+
+  window.db = db;
+  window.query = query;
+  window.collection = collection;
+  window.getDocs = getDocs;
+  window.orderBy = orderBy;
+  window.addDoc = addDoc;
+</script>
+</body>
+</html>
+  window.getDocs = getDocs;
+  window.orderBy = orderBy;
+  window.addDoc = addDoc;
+</script>
+</body>
+</html>
 </body>
 </html>

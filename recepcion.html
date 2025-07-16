@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymAdmin - Panel de Recepción</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s;
+        }
+        .sidebar-collapsed {
+            width: 80px;
+        }
+        .sidebar-collapsed .nav-text {
+            display: none;
+        }
+        .sidebar-collapsed .logo-text {
+            display: none;
+        }
+        .sidebar-collapsed .logo-icon {
+            margin-right: 0;
+        }
+        .main-content {
+            transition: all 0.3s;
+        }
+        .content-expanded {
+            margin-left: 80px;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        
+        
+        <!-- Main Content -->
+        <div class="main-content flex-1 overflow-auto content-expanded">
+            <!-- Header -->
+            <header class="bg-white shadow-sm">
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <h1 class="text-2xl font-bold text-gray-800">Panel de Recepción</h1>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Buscar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button class="p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fas fa-bell"></i>
+                            <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
+                        <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mr-4">
+                            <i class="fas fa-users text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 text-sm">Miembros Activos</h3>
+                            <p class="text-2xl font-bold">328</p>
+                            <p class="text-green-500 text-xs"><i class="fas fa-arrow-up"></i> 12% este mes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                            <i class="fas fa-calendar-check text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 text-sm">Asistencias Hoy</h3>
+                            <p class="text-2xl font-bold">87</p>
+                            <p class="text-green-500 text-xs"><i class="fas fa-arrow-up"></i> 5% ayer</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                            <i class="fas fa-exclamation-circle text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 text-sm">Pagos Pendientes</h3>
+                            <p class="text-2xl font-bold">24</p>
+                            <p class="text-red-500 text-xs"><i class="fas fa-arrow-up"></i> 3 desde ayer</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                            <i class="fas fa-dollar-sign text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-gray-500 text-sm">Ingresos Hoy</h3>
+                            <p class="text-2xl font-bold">$1,240</p>
+                            <p class="text-green-500 text-xs"><i class="fas fa-arrow-up"></i> 8% ayer</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Acciones Rápidas</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <button class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-all">
+                            <i class="fas fa-user-plus mr-2"></i> Nuevo Miembro
+                        </button>
+                        <button class="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-all">
+                            <i class="fas fa-sync-alt mr-2"></i> Renovar Membresía
+                        </button>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-all">
+                            <i class="fas fa-qrcode mr-2"></i> Registrar Acceso
+                        </button>
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-all">
+                            <i class="fas fa-file-invoice-dollar mr-2"></i> Generar Pago
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Recent Members & Attendance -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Recent Members -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold text-gray-800">Nuevos Miembros</h2>
+                            <a href="#" class="text-sm text-indigo-600 hover:underline">Ver todos</a>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Member" class="w-10 h-10 rounded-full">
+                                <div class="ml-3">
+                                    <h4 class="font-medium">Carlos Méndez</h4>
+                                    <p class="text-sm text-gray-500">Registrado hoy</p>
+                                </div>
+                                <div class="ml-auto">
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Nuevo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                <img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Member" class="w-10 h-10 rounded-full">
+                                <div class="ml-3">
+                                    <h4 class="font-medium">Ana Rodríguez</h4>
+                                    <p class="text-sm text-gray-500">Registrado ayer</p>
+                                </div>
+                                <div class="ml-auto">
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Activo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Member" class="w-10 h-10 rounded-full">
+                                <div class="ml-3">
+                                    <h4 class="font-medium">Javier López</h4>
+                                    <p class="text-sm text-gray-500">Registrado hace 2 días</p>
+                                </div>
+                                <div class="ml-auto">
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Activo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Attendance -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold text-gray-800">Últimos Accesos</h2>
+                            <a href="#" class="text-sm text-indigo-600 hover:underline">Ver todos</a>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Member" class="w-10 h-10 rounded-full">
+                                <div class="ml-3">
+                                    <h4 class="font-medium">Laura Gómez</h4>
+                                    <p class="text-sm text-gray-500">Hace 15 minutos</p>
+                                </div>
+                                <div class="ml-auto text-green-500">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                <img src="https://randomuser.me/api/portraits/men/68.jpg" alt="Member" class="w-10 h-10 rounded-full">
+                                <div class="ml-3">
+                                    <h4 class="font-medium">Roberto Sánchez</h4>
+                                    <p class="text-sm text-gray-500">Hace 32 minutos</p>
+                                </div>
+                                <div class="ml-auto text-green-500">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Member" class="w-10 h-10 rounded-full">
+                                <div class="ml-3">
+                                    <h4 class="font-medium">Patricia Ruiz</h4>
+                                    <p class="text-sm text-gray-500">Hace 1 hora</p>
+                                </div>
+                                <div class="ml-auto text-yellow-500">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upcoming Renewals -->
+                <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Próximas Renovaciones</h2>
+                        <a href="#" class="text-sm text-indigo-600 hover:underline">Ver todas</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Miembro</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Membresía</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vence</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img src="https://randomuser.me/api/portraits/men/42.jpg" alt="Member" class="w-8 h-8 rounded-full">
+                                            <div class="ml-3">
+                                                <div class="font-medium">Miguel Ángel</div>
+                                                <div class="text-sm text-gray-500">#M-00482</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm">Premium Anual</div>
+                                        <div class="text-sm text-gray-500">$1,200</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm">15/06/2023</div>
+                                        <div class="text-xs text-yellow-600">En 3 días</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Por vencer</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button class="text-indigo-600 hover:text-indigo-900">Renovar</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Member" class="w-8 h-8 rounded-full">
+                                            <div class="ml-3">
+                                                <div class="font-medium">Daniela Castro</div>
+                                                <div class="text-sm text-gray-500">#M-00481</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm">Básico Mensual</div>
+                                        <div class="text-sm text-gray-500">$500</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm">18/06/2023</div>
+                                        <div class="text-xs text-yellow-600">En 6 días</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Por vencer</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button class="text-indigo-600 hover:text-indigo-900">Renovar</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Member" class="w-8 h-8 rounded-full">
+                                            <div class="ml-3">
+                                                <div class="font-medium">José Martínez</div>
+                                                <div class="text-sm text-gray-500">#M-00479</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm">Intermedio Trimestral</div>
+                                        <div class="text-sm text-gray-500">$900</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm">20/06/2023</div>
+                                        <div class="text-xs text-yellow-600">En 8 días</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Por vencer</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button class="text-indigo-600 hover:text-indigo-900">Renovar</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('content-expanded');
+        });
+
+        // Simulate data for charts (in a real app you would use a chart library)
+        function simulateChart() {
+            const chartContainer = document.querySelector('.chart-container');
+            if (chartContainer) {
+                chartContainer.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">Gráfico de estadísticas se mostraría aquí</div>';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            simulateChart();
+        });
+    </script>
+</body>
+</html>
