@@ -202,7 +202,7 @@
                             <i class="fas fa-wallet text-xl"></i>
                         </div>
                         <div>
-                            <p class="text-gray-500">Cuentas Totales</p>
+                            <p class="text-gray-500">Ingresos Mensuales</p>
                             <h3 class="text-2xl font-bold" id="totalAccounts">0</h3>
                         </div>
                     </div>
@@ -839,7 +839,7 @@ async function exportarExcel(rows, nombreArchivo) {
             const snapshot = await getDocs(q);
             const allSnapshot = await getDocs(collection(db, "usuarios"));
             cuentasTotales = allSnapshot.size;
-            allMembers = [];
+         allMembers = [];
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 allMembers.push({
@@ -857,8 +857,10 @@ async function exportarExcel(rows, nombreArchivo) {
             filteredMembers = [...allMembers];
             mostrarMiembros();
             actualizarPaginacion();
-            document.getElementById('totalAccounts').textContent = cuentasTotales;
+            document.getElementById('totalAccounts').textContent = 0; // Inicializar en 0
         } catch (err) {
+
+             document.getElementById('totalAccounts').textContent = 0;
             console.error("Error al cargar miembros:", err);
             alert("Error al cargar miembros. Verifica la consola para más detalles.");
         }
@@ -1252,11 +1254,15 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
     let activos = 0;
     let nuevos = 0;
     let porVencer = 0;
+    let ingresosMensuales = 0;
     const hoy = new Date();
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
     const cincoDiasDespues = new Date();
     cincoDiasDespues.setDate(hoy.getDate() + 5);
 
-    try {
+     try {
+      const pagosSnapshot = await getDocs(collection(db, "pagos"));
+
       const q = query(collection(db, "usuarios"), orderBy("Creado", "desc"), limit(5));
       const snapshot = await getDocs(q);
       const allSnapshot = await getDocs(collection(db, "usuarios"));
@@ -1289,6 +1295,16 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
         if (fechaFin > hoy && fechaFin <= cincoDiasDespues) {
           porVencer++;
         }
+
+        pagosSnapshot.forEach((doc) => {
+            const pago = doc.data();
+            const fechaPago = pago.Fecha ? pago.Fecha.toDate() : null;
+            if (fechaPago && fechaPago >= inicioMes && fechaPago <= hoy) {
+                ingresosMensuales += pago.Monto || 0;
+            }
+      });
+
+     
 
         const fechaFinStr = fechaFin.toLocaleDateString('es-ES');
         const fechaInicioStr = fechaInicio.toLocaleDateString('es-ES');
@@ -1355,9 +1371,8 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
       totalActivos.textContent = activos;
       nuevosUsuarios.textContent = nuevos;
       expiringSoon.textContent = porVencer;
-      document.getElementById('totalAccounts').textContent = cuentasTotales;
-      
-      animateValue(document.getElementById('totalMembers'), 0, activos, 2000);
+       document.getElementById('totalAccounts').textContent = ingresosMensuales.toLocaleString('es-ES', { style: 'currency', currency: 'USD' });
+            animateValue(document.getElementById('totalMembers'), 0, activos, 2000);
       animateValue(document.getElementById('activeMemberships'), 0, nuevos, 2000);
       animateValue(document.getElementById('expiringSoon'), 0, porVencer, 2000);
       animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
