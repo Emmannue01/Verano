@@ -354,15 +354,15 @@
                     <!-- Campo UID manual -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">UID (manual)</label>
-                        <input type="text" id="nuevoMiembroUID" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="UID único">
+                        <input id="nuevoMiembroUID" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="UID único">
                     </div>
                     <!-- Campo Género -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
-                        <select id="nuevoMiembroGenero" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <select id="Genero" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <option value="Masculino">Masculino</option>
                             <option value="Femenino">Femenino</option>
-                            <option value="Otro">254 tipos de gays</option>
+                            <option value="254 tipos de gays">254 tipos de gays</option>
                         </select>
                     </div>
                     <div>
@@ -383,7 +383,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
-                        <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <select id="tipoMembresia" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <option>Seleccione una opción</option>
                             <option>Básica (1 mes)</option>
                             <option>Estándar (3 meses)</option>
@@ -620,49 +620,16 @@
 
     // Función auxiliar para extraer el timestamp en milisegundos
     function extraerTimestamp(hora) {
-        if (!hora) return 0;
-        if (typeof hora === 'number') return hora;
-        if (typeof hora === 'string') {
-            // Soporte para formato personalizado 'YYYY-M-D_HH:mm:ss'
-            if (/^\d{4}-\d{1,2}-\d{1,2}_\d{2}:\d{2}:\d{2}$/.test(hora)) {
-                const [fecha, tiempo] = hora.split('_');
-                const [anio, mes, dia] = fecha.split('-').map(Number);
-                const [h, m, s] = tiempo.split(':').map(Number);
-                // Mes en JS es 0-indexado
-                return new Date(anio, mes - 1, dia, h, m, s).getTime();
-            }
-            if (!isNaN(Date.parse(hora))) return Date.parse(hora);
-        }
-        if (typeof hora === 'object' && hora.seconds) return hora.seconds * 1000;
-        return 0;
+       return hora;
     }
 
     // Función auxiliar para formatear la fecha
     function formatearFecha24(hora) {
-        if (!hora) return '-';
-        let fecha = null;
-        if (typeof hora === 'number') {
-            fecha = new Date(hora);
-        } else if (typeof hora === 'string') {
-            if (/^\d{4}-\d{1,2}-\d{1,2}_\d{2}:\d{2}:\d{2}$/.test(hora)) {
-                const [f, t] = hora.split('_');
-                const [anio, mes, dia] = f.split('-').map(Number);
-                const [h, m, s] = t.split(':').map(Number);
-                fecha = new Date(anio, mes - 1, dia, h, m, s);
-            } else if (!isNaN(Date.parse(hora))) {
-                fecha = new Date(hora);
-            }
-        } else if (typeof hora === 'object' && hora.seconds) {
-            fecha = new Date(hora.seconds * 1000);
+        if (!hora) {
+            return '-';
         }
-        if (!fecha) return '-';
-        const dia = fecha.getDate().toString().padStart(2, '0');
-        const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
-        const anio = fecha.getFullYear();
-        const horas = fecha.getHours().toString().padStart(2, '0');
-        const minutos = fecha.getMinutes().toString().padStart(2, '0');
-        const segundos = fecha.getSeconds().toString().padStart(2, '0');
-        return `${dia}/${mes}/${anio} ${horas}:${minutos}:${segundos}`;
+
+        return hora;
     }
 
 
@@ -1309,6 +1276,8 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
         let tipo = (data.Tipo || "Basica").toLowerCase();
         if (tipo.includes("básica") || tipo.includes("basica")) tipo = "Basica";
         else if (tipo.includes("estándar") || tipo.includes("estandar")) tipo = "Estandar";
+        else if (tipo.includes("premium")) tipo = "Premium";
+        else if (tipo.includes("vip")) tipo = "vip";
         // Sumar correctamente cada tipo
         if (conteoTipos.hasOwnProperty(tipo)) {
           conteoTipos[tipo]++;
@@ -1484,14 +1453,14 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
     const apellido = form.querySelectorAll('input[type="text"]')[1]?.value.trim() || "";
     const email = form.querySelector('input[type="email"]')?.value.trim();
     const telefono = form.querySelector('input[type="tel"]')?.value.trim();
-    const tipoSelect = form.querySelector('select')?.value;
+    const tipoSelect = form.querySelector('#tipoMembresia')?.value;
     let tipo = "Basica";
-    if (tipoSelect.includes('Básica')) tipo = "Basica";
+    if (tipoSelect.includes('Básica') || tipoSelect.includes('basica')) tipo = "Basica";
     else if (tipoSelect.includes('Estándar') || tipoSelect.includes('Estandar')) tipo = "Estandar";
-    else if (tipoSelect.includes('Premium')) tipo = "Premium";
+    else if (tipoSelect.includes('Premium')) tipo = "premium";
     else if (tipoSelect.includes('VIP')) tipo = "VIP";
-    const fechaInicio = form.querySelector('input[type="date"]')?.value;
-    const genero = "Masculino";
+    const genero = form.querySelector('#Genero')?.value || "Masculino";    
+    const fechaInicio = form.querySelector('input[type="date"]')?.value;    
     if (!nombre || !email || !fechaInicio || !uidManual) {
       alert('Por favor complete los campos obligatorios: Nombre, Email, Fecha de Inicio y UID');
       return;
