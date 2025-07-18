@@ -1017,11 +1017,46 @@ async function exportarExcel(rows, nombreArchivo) {
         }
     });
 
+    // Nueva función para actualizar el estado en Realtime Database
+    async function actualizarEstadoActivoEnRTDB(uid, fechaFin) {
+        try {
+            const { getDatabase, ref, set } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+            const dbRTDB = getDatabase();
+            const hoy = new Date();
+            // Maneja tanto objetos Date como Timestamps de Firestore
+            const fechaExpiracion = fechaFin instanceof Date ? fechaFin : (fechaFin && typeof fechaFin.toDate === 'function' ? fechaFin.toDate() : new Date(fechaFin));
+            const estaActivo = fechaExpiracion >= hoy;
+            
+            await set(ref(dbRTDB, 'activos/' + uid), {
+                activa: estaActivo
+            });
+        } catch (error) {
+            console.error("Error al actualizar estado en RTDB para UID " + uid, error);
+        }
+    }
+
+    // Nueva función para eliminar el estado en Realtime Database
+    async function eliminarEstadoActivoEnRTDB(uid) {
+        try {
+            const { getDatabase, ref, remove } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+            const dbRTDB = getDatabase();
+            await remove(ref(dbRTDB, 'activos/' + uid));
+        } catch (error) {
+            console.error("Error al eliminar estado en RTDB para UID " + uid, error);
+        }
+    }
+
     async function eliminarMiembro(id) {
   if (confirm('¿Estás seguro de eliminar este miembro?')) {
     try {
-      const { deleteDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-      await deleteDoc(doc(db, 'usuarios', id));
+      const { deleteDoc, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+      const memberDocRef = doc(db, 'usuarios', id);
+      const memberDoc = await getDoc(memberDocRef);
+      const memberData = memberDoc.data();
+      if (memberData && memberData.uid) {
+        await eliminarEstadoActivoEnRTDB(memberData.uid);
+      }
+      await deleteDoc(memberDocRef);
       alert('Miembro eliminado correctamente');
       cargarMiembrosModal();
       cargarUsuarios();
@@ -1117,6 +1152,7 @@ async function editarMiembro(id) {
         Tipo: tipo,
         SuscripcionHasta: Timestamp.fromDate(new Date(suscripcionHasta))
       });
+      await actualizarEstadoActivoEnRTDB(uid, new Date(suscripcionHasta));
       alert('Miembro actualizado correctamente\nUID: ' + uid);
       modal.remove();
       cargarMiembrosModal();
@@ -1243,6 +1279,24 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
   const db = getFirestore(app);
 
   let conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
+
+  async function sincronizarEstadosDeMembresia() {
+    try {
+        const usuariosSnap = await getDocs(collection(db, 'usuarios'));
+        
+        const promesas = [];
+        usuariosSnap.forEach(doc => {
+            const data = doc.data();
+            if (data.uid && data.SuscripcionHasta) {
+                promesas.push(actualizarEstadoActivoEnRTDB(data.uid, data.SuscripcionHasta));
+            }
+        });
+        
+        await Promise.all(promesas);
+    } catch (error) {
+        console.error("Error durante la sincronización de estados de membresía:", error);
+    }
+  }
 
   async function cargarUsuarios() {
     const totalActivos = document.getElementById('totalMembers');
@@ -1377,6 +1431,8 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
       animateValue(document.getElementById('expiringSoon'), 0, porVencer, 2000);
       animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
 
+      // Sincroniza todos los estados de membresía con la Realtime Database
+      sincronizarEstadosDeMembresia();
       actualizarGraficoMembresias();
 
     } catch (err) {
@@ -1500,6 +1556,7 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(async ({ updateDoc, doc }) => {
         await updateDoc(doc(db, "usuarios", docRef.id), { uid: uidManual });
       });
+      await actualizarEstadoActivoEnRTDB(uidManual, fechaFin);
       alert('Miembro guardado exitosamente');
       document.getElementById('addMemberModal').classList.add('hidden');
       cargarMiembrosModal();
