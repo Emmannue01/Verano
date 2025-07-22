@@ -1152,7 +1152,7 @@ async function editarMiembro(id) {
     const genero = formData.get('genero');
     const nombre = formData.get('nombre').trim();
     const apellido = formData.get('apellido').trim();
-    const email = formData.get('email').trim();
+    const email = formData.get('email').trim().toLowerCase();
     const telefono = formData.get('telefono').trim();
     const tipo = formData.get('tipo');
     const suscripcionHasta = formData.get('suscripcionHasta');
@@ -1583,7 +1583,7 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
     const uidManual = form.querySelector('#nuevoMiembroUID')?.value.trim();
     const nombre = form.querySelector('input[type="text"]:nth-of-type(1)')?.value.trim();
     const apellido = form.querySelectorAll('input[type="text"]')[1]?.value.trim() || "";
-    const email = form.querySelector('input[type="email"]')?.value.trim();
+    const email = form.querySelector('input[type="email"]')?.value.trim().toLowerCase();
     const telefono = form.querySelector('input[type="tel"]')?.value.trim();
     const tipoSelect = form.querySelector('#tipoMembresia')?.value;
     const rol = form.querySelector('#nuevoMiembroRol')?.value || "cliente";

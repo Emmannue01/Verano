@@ -148,8 +148,9 @@
 
                     // Si no se encuentra por UID, buscar por email para migrar un usuario manual
                     if (!userDoc.exists() && user.email) {
-                        console.log(`Usuario no encontrado por UID (${user.uid}). Buscando por email: ${user.email}`);
-                        const q = query(collection(db, "usuarios"), where("Email", "==", user.email));
+                        const userEmail = user.email.toLowerCase();
+                        console.log(`Usuario no encontrado por UID (${user.uid}). Buscando por email normalizado: ${userEmail}`);
+                        const q = query(collection(db, "usuarios"), where("Email", "==", userEmail));
                         const querySnapshot = await getDocs(q);
 
                         if (!querySnapshot.empty) {
@@ -165,7 +166,7 @@
                             batch.set(newUserDocRef, {
                                 ...oldData,
                                 uid: user.uid, // Asegurarse de que el campo uid también se actualice al de Auth
-                                Email: user.email // Actualizar con el email verificado de Auth
+                                Email: userEmail // Actualizar con el email verificado y normalizado de Auth
                             });
 
                             // 2. Eliminar el documento antiguo para no tener duplicados
