@@ -201,10 +201,10 @@
                         const userDocRef = doc(db, "usuarios", user.uid);
                         const fechaInicio = new Date();
                         const fechaFin = new Date();
-                        fechaFin.setMonth(fechaFin.getMonth() + 1); // Membresía de 1 mes por defecto
+                        fechaFin.setMonth(fechaFin.getMonth()); // Membresía de 1 mes por defecto
 
                         const newUser = {
-                            uid: user.uid,
+                            uid: '',
                             Nombre: user.displayName ? user.displayName.split(' ')[0] : 'Nuevo',
                             Apellido: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : 'Usuario',
                             Email: userEmail,
