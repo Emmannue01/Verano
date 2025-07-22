@@ -34,13 +34,13 @@
                     <i class="fas fa-bell text-xl"></i>
                     <span class="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
                 </button>
-                <div class="relative group">
+                <div class="relative">
                     <button id="profileBtn" class="flex items-center space-x-2 focus:outline-none">
                         <img id="userAvatar" class="h-10 w-10 rounded-full" src="https://i.pravatar.cc/40" alt="User profile">
                         <span id="userName" class="hidden md:inline">Usuario</span>
                         <i class="fas fa-chevron-down text-xs hidden md:inline"></i>
                     </button>
-                    <div id="profileDropdown" class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                         <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Cerrar sesión</a>
                     </div>
                 </div>
@@ -280,6 +280,21 @@
         document.getElementById('logoutButton').addEventListener('click', (e) => {
           e.preventDefault();
           signOut(auth).catch(error => console.error('Error al cerrar sesión:', error));
+        });
+
+        // --- Funcionalidad del Dropdown de Perfil ---
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        profileBtn.addEventListener('click', () => {
+            profileDropdown.classList.toggle('hidden');
+        });
+
+        // Cerrar el dropdown si se hace clic fuera de él
+        window.addEventListener('click', (e) => {
+            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.classList.add('hidden');
+            }
         });
     </script>
 </body>
