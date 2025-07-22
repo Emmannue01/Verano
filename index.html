@@ -146,66 +146,79 @@
                 // Usuario autenticado, ahora verificamos su rol en Firestore
                 setLoading(true); // Mostrar spinner mientras se verifica
                 try {
-                    let userDocRef = doc(db, "usuarios", user.uid);
-                    let userDoc = await getDoc(userDocRef);
                     let userData;
+                    let userDoc;
 
-                    if (userDoc.exists()) {
-                        // 1. Usuario encontrado por UID, todo en orden.
-                        userData = userDoc.data();
-                        console.log(`Usuario encontrado por UID (${user.uid}).`);
-
-                    } else if (user.email) {
-                        // 2. No se encontró por UID, buscar por email para migrar o crear.
+                    // 1. Buscar por email primero, es el caso más común para migrar.
+                    if (user.email) {
                         const userEmail = user.email.toLowerCase();
-                        console.log(`Usuario no encontrado por UID. Buscando por email: ${userEmail}`);
+                        console.log(`Buscando usuario por email: ${userEmail}`);
                         const q = query(collection(db, "usuarios"), where("Email", "==", userEmail));
                         const querySnapshot = await getDocs(q);
 
                         if (!querySnapshot.empty) {
-                            // 2a. Encontrado por email -> Migrar datos
-                            const oldUserDoc = querySnapshot.docs[0];
-                            console.log(`Usuario encontrado por email. Migrando desde doc ID ${oldUserDoc.id} a ${user.uid}`);
-                            
-                            const batch = writeBatch(db);
-                            const oldData = oldUserDoc.data();
-                            const newUserDocRef = doc(db, "usuarios", user.uid);
+                            // 1a. Encontrado por email.
+                            const foundDoc = querySnapshot.docs[0];
+                            console.log(`Usuario encontrado por email con doc ID: ${foundDoc.id}.`);
 
-                            batch.set(newUserDocRef, {
-                                ...oldData,
-                                uid: user.uid,
-                                Email: userEmail
-                            });
-                            batch.delete(oldUserDoc.ref);
-                            await batch.commit();
+                            // Si el ID del documento no es el UID de Auth, migrarlo.
+                            if (foundDoc.id !== user.uid) {
+                                console.log(`El ID del documento (${foundDoc.id}) no coincide con el UID de Auth (${user.uid}). Migrando...`);
+                                const batch = writeBatch(db);
+                                const oldData = foundDoc.data();
+                                const newUserDocRef = doc(db, "usuarios", user.uid);
 
-                            const migratedDoc = await getDoc(newUserDocRef);
-                            userData = migratedDoc.data();
-                            console.log("Migración completada.");
-                        } else {
-                            // 2b. No encontrado por email -> Crear nuevo usuario
-                            console.log("Usuario no encontrado. Creando nuevo registro de cliente.");
-                            const fechaInicio = new Date();
-                            const fechaFin = new Date();
-                            fechaFin.setMonth(fechaFin.getMonth() + 1); // Membresía de 1 mes por defecto
-
-                            const newUser = {
-                                uid: user.uid,
-                                Nombre: user.displayName ? user.displayName.split(' ')[0] : 'Nuevo',
-                                Apellido: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : 'Usuario',
-                                Email: userEmail,
-                                rol: 'cliente',
-                                Tipo: '',
-                                Creado: Timestamp.fromDate(fechaInicio),
-                                SuscripcionHasta: Timestamp.fromDate(fechaFin),
-                                Telefono: '',
-                                Genero: ''
-                            };
-                            
-                            await setDoc(userDocRef, newUser);
-                            userData = newUser;
-                            console.log("Nuevo cliente creado exitosamente.");
+                                batch.set(newUserDocRef, { ...oldData, uid: user.uid, Email: userEmail });
+                                batch.delete(foundDoc.ref);
+                                await batch.commit();
+                                
+                                userDoc = await getDoc(newUserDocRef);
+                                console.log("Migración completada.");
+                            } else {
+                                // El ID del documento ya es el UID de Auth, todo correcto.
+                                userDoc = foundDoc;
+                            }
+                            userData = userDoc.data();
                         }
+                    }
+
+                    // 2. Si no se encontró por email, buscar por UID como fallback.
+                    if (!userData) {
+                        console.log("No se encontró por email, buscando por UID...");
+                        const userDocRef = doc(db, "usuarios", user.uid);
+                        userDoc = await getDoc(userDocRef);
+
+                        if (userDoc.exists()) {
+                            console.log(`Usuario encontrado por UID (${user.uid}).`);
+                            userData = userDoc.data();
+                        }
+                    }
+
+                    // 3. Si no se encontró por ningún método, es un usuario nuevo.
+                    if (!userData) {
+                        console.log("Usuario no encontrado. Creando nuevo registro de cliente.");
+                        const userEmail = user.email.toLowerCase();
+                        const userDocRef = doc(db, "usuarios", user.uid);
+                        const fechaInicio = new Date();
+                        const fechaFin = new Date();
+                        fechaFin.setMonth(fechaFin.getMonth() + 1); // Membresía de 1 mes por defecto
+
+                        const newUser = {
+                            uid: user.uid,
+                            Nombre: user.displayName ? user.displayName.split(' ')[0] : 'Nuevo',
+                            Apellido: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : 'Usuario',
+                            Email: userEmail,
+                            rol: 'cliente',
+                            Tipo: 'Basica',
+                            Creado: Timestamp.fromDate(fechaInicio),
+                            SuscripcionHasta: Timestamp.fromDate(fechaFin),
+                            Telefono: '',
+                            Genero: 'Otro'
+                        };
+                        
+                        await setDoc(userDocRef, newUser);
+                        userData = newUser;
+                        console.log("Nuevo cliente creado exitosamente.");
                     }
 
                     if (userData) {
