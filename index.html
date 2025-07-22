@@ -1,1273 +1,158 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerFit Gym - Inicio de Sesión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        .bg-gym {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?ixlib=rb-4.0.3');
+            background-size: cover;
+            background-position: center;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+        .input-effect {
+            transition: all 0.3s ease;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
+        .input-effect:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
-        .chart-container {
-            height: 300px;
-            width: 100%;
+        .shake {
+            animation: shake 0.5s;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <div class="hidden md:flex md:flex-shrink-0">
-            <div class="flex flex-col w-64 bg-indigo-900 text-white">
-                <div class="flex items-center justify-center h-16 px-4 border-b border-indigo-800">
-                    <div class="flex items-center">
-                        <i class="fas fa-dumbbell text-2xl text-yellow-400 mr-2"></i>
-                        <span class="text-xl font-bold">GYM PRO</span>
+<body class="bg-gray-100 font-sans">
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sección izquierda (imagen) -->
+        <div class="w-full md:w-1/2 bg-gym flex items-center justify-center p-10 text-white">
+            <div class="text-center max-w-md">
+                <h1 class="text-4xl font-bold mb-4">GYM <span class="text-blue-500">PRO</span></h1>
+                <p class="text-lg mb-6">Transforma tu cuerpo, fortalece tu mente</p>
+                <div class="flex justify-center space-x-4">
+                    <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+                        <i class="fas fa-dumbbell text-2xl mb-2"></i>
+                        <p>+50 Máquinas</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+                        <i class="fas fa-users text-2xl mb-2"></i>
+                        <p>+1000 Miembros</p>
+                    </div>
+                    <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+                        <i class="fas fa-trophy text-2xl mb-2"></i>
+                        <p>Entrenadores Certificados</p>
                     </div>
                 </div>
-                <div class="flex flex-col flex-grow px-4 py-4 overflow-y-auto custom-scrollbar">
-                    <div class="space-y-2">
-                        <div class="flex items-center px-4 py-3 bg-indigo-800 rounded-lg">
-                            <i class="fas fa-tachometer-alt mr-3"></i>
-                            <span>Dashboard</span>
+            </div>
+        </div>
+
+        <!-- Sección derecha (formulario) -->
+        <div class="w-full md:w-1/2 flex items-center justify-center p-8">
+            <div class="w-full max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="p-8">
+                    <div class="flex justify-center mb-6">
+                        <div class="bg-red-500 p-3 rounded-full">
+                            <i class="fas fa-lock text-white text-2xl"></i>
                         </div>
-                        <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                            <i class="fas fa-users mr-3"></i>
-                            <span>Miembros</span>
-                        </a>
-                        <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                            <i class="fas fa-id-card mr-3"></i>
-                            <span>Membresías</span>
-                        </a>
-                        <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                            <i class="fas fa-calendar-check mr-3"></i>
-                            <span>Asistencia</span>
-                        </a>
-                        <a href="#" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                            <i class="fas fa-chart-bar mr-3"></i>
-                            <span>Reportes</span>
-                        </a>
-                        <!-- Ícono de configuración eliminado del sidebar -->
                     </div>
-                    <div class="mt-auto mb-4 px-4 py-3 bg-indigo-800 rounded-lg">
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-1">Iniciar Sesión</h2>
+                    <p class="text-center text-gray-600 mb-8">Ingresa tus credenciales para acceder</p>
+
+                    <form id="loginForm" class="space-y-6">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-envelope text-gray-400"></i>
+                                </div>
+                                <input type="email" id="email" name="email" 
+                                    class="input-effect w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                    placeholder="tu@email.com" required>
+                            </div>
+                            <p id="emailError" class="hidden text-red-500 text-xs mt-1"></p>
+                        </div>
+
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-gray-400"></i>
+                                </div>
+                                <input type="password" id="password" name="password" 
+                                    class="input-effect w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" 
+                                    placeholder="••••••••" required>
+                                <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                                </button>
+                            </div>
+                            <p id="passwordError" class="hidden text-red-500 text-xs mt-1"></p>
+                        </div>
+
                         <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm">Soporte</p>
-                                <p class="text-xs text-gray-400">18459681@gmail.com</p>
+                            <div class="flex items-center">
+                                <input id="remember" name="remember" type="checkbox" class="h-4 w-4 text-red-500 focus:ring-red-500 border-gray-300 rounded">
+                                <label for="remember" class="ml-2 block text-sm text-gray-700">Recordarme</label>
                             </div>
-                            <i class="fas fa-headset text-xl"></i>
+                            <div class="text-sm">
+                                <a href="#" class="font-medium text-blue-500 hover:text-blue-600">¿Olvidaste tu contraseña?</a>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Main content -->
-        <div class="flex-1 overflow-x-hidden overflow-y-auto">
-            <!-- Top navbar -->
-            <div class="bg-white shadow-sm">
-                <div class="flex items-center justify-between px-6 py-4">
-                    <div class="flex items-center">
-                        <button id="sidebarToggle" class="md:hidden mr-4 text-gray-600 hover:text-gray-900">
-                            <i class="fas fa-bars text-xl"></i>
-                        </button>
-                        <h1 class="text-xl font-semibold text-gray-800">Panel de Control</h1>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="relative">
-                            <button class="text-gray-600 hover:text-gray-900">
-                                <i class="fas fa-bell text-xl"></i>
-                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                        <div>
+                            <button type="submit" 
+                                class="btn-hover w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                                INGRESAR
                             </button>
-                        </div>
-                        <div class="relative">
-                            <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">
-                                <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User profile">
-                                <span class="hidden md:block">Admin</span>
-                                <i class="fas fa-chevron-down text-xs"></i>
-                            </button>
-                            <!-- Dropdown menu -->
-                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Perfil</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configuración</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mobile sidebar (hidden by default) -->
-            <div id="mobileSidebar" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden">
-                <div class="fixed inset-y-0 left-0 w-64 bg-indigo-900 text-white transform -translate-x-full transition duration-300 ease-in-out" id="sidebar">
-                    <div class="flex items-center justify-between h-16 px-4 border-b border-indigo-800">
-                        <div class="flex items-center">
-                            <i class="fas fa-dumbbell text-2xl text-yellow-400 mr-2"></i>
-                            <span class="text-xl font-bold">GYM PRO</span>
-                        </div>
-                        <button id="closeSidebar" class="text-white">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="flex flex-col h-full px-4 py-4 overflow-y-auto">
-                        <div class="space-y-2">
-                            <div class="flex items-center px-4 py-3 bg-indigo-800 rounded-lg">
-                                <i class="fas fa-tachometer-alt mr-3"></i>
-                                <span>Dashboard</span>
-                            </div>
-                            <a href="#" id="mobileMiembros" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                                <i class="fas fa-users mr-3"></i>
-                                <span>Miembros</span>
-                            </a>
-                            <a href="#" id="mobileMembresias" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                                <i class="fas fa-id-card mr-3"></i>
-                                <span>Membresías</span>
-                            </a>
-                            <a href="#" id="mobileAsistencia" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                                <i class="fas fa-calendar-check mr-3"></i>
-                                <span>Asistencia</span>
-                            </a>
-                            <a href="#" id="mobileReportes" class="flex items-center px-4 py-3 hover:bg-indigo-800 rounded-lg transition duration-200">
-                                <i class="fas fa-chart-bar mr-3"></i>
-                                <span>Reportes</span>
-                            </a>
-                            <!-- Ícono de configuración eliminado del sidebar móvil -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main content area -->
-            <div class="p-6">
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <!-- Total Members -->
-                    <div class="bg-white rounded-lg shadow p-6 flex items-center fade-in">
-                        <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                            <i class="fas fa-users text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">Miembros Activos</p>
-                            <h3 class="text-2xl font-bold" id="totalMembers">342</h3>
-                        </div>
-                    </div>
-
-                    <!-- Active Memberships -->
-                    <div class="bg-white rounded-lg shadow p-6 flex items-center fade-in">
-                        <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
-                            <i class="fas fa-id-card text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">Membresías Activas</p>
-                            <h3 class="text-2xl font-bold" id="activeMemberships">298</h3>
-                        </div>
-                    </div>
-
-                    <!-- Expiring Soon -->
-                    <div class="bg-white rounded-lg shadow p-6 flex items-center fade-in">
-                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
-                            <i class="fas fa-exclamation-circle text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">Por Vencer</p>
-                            <h3 class="text-2xl font-bold" id="expiringSoon">24</h3>
-                        </div>
-                    </div>
-
-                    <!-- Monthly Revenue -->
-                    <div class="bg-white rounded-lg shadow p-6 flex items-center fade-in">
-                        <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                            <i class="fas fa-wallet text-xl"></i>
-                        </div>
-                        <div>
-                            <p class="text-gray-500">Ingresos Mensuales</p>
-                            <h3 class="text-2xl font-bold" id="totalAccounts">0</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts and Tables Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                    <!-- Membership Types Chart -->
-                    <div class="lg:col-span-2 bg-white rounded-lg shadow p-6 fade-in">
-                        <h3 class="text-lg font-semibold mb-4">Distribución de Membresías</h3>
-                        <div class="chart-container">
-                            <canvas id="membershipChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Recent Activities -->
-                    <div class="bg-white rounded-lg shadow p-6 fade-in">
-                        <h3 class="text-lg font-semibold mb-4">Actividad Reciente</h3>
-                        <div class="space-y-4 h-64 overflow-y-auto custom-scrollbar">
-                            <!-- Aquí se llenará dinámicamente con JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Members Table -->
-                <div class="bg-white rounded-lg shadow overflow-hidden mb-6 fade-in">
-                    <div class="flex items-center justify-between px-6 py-4 border-b">
-                        <h3 class="text-lg font-semibold">Últimos Miembros</h3>
-                        <a href="#" class="text-sm text-indigo-600 hover:text-indigo-800">Ver todos</a>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Membresía</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Inicio</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Fin</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <!-- Aquí se llenará dinámicamente con JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="text-sm text-gray-500 px-6 py-4">
-                        Mostrando <span class="font-medium">1</span> a <span class="font-medium">5</span> de <span class="font-medium">28</span> miembros
-                    <div class="px-6 py-4 border-t flex items-center justify-between">
-                        
-                        <div class="flex space-x-2">
-                            <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"><i class="fas fa-chevron-left"></i></button>
-                            <button class="px-3 py-1 rounded-md bg-indigo-600 text-white">1</button>
-                            <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">2</button>
-                            <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">3</button>
-                            <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<div id="membersModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-4 mx-auto p-5 border w-11/12 md:w-5/6 lg:w-4/5 shadow-lg rounded-md bg-white">
-        <div class="flex justify-between items-center pb-4 border-b">
-            <h3 class="text-xl font-semibold">Gestión de Miembros</h3>
-            <button id="closeMembersModal" class="text-gray-500 hover:text-gray-700">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="mt-4">
-            <div class="flex flex-col md:flex-row justify-between mb-6 gap-4">
-                <div class="relative w-full md:w-1/3">
-                    <input type="text" placeholder="Buscar miembros..." class="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                </div>
-                <div class="flex gap-2">
-                    <select class="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option>Todos los estados</option>
-                        <option>Activos</option>
-                        <option>Expirados</option>
-                        <option>Por vencer</option>
-                    </select>
-                    <select class="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option>Todos los tipos</option>
-                        <option>Basica</option>
-                        <option>Estandar</option>
-                        <option>Premium</option>
-                        <option>VIP</option>
-                    </select>
-                    <button class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
-                        <i class="fas fa-plus mr-2"></i>Nuevo Miembro
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Membresía</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Fin</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200" id="membersModalBody">
-                            
-                        </tbody>
-                        <div class="text-sm text-gray-500">
-                        Mostrando <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">124</span> miembros
-                    </div>
-                    </table>
-                </div>
-                <div class="px-6 py-4 border-t flex items-center justify-between">
-                    
-                    <div class="flex space-x-2">
-                        <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"><i class="fas fa-chevron-left"></i></button>
-                        <button class="px-3 py-1 rounded-md bg-indigo-600 text-white">1</button>
-                        <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">2</button>
-                        <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">3</button>
-                        <button class="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300"><i class="fas fa-chevron-right"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<div id="addMemberModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
-        <div class="flex justify-between items-center pb-4 border-b">
-            <h3 class="text-xl font-semibold">Agregar Nuevo Miembro</h3>
-            <button id="closeModal" class="text-gray-500 hover:text-gray-700">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="mt-4">
-            <form>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Campo UID manual -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">UID (manual)</label>
-                        <input id="nuevoMiembroUID" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="UID único">
-                    </div>
-                    <!-- Campo Género -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
-                        <select id="Genero" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="Masculino">Masculino</option>
-                            <option value="Femenino">Femenino</option>
-                            <option value="254 tipos de gays">254 tipos de gays</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                        <input type="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                        <input type="tel" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
-                        <select id="tipoMembresia" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option>Seleccione una opción</option>
-                            <option>Básica (1 mes)</option>
-                            <option>Estándar (3 meses)</option>
-                            <option>Premium (6 meses)</option>
-                            <option>VIP (12 meses)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio</label>
-                        <input type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    
-                </div>
-                <div class="mt-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Foto (Opcional)</label>
-                    <div class="mt-1 flex items-center">
-                        <span class="inline-block h-12 w-12 rounded-full overflow-hidden bg-gray-100">
-                            <svg class="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
-                        </span>
-                        <button type="button" class="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Cambiar
-                        </button>
-                    </div>
-                </div>
-                <div class="mt-8 flex justify-end">
-                    <button type="button" onclick="document.getElementById('addMemberModal').classList.add('hidden')" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Cancelar
-                    </button>
-                    <button type="button" onclick="guardarNuevoMiembro()" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Guardar Miembro
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-
-    // Funcionalidad para abrir el modal de Miembros
-    document.querySelector('a[href="#"]:has(i.fa-users)').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('membersModal').classList.remove('hidden');
-        cargarMiembrosModal();
-    });
-
-    // Funcionalidad para abrir el modal de Membresías
-    document.querySelector('a[href="#"]:has(i.fa-id-card)').addEventListener('click', function(e) {
-        e.preventDefault();
-        mostrarModalMembresias();
-    });
-
-    // Modal específico para gestionar costos de membresías
-    function mostrarModalMembresias() {
-        let costos = {
-            Basica: 200,
-            Estandar: 500,
-            Premium: 900,
-            VIP: 1500
-        };
-        // Cargar los costos actuales desde Firestore
-        import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(async ({ getDocs, collection }) => {
-            const snap = await getDocs(collection(db, 'subscripciones'));
-            snap.forEach(doc => {
-                const d = doc.data();
-                if (d.nombre && d.costo) {
-                    if (d.nombre === 'Basica') costos.Basica = d.costo;
-                    if (d.nombre === 'Estandar') costos.Estandar = d.costo;
-                    if (d.nombre === 'Premium') costos.Premium = d.costo;
-                    if (d.nombre === 'VIP') costos.VIP = d.costo;
-                }
-            });
-            renderModal();
-        });
-
-        function renderModal() {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
-            modal.innerHTML = `
-                <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
-                    <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeMembresiasModal"><i class="fas fa-times"></i></button>
-                    <h3 class="text-xl font-semibold mb-4">Gestión de Membresías</h3>
-                    <form id="formCostosMembresias">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo Básica (1 mes)</label>
-                            <input type="number" min="0" step="1" name="Basica" value="${costos.Basica}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo Estándar (3 meses)</label>
-                            <input type="number" min="0" step="1" name="Estandar" value="${costos.Estandar}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo Premium (6 meses)</label>
-                            <input type="number" min="0" step="1" name="Premium" value="${costos.Premium}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                        </div>
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Costo VIP (12 meses)</label>
-                            <input type="number" min="0" step="1" name="VIP" value="${costos.VIP}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                        </div>
-                        <div class="flex justify-end gap-2">
-                            <button type="button" id="closeMembresiasModalBtn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancelar</button>
-                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Guardar Cambios</button>
                         </div>
                     </form>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            document.getElementById('closeMembresiasModal').onclick = () => modal.remove();
-            document.getElementById('closeMembresiasModalBtn').onclick = () => modal.remove();
-            document.getElementById('formCostosMembresias').onsubmit = async function(e) {
-                e.preventDefault();
-                const data = new FormData(e.target);
-                const subs = [
-                    { nombre: 'Basica', costo: parseInt(data.get('Basica')) },
-                    { nombre: 'Estandar', costo: parseInt(data.get('Estandar')) },
-                    { nombre: 'Premium', costo: parseInt(data.get('Premium')) },
-                    { nombre: 'VIP', costo: parseInt(data.get('VIP')) }
-                ];
-                const { setDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-                for (const sub of subs) {
-                    await setDoc(doc(db, 'subscripciones', sub.nombre), { nombre: sub.nombre, costo: sub.costo });
-                }
-                alert('Costos actualizados correctamente y guardados en la base de datos.');
-                modal.remove();
-            };
-        }
-    }
 
-    // Funcionalidad para abrir el modal de Asistencias
-    document.querySelector('a[href="#"]:has(i.fa-calendar-check)').addEventListener('click', function(e) {
-        e.preventDefault();
-        mostrarModalAsistencias();
-    });
+                    <!-- Separador -->
+                    <div class="relative flex py-5 items-center">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="flex-shrink mx-4 text-gray-400">O inicia sesión con</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
 
-    function mostrarModalAsistencias() {
-        const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
-        modal.innerHTML = `
-            <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-4xl relative">
-                <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeAsistenciasModal"><i class="fas fa-times"></i></button>
-                <h3 class="text-xl font-semibold mb-4">Asistencias en Tiempo Real</h3>
-                <div class="overflow-x-auto max-h-96">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UID</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora de Entrada</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora de Salida</th>
-                            </tr>
-                        </thead>
-                        <tbody id="asistenciasBody" class="bg-white divide-y divide-gray-200">
-                            <tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">Cargando...</td></tr>
-                        </tbody>
-                    </table>
+                    <!-- Botón de Google -->
+                    <div>
+                        <button id="googleLoginBtn"
+                            class="btn-hover w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
+                            <img class="w-5 h-5 mr-2" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo">
+                            Ingresar con Google
+                        </button>
+                    </div>
+
                 </div>
+
             </div>
-        `;
-        document.body.appendChild(modal);
-        document.getElementById('closeAsistenciasModal').onclick = () => modal.remove();
-
-        cargarAsistenciasRealtimeRTDB(document.getElementById('asistenciasBody'));
-    }
-
-    async function cargarAsistenciasRealtimeRTDB(tbody) {
-        try {
-            // Obtener mapeo UID → Nombre
-            let uidToName = {};
-            try {
-                const { getDocs, collection } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-                const usuariosSnap = await getDocs(collection(db, 'usuarios'));
-                usuariosSnap.forEach(doc => {
-                    const d = doc.data();
-                    const nombreCompleto = (d.Nombre ? d.Nombre : '') + (d.Apellido ? ' ' + d.Apellido : '');
-                    uidToName[doc.id] = nombreCompleto.trim() || doc.id;
-                    if (d.uid) {
-                        uidToName[d.uid] = nombreCompleto.trim() || d.uid;
-                    }
-                });
-            } catch (e) {}
-
-            const { getDatabase, ref, onValue } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
-            const dbRTDB = getDatabase();
-            const lecturasRef = ref(dbRTDB, 'lecturas');
-            onValue(lecturasRef, (snapshot) => {
-                tbody.innerHTML = '';
-                const data = snapshot.val();
-                if (!data) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-400">Sin registros</td></tr>';
-                    return;
-                }
-                // Agrupar por UID
-                const registros = Object.values(data);
-                const porUid = {};
-                registros.forEach(reg => {
-                    const uid = reg.uid || reg.id;
-                    if (!uid) return;
-                    if (!porUid[uid]) porUid[uid] = [];
-                    porUid[uid].push(reg);
-                });
-                Object.entries(porUid).forEach(([uid, lista]) => {
-                    // Ordenar por timestamp ascendente
-                    lista.sort((a, b) => {
-                        const tA = extraerTimestamp(a.timestamp);
-                        const tB = extraerTimestamp(b.timestamp);
-                        return tA - tB;
-                    });
-                    const nombre = uidToName[uid] || uid;
-                    // Procesar en pares de lecturas (entrada/salida)
-                    for (let i = 0; i < lista.length; i += 2) {
-                        const entrada = lista[i];
-                        const salida = lista[i + 1];
-                        const horaEntrada = entrada ? formatearFecha24(entrada.timestamp) : '-';
-                        const horaSalida = salida ? formatearFecha24(salida.timestamp) : '-';
-                        tbody.innerHTML += `
-                            <tr>
-                                <td class="px-4 py-4 whitespace-nowrap">${uid}</td>
-                                <td class="px-4 py-4 whitespace-nowrap">${nombre}</td>
-                                <td class="px-4 py-4 whitespace-nowrap">${horaEntrada}</td>
-                                <td class="px-4 py-4 whitespace-nowrap">${horaSalida}</td>
-                            </tr>
-                        `;
-                    }
-                });
-            }, (err) => {
-                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-400">Error al cargar asistencias</td></tr>';
-            });
-        } catch (err) {
-            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-400">Error al cargar asistencias</td></tr>';
-        }
-    }
-
-    // Función auxiliar para extraer el timestamp en milisegundos
-    function extraerTimestamp(hora) {
-       return hora;
-    }
-
-    // Función auxiliar para formatear la fecha
-    function formatearFecha24(hora) {
-        if (!hora) {
-            return '-';
-        }
-
-        return hora;
-    }
-
-
-
-    // Función genérica para mostrar modales simples
-    function mostrarModalGenerico(titulo, contenido) {
-        // Si es la sección de reportes, mostrar UI especial
-        if (titulo === 'Reportes') {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
-            modal.innerHTML = `
-                <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-3xl relative">
-                    <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeGenericModal"><i class="fas fa-times"></i></button>
-                    <h3 class="text-xl font-semibold mb-4">Reportes del Gimnasio</h3>
-                    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-gray-50 rounded-lg p-4 shadow">
-                            <h4 class="font-semibold mb-2 text-indigo-700"><i class="fas fa-users mr-2"></i>Reporte General de Usuarios</h4>
-                            <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 w-full" onclick="generarReporteUsuarios()">Descargar Excel</button>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-4 shadow">
-                            <h4 class="font-semibold mb-2 text-green-700"><i class="fas fa-calendar-check mr-2"></i>Reporte de Asistencias</h4>
-                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full" onclick="generarReporteAsistencias()">Descargar Excel</button>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-4 shadow">
-                            <h4 class="font-semibold mb-2 text-yellow-700"><i class="fas fa-id-card mr-2"></i>Reporte de Membresías</h4>
-                            <button class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 w-full" onclick="generarReporteMembresias()">Descargar Excel</button>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-4 shadow">
-                            <h4 class="font-semibold mb-2 text-purple-700"><i class="fas fa-wallet mr-2"></i>Reporte de Ingresos</h4>
-                            <button class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 w-full" onclick="generarReporteIngresos()">Descargar Excel</button>
-                        </div>
-                    </div>
-                    <div class="flex justify-end">
-                        <button type="button" id="closeGenericModalBtn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cerrar</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            document.getElementById('closeGenericModal').onclick = () => modal.remove();
-            document.getElementById('closeGenericModalBtn').onclick = () => modal.remove();
-        } else {
-            // Modal genérico por defecto
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
-            modal.innerHTML = `
-                <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
-                    <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeGenericModal"><i class="fas fa-times"></i></button>
-                    <h3 class="text-xl font-semibold mb-4">${titulo}</h3>
-                    <div class="mb-8 text-gray-700">${contenido}</div>
-                    <div class="flex justify-end">
-                        <button type="button" id="closeGenericModalBtn" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cerrar</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            document.getElementById('closeGenericModal').onclick = () => modal.remove();
-            document.getElementById('closeGenericModalBtn').onclick = () => modal.remove();
-        }
-    }
-// Cargar SheetJS para exportar a Excel
-let sheetjsLoaded = false;
-async function loadSheetJS() {
-    if (!sheetjsLoaded) {
-        await import('https://cdn.sheetjs.com/xlsx-latest/package/xlsx.mjs');
-        sheetjsLoaded = true;
-    }
-}
-
-// Reporte General de Usuarios
-async function generarReporteUsuarios() {
-    await loadSheetJS();
-    const { getDocs, collection } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    const usuariosSnap = await getDocs(collection(db, 'usuarios'));
-    const rows = [];
-    usuariosSnap.forEach(doc => {
-        const d = doc.data();
-        let fechaCreacion = '-';
-        if (d.Creado) {
-            if (typeof d.Creado.toDate === 'function') {
-                fechaCreacion = d.Creado.toDate().toLocaleDateString('es-ES');
-            } else if (typeof d.Creado === 'string' || typeof d.Creado === 'number') {
-                fechaCreacion = new Date(d.Creado).toLocaleDateString('es-ES');
-            }
-        }
-        rows.push({
-            UID: d.uid || doc.id,
-            Nombre: d.Nombre || '',
-            Apellido: d.Apellido || '',
-            Email: d.Email || '',
-            Teléfono: d.Telefono || '',
-            Tipo: d.Tipo || '',
-            'Fecha de Creación': fechaCreacion,
-            'Fecha Fin': d.SuscripcionHasta ? (d.SuscripcionHasta.toDate ? d.SuscripcionHasta.toDate().toLocaleDateString('es-ES') : '-') : '-',
-            Estado: d.Estado || '-',
-        });
-    });
-    if (rows.length === 0) return alert('No hay usuarios para exportar.');
-    exportarExcel(rows, 'Usuarios.xlsx');
-}
-
-// Reporte de Asistencias
-async function generarReporteAsistencias() {
-    await loadSheetJS();
-    const { getDatabase, ref, get } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
-    const dbRTDB = getDatabase();
-    const lecturasRef = ref(dbRTDB, 'lecturas');
-    const snap = await get(lecturasRef);
-    const data = snap.val();
-    if (!data) return alert('No hay asistencias para exportar.');
-    const rows = Object.values(data).map(reg => ({
-        UID: reg.uid || reg.id || '-',
-        Nombre: reg.nombre || '-',
-        'Hora': reg.horaEntrada || reg.hora || reg.timestamp || '-',
-    }));
-    exportarExcel(rows, 'Asistencias.xlsx');
-}
-
-// Reporte de Membresías
-async function generarReporteMembresias() {
-    await loadSheetJS();
-    const { getDocs, collection } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    const usuariosSnap = await getDocs(collection(db, 'usuarios'));
-    const rows = [];
-    usuariosSnap.forEach(doc => {
-        const d = doc.data();
-        let fechaCreacion = '-';
-        if (d.Creado) {
-            if (typeof d.Creado.toDate === 'function') {
-                fechaCreacion = d.Creado.toDate().toLocaleDateString('es-ES');
-            } else if (typeof d.Creado === 'string' || typeof d.Creado === 'number') {
-                fechaCreacion = new Date(d.Creado).toLocaleDateString('es-ES');
-            }
-        }
-        // Normalizar tipo para el reporte
-        let tipo = (d.Tipo || "Basica").toLowerCase();
-        if (tipo.includes("básica") || tipo.includes("basica")) tipo = "Básica";
-        else if (tipo.includes("estándar") || tipo.includes("estandar")) tipo = "Estandar";
-        else if (tipo.includes("premium")) tipo = "Premium";
-        else if (tipo.includes("vip")) tipo = "VIP";
-        rows.push({
-            UID: d.uid || doc.id,
-            Nombre: d.Nombre || '',
-            Apellido: d.Apellido || '',
-            Tipo: tipo,
-            'Fecha de Creación': fechaCreacion,
-            'Fecha Fin': d.SuscripcionHasta ? (d.SuscripcionHasta.toDate ? d.SuscripcionHasta.toDate().toLocaleDateString('es-ES') : '-') : '-',
-            Estado: d.Estado || '-',
-        });
-    });
-    if (rows.length === 0) return alert('No hay membresías para exportar.');
-    exportarExcel(rows, 'Membresias.xlsx');
-}
-
-// Reporte de Ingresos (requiere campo de pagos o ingresos en la BD)
-async function generarReporteIngresos() {
-    await loadSheetJS();
-    const { getDocs, collection } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-    try {
-        const pagosSnap = await getDocs(collection(db, 'pagos'));
-        const rows = [];
-        pagosSnap.forEach(doc => {
-            const d = doc.data();
-            rows.push({
-                UID: d.uid || '-',
-                Nombre: d.Nombre || '-',
-                Monto: d.Monto || d.monto || '-',
-                Fecha: d.Fecha ? (d.Fecha.toDate ? d.Fecha.toDate().toLocaleDateString('es-ES') : d.Fecha) : '-',
-                Concepto: d.Concepto || '-',
-            });
-        });
-        if (rows.length === 0) return alert('No hay ingresos registrados en la colección "pagos". Si no existe, crea la colección o avísame para ajustar el reporte.');
-        exportarExcel(rows, 'Ingresos.xlsx');
-    } catch (e) {
-        alert('No se encontró la colección "pagos" en la base de datos. Por favor, crea la colección o avísame para ajustar el reporte.');
-    }
-}
-
-
-async function exportarExcel(rows, nombreArchivo) {
-   
-    const XLSX = await import('https://cdn.sheetjs.com/xlsx-latest/package/xlsx.mjs');
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-    XLSX.writeFile(wb, nombreArchivo);
-}
-
-    document.getElementById('closeMembersModal').addEventListener('click', function() {
-        document.getElementById('membersModal').classList.add('hidden');
-    });
-
-    window.addEventListener('click', function(e) {
-        if (e.target === document.getElementById('membersModal')) {
-            document.getElementById('membersModal').classList.add('hidden');
-        }
-    });
-
-    let currentPage = 1;
-    const membersPerPage = 10;
-    let allMembers = [];
-    let filteredMembers = [];
-    let cuentasTotales = 0;
-
-    async function cargarMiembrosModal() {
-        try {
-            const q = query(collection(db, "usuarios"), orderBy("Creado", "desc"));
-            const snapshot = await getDocs(q);
-            const allSnapshot = await getDocs(collection(db, "usuarios"));
-            cuentasTotales = allSnapshot.size;
-         allMembers = [];
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                allMembers.push({
-                    id: doc.id,
-                    UID: data.uid || doc.id, // <-- Agregar UID
-                    Nombre: data.Nombre || "Sin nombre",
-                    Apellido: data.Apellido || "",
-                    Email: data.Email || "Sin email",
-                    Telefono: data.Telefono || "Sin teléfono",
-                    Tipo: data.Tipo || "Básica",
-                    SuscripcionHasta: data.SuscripcionHasta ? data.SuscripcionHasta.toDate() : new Date(),
-                    Genero: data.Genero || "Masculino"
-                });
-            });
-            filteredMembers = [...allMembers];
-            mostrarMiembros();
-            actualizarPaginacion();
-            document.getElementById('totalAccounts').textContent = 0; // Inicializar en 0
-        } catch (err) {
-
-             document.getElementById('totalAccounts').textContent = 0;
-            console.error("Error al cargar miembros:", err);
-            alert("Error al cargar miembros. Verifica la consola para más detalles.");
-        }
-    }
-
-    function mostrarMiembros() {
-        const startIndex = (currentPage - 1) * membersPerPage;
-        const endIndex = startIndex + membersPerPage;
-        const membersToShow = filteredMembers.slice(startIndex, endIndex);
-        const tbody = document.getElementById('membersModalBody');
-        tbody.innerHTML = '';
-        membersToShow.forEach(member => {
-            const fechaFin = member.SuscripcionHasta instanceof Date ? member.SuscripcionHasta : new Date(member.SuscripcionHasta);
-            const hoy = new Date();
-            const estado = fechaFin >= hoy ? 'Activo' : 'Expirado';
-            const estadoClass = fechaFin >= hoy ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-            tbody.innerHTML += `
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10">
-                                <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${member.Genero === 'Femenino' ? 'women' : 'men'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
-                            </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">${member.Nombre} ${member.Apellido}</div>
-                                <div class="text-sm text-gray-500">${member.Email}</div>
-                                <div class="text-xs text-gray-400">UID: ${member.UID || member.id}</div> <!-- Mostrar UID -->
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${member.Telefono}</div>
-                        <div class="text-sm text-gray-500">${member.Email}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${member.Tipo}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${fechaFin.toLocaleDateString('es-ES')}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${estadoClass}">
-                            ${estado}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button onclick="editarMiembro('${member.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3"><i class="fas fa-edit"></i></button>
-                        <button onclick="eliminarMiembro('${member.id}')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash-alt"></i></button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    document.querySelector('#membersModal input[type="text"]').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        filtrarMiembros(searchTerm);
-    });
-
-    document.querySelectorAll('#membersModal select').forEach(select => {
-        select.addEventListener('change', function() {
-            filtrarMiembros();
-        });
-    });
-
-    function filtrarMiembros(searchTerm = '') {
-        const estadoFilter = document.querySelector('#membersModal select:first-of-type').value;
-        const tipoFilter = document.querySelector('#membersModal select:last-of-type').value;
-        
-        filteredMembers = allMembers.filter(member => {
-            const matchesSearch = member.Nombre.toLowerCase().includes(searchTerm) || 
-                                member.Email?.toLowerCase().includes(searchTerm) ||
-                                member.Telefono?.includes(searchTerm);
-            
-            const hoy = new Date();
-            const fechaFin = member.fechaFin instanceof Date ? member.fechaFin : new Date(member.fechaFin);
-            let matchesEstado = true;
-            let matchesTipo = true;
-            
-            if (estadoFilter !== 'Todos los estados') {
-                if (estadoFilter === 'Activos') matchesEstado = fechaFin >= hoy;
-                if (estadoFilter === 'Expirados') matchesEstado = fechaFin < hoy;
-                if (estadoFilter === 'Por vencer') {
-                    const cincoDiasDespues = new Date();
-                    cincoDiasDespues.setDate(hoy.getDate() + 5);
-                    matchesEstado = fechaFin > hoy && fechaFin <= cincoDiasDespues;
-                }
-            }
-            
-            if (tipoFilter !== 'Todos los tipos') {
-                matchesTipo = member.Tipo === tipoFilter;
-            }
-            
-            return matchesSearch && matchesEstado && matchesTipo;
-        });
-        
-        currentPage = 1;
-        mostrarMiembros();
-        actualizarPaginacion();
-    }
-
-    function actualizarPaginacion() {
-        const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
-        const paginationInfo = document.querySelector('#membersModal .text-sm.text-gray-500');
-        const paginationButtons = document.querySelectorAll('#membersModal .flex.space-x-2 button');
-        
-        const startItem = (currentPage - 1) * membersPerPage + 1;
-        const endItem = Math.min(currentPage * membersPerPage, filteredMembers.length);
-        
-        paginationInfo.innerHTML = `Mostrando <span class="font-medium">${startItem}</span> a <span class="font-medium">${endItem}</span> de <span class="font-medium">${filteredMembers.length}</span> miembros`;
-        
-        paginationButtons.forEach((button, index) => {
-            if (index === 0) {
-                button.disabled = currentPage === 1;
-                button.classList.toggle('bg-gray-200', !button.disabled);
-                button.classList.toggle('bg-gray-100', button.disabled);
-            } else if (index === paginationButtons.length - 1) {
-                button.disabled = currentPage === totalPages;
-                button.classList.toggle('bg-gray-200', !button.disabled);
-                button.classList.toggle('bg-gray-100', button.disabled);
-            } else {
-                const pageNumber = index;
-                button.textContent = pageNumber;
-                button.classList.toggle('bg-indigo-600', pageNumber === currentPage);
-                button.classList.toggle('text-white', pageNumber === currentPage);
-                button.classList.toggle('bg-gray-200', pageNumber !== currentPage);
-                button.style.display = pageNumber <= totalPages ? '' : 'none';
-            }
-        });
-    }
-
-    document.querySelector('#membersModal .flex.space-x-2').addEventListener('click', function(e) {
-        const target = e.target.closest('button');
-        if (!target) return;
-        
-        const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
-        
-        if (target.innerHTML.includes('chevron-left')) {
-            if (currentPage > 1) {
-                currentPage--;
-                mostrarMiembros();
-                actualizarPaginacion();
-            }
-        } else if (target.innerHTML.includes('chevron-right')) {
-            if (currentPage < totalPages) {
-                currentPage++;
-                mostrarMiembros();
-                actualizarPaginacion();
-            }
-        } else if (!isNaN(parseInt(target.textContent))) {
-            currentPage = parseInt(target.textContent);
-            mostrarMiembros();
-            actualizarPaginacion();
-        }
-    });
-
-    // Nueva función para actualizar el estado en Realtime Database
-    async function actualizarEstadoActivoEnRTDB(uid, fechaFin) {
-        try {
-            const { getDatabase, ref, set } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
-            const dbRTDB = getDatabase();
-            const hoy = new Date();
-            // Maneja tanto objetos Date como Timestamps de Firestore
-            const fechaExpiracion = fechaFin instanceof Date ? fechaFin : (fechaFin && typeof fechaFin.toDate === 'function' ? fechaFin.toDate() : new Date(fechaFin));
-            const estaActivo = fechaExpiracion >= hoy;
-            
-            await set(ref(dbRTDB, 'activos/' + uid), {
-                activa: estaActivo
-            });
-        } catch (error) {
-            console.error("Error al actualizar estado en RTDB para UID " + uid, error);
-        }
-    }
-
-    // Nueva función para eliminar el estado en Realtime Database
-    async function eliminarEstadoActivoEnRTDB(uid) {
-        try {
-            const { getDatabase, ref, remove } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
-            const dbRTDB = getDatabase();
-            await remove(ref(dbRTDB, 'activos/' + uid));
-        } catch (error) {
-            console.error("Error al eliminar estado en RTDB para UID " + uid, error);
-        }
-    }
-
-    async function eliminarMiembro(id) {
-  if (confirm('¿Estás seguro de eliminar este miembro?')) {
-    try {
-      const { deleteDoc, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-      const memberDocRef = doc(db, 'usuarios', id);
-      const memberDoc = await getDoc(memberDocRef);
-      const memberData = memberDoc.data();
-      if (memberData && memberData.uid) {
-        await eliminarEstadoActivoEnRTDB(memberData.uid);
-      }
-      await deleteDoc(memberDocRef);
-      alert('Miembro eliminado correctamente');
-      cargarMiembrosModal();
-      cargarUsuarios();
-    } catch (err) {
-      
-    }
-  }
-}
-
-async function editarMiembro(id) {
-  const member = allMembers.find(m => m.id === id);
-  if (!member) return;
-  const modal = document.createElement('div');
-  modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
-  modal.innerHTML = `
-    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
-      <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeEditModal"><i class="fas fa-times"></i></button>
-      <h3 class="text-xl font-semibold mb-4">Editar Miembro</h3>
-      <form id="editMemberForm">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">UID</label>
-            <input type="text" name="uid" value="${member.UID || member.id}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
-            <select name="genero" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="Masculino"${member.Genero === 'Masculino' ? ' selected' : ''}>Masculino</option>
-              <option value="Femenino"${member.Genero === 'Femenino' ? ' selected' : ''}>Femenino</option>
-              <option value="Otro"${member.Genero === 'Otro' ? ' selected' : ''}>254 tipos de gays</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <input type="text" name="nombre" value="${member.Nombre}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-            <input type="text" name="apellido" value="${member.Apellido}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-            <input type="email" name="email" value="${member.Email}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-            <input type="tel" name="telefono" value="${member.Telefono}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
-            <select name="tipo" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option${member.Tipo==='Básica'||member.Tipo==='Basica'?' selected':''}>Básica</option>
-              <option${member.Tipo==='Estándar'||member.Tipo==='Estandar'?' selected':''}>Estándar</option>
-              <option${member.Tipo==='Premium'?' selected':''}>Premium</option>
-              <option${member.Tipo==='VIP'?' selected':''}>VIP</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
-            <input type="date" name="suscripcionHasta" value="${member.SuscripcionHasta.toISOString().slice(0,10)}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
         </div>
-        <div class="mt-8 flex justify-end">
-          <button type="button" id="cancelEditMember" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancelar</button>
-          <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Guardar Cambios</button>
-        </div>
-      </form>
     </div>
-  `;
-  document.body.appendChild(modal);
-  document.getElementById('closeEditModal').onclick = () => modal.remove();
-  document.getElementById('cancelEditMember').onclick = () => modal.remove();
-  document.getElementById('editMemberForm').onsubmit = async function(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const uid = formData.get('uid').trim();
-    const genero = formData.get('genero');
-    const nombre = formData.get('nombre').trim();
-    const apellido = formData.get('apellido').trim();
-    const email = formData.get('email').trim();
-    const telefono = formData.get('telefono').trim();
-    const tipo = formData.get('tipo');
-    const suscripcionHasta = formData.get('suscripcionHasta');
-    try {
-      const { updateDoc, doc, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-      await updateDoc(doc(db, 'usuarios', id), {
-        uid: uid,
-        Genero: genero,
-        Nombre: nombre,
-        Apellido: apellido,
-        Email: email,
-        Telefono: telefono,
-        Tipo: tipo,
-        SuscripcionHasta: Timestamp.fromDate(new Date(suscripcionHasta))
-      });
-      await actualizarEstadoActivoEnRTDB(uid, new Date(suscripcionHasta));
-      alert('Miembro actualizado correctamente\nUID: ' + uid);
-      modal.remove();
-      cargarMiembrosModal();
-      cargarUsuarios();
-    } catch (err) {
-     
-    }
-  };
-}
 
-// Mostrar modal de agregar miembro desde el botón en el modal de gestión de miembros
-document.querySelector('#membersModal button.bg-indigo-600').addEventListener('click', function() {
-    document.getElementById('addMemberModal').classList.remove('hidden');
-});
+    <script type="module">
+        // Importaciones de Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            signInWithEmailAndPassword,
+            GoogleAuthProvider,
+            signInWithPopup
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-function verMiembro(id) {
-  let member = null;
-  // Buscar en allMembers si está cargado, si no, buscar en Firestore
-  if (typeof allMembers !== 'undefined' && Array.isArray(allMembers)) {
-    member = allMembers.find(m => m.id === id);
-  }
-  if (!member) {
-    // Buscar en Firestore si no está en allMembers
-    getDocs(query(collection(db, "usuarios"))).then(snapshot => {
-      snapshot.forEach(doc => {
-        if (doc.id === id) {
-          const data = doc.data();
-          member = {
-            id: doc.id,
-            UID: data.uid || doc.id, // <-- Agregar UID
-            Nombre: data.Nombre || "Sin nombre",
-            Apellido: data.Apellido || "",
-            Email: data.Email || "Sin email",
-            Telefono: data.Telefono || "Sin teléfono",
-            Tipo: data.Tipo || "Básica",
-            SuscripcionHasta: data.SuscripcionHasta ? data.SuscripcionHasta.toDate() : new Date(),
-            Creado: data.Creado ? data.Creado.toDate() : new Date(),
-            Genero: data.UID || ""
-          };
-        }
-      });
-      if (member) mostrarModalVerMiembro(member);
-    });
-  } else {
-    mostrarModalVerMiembro(member);
-  }
-}
-
-function mostrarModalVerMiembro(member) {
-  const modal = document.createElement('div');
-  modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
-  modal.innerHTML = `
-    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
-      <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeViewModal"><i class="fas fa-times"></i></button>
-      <h3 class="text-xl font-semibold mb-4">Detalle del Miembro</h3>
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">UID</label>
-        <div class="text-xs text-gray-500">${member.UID || member.id}</div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-          <div class="text-gray-900">${member.Nombre}</div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-          <div class="text-gray-900">${member.Apellido}</div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-          <div class="text-gray-900">${member.Email}</div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-          <div class="text-gray-900">${member.Telefono}</div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
-          <div class="text-gray-900">${member.Tipo}</div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio</label>
-          <div class="text-gray-900">${member.Creado ? new Date(member.Creado).toLocaleDateString('es-ES') : ''}</div>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
-          <div class="text-gray-900">${member.SuscripcionHasta ? new Date(member.SuscripcionHasta).toLocaleDateString('es-ES') : ''}</div>
-        </div>
-      </div>
-      <div class="mt-8 flex justify-end">
-        <button type="button" id="closeViewMember" class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cerrar</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  document.getElementById('closeViewModal').onclick = () => modal.remove();
-  document.getElementById('closeViewMember').onclick = () => modal.remove();
-}
-window.verMiembro = verMiembro;
-
-// Funcionalidad para abrir el modal de Reportes
-document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('click', function(e) {
-    e.preventDefault();
-    mostrarModalGenerico('Reportes', '');
-});
-
-</script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { 
-    getFirestore, collection, getDocs, query, orderBy, limit, addDoc, Timestamp 
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-  const firebaseConfig = {
-      apiKey: "TU_API_KEY",
+        
+          const firebaseConfig = {
+      apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
       authDomain: "gymrats-d16eb.firebaseapp.com",
       projectId: "gymrats-d16eb",
       storageBucket: "gymrats-d16eb.appspot.com",
@@ -1275,348 +160,102 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
       appId: "1:106526343668278361492:web:abcd1234efgh5678"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-  let conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
+        // Obtener elementos del DOM
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
 
-  async function sincronizarEstadosDeMembresia() {
-    try {
-        const usuariosSnap = await getDocs(collection(db, 'usuarios'));
-        
-        const promesas = [];
-        usuariosSnap.forEach(doc => {
-            const data = doc.data();
-            if (data.uid && data.SuscripcionHasta) {
-                promesas.push(actualizarEstadoActivoEnRTDB(data.uid, data.SuscripcionHasta));
+        // Función para manejar el estado de carga de los botones
+        const setLoading = (isLoading) => {
+            if (isLoading) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Cargando...';
+                submitBtn.disabled = true;
+                googleLoginBtn.disabled = true;
+            } else {
+                submitBtn.innerHTML = 'INGRESAR';
+                submitBtn.disabled = false;
+                googleLoginBtn.disabled = false;
+            }
+        };
+
+        // Función para mostrar errores
+        const showError = (message) => {
+            alert(message); // Un alert simple es suficiente por ahora.
+            loginForm.classList.add('shake');
+            setTimeout(() => loginForm.classList.remove('shake'), 500);
+        };
+
+        // Observador del estado de autenticación: redirige si el usuario ya está logueado
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log('Usuario autenticado, redirigiendo a index.html');
+                window.location.href = 'index.html';
+            } else {
+                console.log('No hay usuario autenticado.');
             }
         });
-        
-        await Promise.all(promesas);
-    } catch (error) {
-        console.error("Error durante la sincronización de estados de membresía:", error);
-    }
-  }
 
-  async function cargarUsuarios() {
-    const totalActivos = document.getElementById('totalMembers');
-       const nuevosUsuarios = document.getElementById('activeMemberships');
-    const expiringSoon = document.getElementById('expiringSoon');
-    const miembrosTableBody = document.querySelector('tbody');
-    const actividadReciente = document.querySelector('.space-y-4');
-    
-    let activos = 0;
-    let nuevos = 0;
-    let porVencer = 0;
-    let ingresosMensuales = 0;
-    const hoy = new Date();
-    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-    const cincoDiasDespues = new Date();
-    cincoDiasDespues.setDate(hoy.getDate() + 5);
+        // Evento para el inicio de sesión con Correo y Contraseña
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setLoading(true);
 
-     try {
-      const pagosSnapshot = await getDocs(collection(db, "pagos"));
+            const email = emailInput.value;
+            const password = passwordInput.value;
 
-      const q = query(collection(db, "usuarios"), orderBy("Creado", "desc"), limit(5));
-      const snapshot = await getDocs(q);
-      const allSnapshot = await getDocs(collection(db, "usuarios"));
-      cuentasTotales = allSnapshot.size;
-
-      miembrosTableBody.innerHTML = '';
-      actividadReciente.innerHTML = '';
-
-      // Reiniciar conteoTipos antes de contar
-      conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
-
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        const fechaFin = data.SuscripcionHasta.toDate();
-        const fechaInicio = data.Creado.toDate();
-        // Normalizar tipo para evitar errores de escritura
-        let tipo = (data.Tipo || "Basica").toLowerCase();
-        if (tipo.includes("básica") || tipo.includes("basica")) tipo = "Basica";
-        else if (tipo.includes("estándar") || tipo.includes("estandar")) tipo = "Estandar";
-        else if (tipo.includes("premium")) tipo = "Premium";
-        else if (tipo.includes("vip")) tipo = "VIP";
-        // Sumar correctamente cada tipo
-        if (conteoTipos.hasOwnProperty(tipo)) {
-          conteoTipos[tipo]++;
-        }
-
-        if (fechaFin >= hoy) activos++;
-        nuevos++;
-
-        if (fechaFin > hoy && fechaFin <= cincoDiasDespues) {
-          porVencer++;
-        }
-
-        pagosSnapshot.forEach((doc) => {
-            const pago = doc.data();
-            const fechaPago = pago.Fecha ? pago.Fecha.toDate() : null;
-            if (fechaPago && fechaPago >= inicioMes && fechaPago <= hoy) {
-                ingresosMensuales += pago.Monto || 0;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // La redirección la maneja onAuthStateChanged
+            } catch (error) {
+                let errorMessage = 'Ocurrió un error. Inténtalo de nuevo.';
+                switch (error.code) {
+                    case 'auth/invalid-credential':
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = 'Correo o contraseña incorrectos.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'El formato del correo no es válido.';
+                        break;
+                }
+                showError(errorMessage);
+            } finally {
+                setLoading(false);
             }
-      });
+        });
 
-     
+        // Evento para el inicio de sesión con Google
+        googleLoginBtn.addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            setLoading(true);
+            try {
+                await signInWithPopup(auth, provider);
+                // La redirección la maneja onAuthStateChanged
+            } catch (error) {
+                showError('No se pudo iniciar sesión con Google. Inténtalo de nuevo.');
+            } finally {
+                setLoading(false);
+            }
+        });
 
-        const fechaFinStr = fechaFin.toLocaleDateString('es-ES');
-        const fechaInicioStr = fechaInicio.toLocaleDateString('es-ES');
-
-        let estado = '';
-        let estadoClass = '';
-        if (fechaFin >= hoy) {
-          estado = 'Activa';
-          estadoClass = 'bg-green-100 text-green-800';
-               } else {
-          estado = 'Expirada';
-          estadoClass = 'bg-red-100 text-red-800';
-        }
-
-       
-
-        miembrosTableBody.innerHTML += `
-          <tr class="fade-in">
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 h-10 w-10">
-                  <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${data.Genero === 'Femenino' ? 'women' : 'men'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
-                </div>
-                <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">${data.Nombre} ${data.Apellido || ''}</div>
-                  <div class="text-sm text-gray-500">${data.Email || 'Sin email'}</div>
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">${tipo}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              ${fechaInicioStr}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              ${fechaFinStr}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${estadoClass}">
-                ${estado}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
-              <button onclick="verMiembro('${doc.id}')" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-eye"></i></button>
-            </td>
-          </tr>
-        `;
-
-        actividadReciente.innerHTML += `
-          <div class="flex items-start">
-            <div class="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
-              <i class="fas fa-user-plus"></i>
-            </div>
-            <div>
-              <p class="text-sm font-medium">Nuevo miembro registrado</p>
-              <p class="text-xs text-gray-500">${data.Nombre} ${data.Apellido || ''} ha adquirido la membresía ${tipo}</p>
-              <p class="text-xs text-gray-400 mt-1">${fechaInicio.toLocaleString('es-ES')}</p>
-            </div>
-          </div>
-        `;
-      });
-
-      totalActivos.textContent = activos;
-      nuevosUsuarios.textContent = nuevos;
-      expiringSoon.textContent = porVencer;
-       document.getElementById('totalAccounts').textContent = ingresosMensuales.toLocaleString('es-ES', { style: 'currency', currency: 'USD' });
-            animateValue(document.getElementById('totalMembers'), 0, activos, 2000);
-      animateValue(document.getElementById('activeMemberships'), 0, nuevos, 2000);
-      animateValue(document.getElementById('expiringSoon'), 0, porVencer, 2000);
-      animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
-
-      // Sincroniza todos los estados de membresía con la Realtime Database
-      sincronizarEstadosDeMembresia();
-      actualizarGraficoMembresias();
-
-    } catch (err) {
-      console.error("Error al cargar usuarios:", err);
-    }
-  }
-
-  function actualizarGraficoMembresias() {
-    // Asegura que los datos sean números y no undefined
-    membershipChart.data.datasets[0].data = [
-      conteoTipos.Basica || 0,
-      conteoTipos.Estandar || 0,
-      conteoTipos.Premium || 0,
-      conteoTipos.VIP || 0
-    ];
-    membershipChart.update();
-  }
-
-  document.getElementById('sidebarToggle').addEventListener('click', function() {
-    document.getElementById('mobileSidebar').classList.remove('hidden');
-    document.getElementById('sidebar').classList.remove('-translate-x-full');
-  });
-
-  document.getElementById('closeSidebar').addEventListener('click', function() {
-    document.getElementById('sidebar').classList.add('-translate-x-full');
-    setTimeout(() => {
-      document.getElementById('mobileSidebar').classList.add('hidden');
-    }, 300);
-  });
-
-  document.getElementById('userMenuButton').addEventListener('click', function() {
-    document.getElementById('userMenu').classList.toggle('hidden');
-  });
-
-  window.addEventListener('click', function(e) {
-    if (!e.target.closest('#userMenuButton') && !e.target.closest('#userMenu')) {
-      document.getElementById('userMenu').classList.add('hidden');
-    }
-  });
-
-  document.getElementById('closeModal').addEventListener('click', function() {
-    document.getElementById('addMemberModal').classList.add('hidden');
-  });
-
-  const membershipCtx = document.getElementById('membershipChart').getContext('2d');
-  const membershipChart = new Chart(membershipCtx, {
-      type: 'doughnut',
-      data: {
-          labels: ['Básica', 'Estándar', 'Premium', 'VIP'],
-          datasets: [{
-              data: [0, 0, 0, 0],
-              backgroundColor: [
-                  '#3B82F6',
-                  '#10B981',
-                  '#F59E0B',
-                  '#8B5CF6'
-              ],
-              borderWidth: 0
-          }]
-      },
-      options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-              legend: {
-                  position: 'right',
-              },
-              tooltip: {
-                  callbacks: {
-                      label: function(context) {
-                          let label = context.label || '';
-                          if (label) {
-                              label += ': ';
-                          }
-                          label += context.raw + ' miembros';
-                          return label;
-                      }
-                  }
-              }
-          },
-          cutout: '70%'
-      }
-  });
-
-  async function guardarNuevoMiembro() {
-    const form = document.querySelector('#addMemberModal form');
-    const uidManual = form.querySelector('#nuevoMiembroUID')?.value.trim();
-    const nombre = form.querySelector('input[type="text"]:nth-of-type(1)')?.value.trim();
-    const apellido = form.querySelectorAll('input[type="text"]')[1]?.value.trim() || "";
-    const email = form.querySelector('input[type="email"]')?.value.trim();
-    const telefono = form.querySelector('input[type="tel"]')?.value.trim();
-    const tipoSelect = form.querySelector('#tipoMembresia')?.value;
-    let tipo = "Basica";
-    if (tipoSelect.includes('Básica') || tipoSelect.includes('basica')) tipo = "Basica";
-    else if (tipoSelect.includes('Estándar') || tipoSelect.includes('Estandar')) tipo = "Estandar";
-    else if (tipoSelect.includes('Premium')) tipo = "premium";
-    else if (tipoSelect.includes('VIP')) tipo = "VIP";
-    const genero = form.querySelector('#Genero')?.value || "Masculino";    
-    const fechaInicio = form.querySelector('input[type="date"]')?.value;    
-    if (!nombre || !email || !fechaInicio || !uidManual) {
-      alert('Por favor complete los campos obligatorios: Nombre, Email, Fecha de Inicio y UID');
-      return;
-    }
-    try {
-      const fechaFin = new Date(fechaInicio);
-      if (tipo === 'Estandar') fechaFin.setMonth(fechaFin.getMonth() + 3);
-      else if (tipo === 'Premium') fechaFin.setMonth(fechaFin.getMonth() + 6);
-      else if (tipo === 'VIP') fechaFin.setMonth(fechaFin.getMonth() + 12);
-      else fechaFin.setMonth(fechaFin.getMonth() + 1);
-      const docRef = await addDoc(collection(db,"usuarios"), {
-        Nombre: nombre,
-        Apellido: apellido,
-        Email: email,
-        Telefono: telefono,
-        Tipo: tipo,
-        Genero: genero,
-        Creado: Timestamp.fromDate(new Date(fechaInicio)),
-        SuscripcionHasta: Timestamp.fromDate(fechaFin),
-        uid: uidManual // Usar el UID manual
-      });
-      await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(async ({ updateDoc, doc }) => {
-        await updateDoc(doc(db, "usuarios", docRef.id), { uid: uidManual });
-      });
-      await actualizarEstadoActivoEnRTDB(uidManual, fechaFin);
-      alert('Miembro guardado exitosamente');
-      document.getElementById('addMemberModal').classList.add('hidden');
-      cargarMiembrosModal();
-      cargarUsuarios();
-      form.reset();
-    } catch (err) {
-      
-    }
-  }
-  window.guardarNuevoMiembro = guardarNuevoMiembro;
-
-  function animateValue(obj, start, end, duration) {
-    let startTimestamp = null;
-    const step = (timestamp) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
-      if (progress < 1) {
-        window.requestAnimationFrame(step);
-      }
-    };
-    window.requestAnimationFrame(step);
-  }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const options = {
-      root: null,
-      threshold: 0.1
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const target = entry.target;
-          const id = target.id;
-          const value = parseInt(target.textContent.replace(/,/g, ''));
-          target.textContent = '0';
-          animateValue(document.getElementById(id), 0, value, 2000);
-          observer.unobserve(target);
-        }
-      });
-    }, options);
-
-    const counters = ['totalMembers', 'activeMemberships', 'expiringSoon', 'monthlyRevenue'];
-    counters.forEach(id => {
-      const element = document.getElementById(id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
-
-    cargarUsuarios();
-  });
-
-  window.db = db;
-  window.query = query;
-  window.collection = collection;
-  window.getDocs = getDocs;
-  window.orderBy = orderBy;
-  window.addDoc = addDoc;
-</script>
+        // Funcionalidad para mostrar/ocultar contraseña
+        togglePassword.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+    </script>
 </body>
 </html>
