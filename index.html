@@ -98,9 +98,11 @@
             getDoc, 
             query, 
             collection, 
-            where, 
-            getDocs, 
-            writeBatch 
+            where,
+            getDocs,
+            writeBatch,
+            setDoc,
+            Timestamp
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         
@@ -142,64 +144,80 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // Usuario autenticado, ahora verificamos su rol en Firestore
+                setLoading(true); // Mostrar spinner mientras se verifica
                 try {
                     let userDocRef = doc(db, "usuarios", user.uid);
                     let userDoc = await getDoc(userDocRef);
+                    let userData;
 
-                    // Si no se encuentra por UID, buscar por email para migrar un usuario manual
-                    if (!userDoc.exists() && user.email) {
+                    if (userDoc.exists()) {
+                        // 1. Usuario encontrado por UID, todo en orden.
+                        userData = userDoc.data();
+                        console.log(`Usuario encontrado por UID (${user.uid}).`);
+
+                    } else if (user.email) {
+                        // 2. No se encontró por UID, buscar por email para migrar o crear.
                         const userEmail = user.email.toLowerCase();
-                        console.log(`Usuario no encontrado por UID (${user.uid}). Buscando por email normalizado: ${userEmail}`);
+                        console.log(`Usuario no encontrado por UID. Buscando por email: ${userEmail}`);
                         const q = query(collection(db, "usuarios"), where("Email", "==", userEmail));
                         const querySnapshot = await getDocs(q);
 
                         if (!querySnapshot.empty) {
-                            // Se encontró un usuario por email. Hay que migrar sus datos.
+                            // 2a. Encontrado por email -> Migrar datos
                             const oldUserDoc = querySnapshot.docs[0];
-                            console.log(`Usuario encontrado por email con ID de documento: ${oldUserDoc.id}. Migrando a nuevo documento con ID = UID de Auth: ${user.uid}`);
-
+                            console.log(`Usuario encontrado por email. Migrando desde doc ID ${oldUserDoc.id} a ${user.uid}`);
+                            
                             const batch = writeBatch(db);
                             const oldData = oldUserDoc.data();
-                            
-                            // 1. Crear el nuevo documento con el UID de Auth como ID
                             const newUserDocRef = doc(db, "usuarios", user.uid);
+
                             batch.set(newUserDocRef, {
                                 ...oldData,
-                                uid: user.uid, // Asegurarse de que el campo uid también se actualice al de Auth
-                                Email: userEmail // Actualizar con el email verificado y normalizado de Auth
+                                uid: user.uid,
+                                Email: userEmail
                             });
-
-                            // 2. Eliminar el documento antiguo para no tener duplicados
                             batch.delete(oldUserDoc.ref);
-
                             await batch.commit();
-                            console.log("Migración de usuario completada exitosamente.");
 
-                            // Volver a leer el documento ya migrado para continuar el flujo normal
-                            userDoc = await getDoc(newUserDocRef);
+                            const migratedDoc = await getDoc(newUserDocRef);
+                            userData = migratedDoc.data();
+                            console.log("Migración completada.");
+                        } else {
+                            // 2b. No encontrado por email -> Crear nuevo usuario
+                            console.log("Usuario no encontrado. Creando nuevo registro de cliente.");
+                            const fechaInicio = new Date();
+                            const fechaFin = new Date();
+                            fechaFin.setMonth(fechaFin.getMonth() + 1); // Membresía de 1 mes por defecto
+
+                            const newUser = {
+                                uid: user.uid,
+                                Nombre: user.displayName ? user.displayName.split(' ')[0] : 'Nuevo',
+                                Apellido: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : 'Usuario',
+                                Email: userEmail,
+                                rol: 'cliente',
+                                Tipo: '',
+                                Creado: Timestamp.fromDate(fechaInicio),
+                                SuscripcionHasta: Timestamp.fromDate(fechaFin),
+                                Telefono: '',
+                                Genero: ''
+                            };
+                            
+                            await setDoc(userDocRef, newUser);
+                            userData = newUser;
+                            console.log("Nuevo cliente creado exitosamente.");
                         }
                     }
 
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        const userRole = userData.rol || 'cliente'; // Si no tiene rol, es cliente
-
+                    if (userData) {
+                        const userRole = userData.rol || 'cliente';
                         console.log(`Usuario autenticado con rol: ${userRole}`);
-
                         switch (userRole) {
-                            case 'administrador':
-                                window.location.href = 'dashboard.html';
-                                break;
-                            case 'recepcion':
-                                window.location.href = 'recepcion.html';
-                                break;
-                            default: // cliente y otros
-                                window.location.href = 'usuarios.html';
-                                break;
+                            case 'administrador': window.location.href = 'dashboard.html'; break;
+                            case 'recepcion': window.location.href = 'recepcion.html'; break;
+                            default: window.location.href = 'usuarios.html'; break;
                         }
                     } else {
-                        // Si el usuario no tiene un documento en Firestore, lo mandamos al portal de cliente
-                        console.log("Usuario sin documento en Firestore, redirigiendo a portal de cliente.");
+                        console.log("No se pudieron obtener los datos del usuario. Redirigiendo a portal de cliente.");
                         window.location.href = 'usuarios.html';
                     }
                 } catch (error) {
@@ -207,6 +225,7 @@
                     showError("No se pudo verificar tu rol. Intenta de nuevo.");
                     // Opcional: cerrar sesión si hay un error crítico
                     // auth.signOut();
+                    setLoading(false);
                 }
             } else {
                 console.log('No hay usuario autenticado.');
