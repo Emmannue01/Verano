@@ -92,10 +92,12 @@
             GoogleAuthProvider,
             signInWithPopup
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         
   const firebaseConfig = {
-      apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
+      // IMPORTANTE: Asegúrate de que esta configuración sea la correcta de tu proyecto
+      apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0", 
       authDomain: "gymrats-d16eb.firebaseapp.com",
       projectId: "gymrats-d16eb",
       storageBucket: "gymrats-d16eb.appspot.com",
@@ -106,6 +108,7 @@
         // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
         // Obtener elementos del DOM
         const googleLoginBtn = document.getElementById('googleLoginBtn');
@@ -127,10 +130,41 @@
         };
 
         // Observador del estado de autenticación: redirige si el usuario ya está logueado
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                console.log('Usuario autenticado, redirigiendo a dashboard.html');
-                window.location.href = 'dashboard.html';
+                // Usuario autenticado, ahora verificamos su rol en Firestore
+                try {
+                    const userDocRef = doc(db, "usuarios", user.uid);
+                    const userDoc = await getDoc(userDocRef);
+
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const userRole = userData.rol || 'cliente'; // Si no tiene rol, es cliente
+
+                        console.log(`Usuario autenticado con rol: ${userRole}`);
+
+                        switch (userRole) {
+                            case 'administrador':
+                                window.location.href = 'dashboard.html';
+                                break;
+                            case 'recepcion':
+                                window.location.href = 'recepcion.html';
+                                break;
+                            default: // cliente y otros
+                                window.location.href = 'usuarios.html';
+                                break;
+                        }
+                    } else {
+                        // Si el usuario no tiene un documento en Firestore, lo mandamos al portal de cliente
+                        console.log("Usuario sin documento en Firestore, redirigiendo a portal de cliente.");
+                        window.location.href = 'usuarios.html';
+                    }
+                } catch (error) {
+                    console.error("Error al obtener el rol del usuario:", error);
+                    showError("No se pudo verificar tu rol. Intenta de nuevo.");
+                    // Opcional: cerrar sesión si hay un error crítico
+                    // auth.signOut();
+                }
             } else {
                 console.log('No hay usuario autenticado.');
             }

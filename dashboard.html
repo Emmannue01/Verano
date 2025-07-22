@@ -104,15 +104,15 @@
                         </div>
                         <div class="relative">
                             <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">
-                                <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User profile">
-                                <span class="hidden md:block">Admin</span>
+                                <img id="userAvatar" class="h-8 w-8 rounded-full" src="https://i.pravatar.cc/32" alt="User profile">
+                                <span id="userName" class="hidden md:block">Usuario</span>
                                 <i class="fas fa-chevron-down text-xs"></i>
                             </button>
                             <!-- Dropdown menu -->
                             <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Perfil</a>
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configuración</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+                                <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
                             </div>
                         </div>
                     </div>
@@ -1263,22 +1263,65 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { 
-    getFirestore, collection, getDocs, query, orderBy, limit, addDoc, Timestamp 
+    getFirestore, collection, getDocs, query, orderBy, limit, addDoc, Timestamp, doc, getDoc
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
-      apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
+      // IMPORTANTE: Asegúrate de que esta configuración sea la correcta de tu proyecto
+      apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0", 
       authDomain: "gymrats-d16eb.firebaseapp.com",
       projectId: "gymrats-d16eb",
       storageBucket: "gymrats-d16eb.appspot.com",
       messagingSenderId: "106526343668278361492",
-      appId: "1:106526343668278361492:web:abcd1234efgh5678"
+      appId: "1:106526343668278361492:web:abcd1234efgh5678" // Reemplazar con tu App ID real
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const auth = getAuth(app);
 
   let conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
+
+  // --- Guardia de Autenticación y Roles ---
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // Usuario autenticado, ahora verificamos su rol
+      const userDocRef = doc(db, "usuarios", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists() && userDoc.data().rol === 'administrador') {
+        // El usuario es administrador, puede quedarse.
+        console.log("Acceso de administrador concedido.");
+        cargarUsuarios(); // Cargar los datos del dashboard
+
+        // Actualizar UI con datos del usuario
+        const userNameSpan = document.getElementById('userName');
+        const userAvatarImg = document.getElementById('userAvatar');
+        if (userNameSpan) {
+            userNameSpan.textContent = user.displayName || user.email.split('@')[0];
+        }
+        if (userAvatarImg && user.photoURL) {
+            userAvatarImg.src = user.photoURL;
+        }
+
+      } else {
+        // No es administrador o no tiene documento, lo expulsamos.
+        console.log("Acceso denegado. El usuario no es administrador.");
+        window.location.href = 'index.html';
+      }
+    } else {
+      // No hay usuario, lo expulsamos.
+      console.log("Usuario no autenticado, redirigiendo a login.");
+      window.location.href = 'index.html';
+    }
+  });
+
+  // --- Funcionalidad de Cerrar Sesión ---
+  document.getElementById('logoutButton').addEventListener('click', (e) => {
+    e.preventDefault();
+    signOut(auth).catch(error => console.error('Error al cerrar sesión:', error));
+  });
 
   async function sincronizarEstadosDeMembresia() {
     try {

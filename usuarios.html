@@ -36,14 +36,14 @@
                 </button>
                 <div class="relative group">
                     <button id="profileBtn" class="flex items-center space-x-2 focus:outline-none">
-                        <div class="h-10 w-10 rounded-full bg-indigo-700 flex items-center justify-center text-white font-semibold">JD</div>
-                        <span class="hidden md:inline">John Doe</span>
+                        <img id="userAvatar" class="h-10 w-10 rounded-full" src="https://i.pravatar.cc/40" alt="User profile">
+                        <span id="userName" class="hidden md:inline">Usuario</span>
                         <i class="fas fa-chevron-down text-xs hidden md:inline"></i>
                     </button>
                     <div id="profileDropdown" class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Mi perfil</a>
                         <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Configuración</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Cerrar sesión</a>
+                        <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Cerrar sesión</a>
                     </div>
                 </div>
             </div>
@@ -215,35 +215,53 @@
         </div>
     </nav>
 
-    <script>
-        // Toggle profile dropdown
-        document.getElementById('profileBtn').addEventListener('click', function() {
-            const dropdown = document.getElementById('profileDropdown');
-            dropdown.classList.toggle('hidden');
-        });
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const profileBtn = document.getElementById('profileBtn');
-            const dropdown = document.getElementById('profileDropdown');
-            
-            if (!profileBtn.contains(event.target) && !dropdown.contains(event.target)) {
-                dropdown.classList.add('hidden');
+        const firebaseConfig = {
+            // IMPORTANTE: Reemplaza este objeto completo con la configuración de tu proyecto
+            apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
+            authDomain: "gymrats-d16eb.firebaseapp.com",
+            projectId: "gymrats-d16eb",
+            storageBucket: "gymrats-d16eb.appspot.com",
+            messagingSenderId: "106526343668278361492",
+            appId: "1:106526343668278361492:web:abcd1234efgh5678"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // --- Guardia de Autenticación para Clientes ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuario autenticado, puede quedarse.
+                console.log("Acceso de cliente concedido.");
+
+                // Actualizar UI con datos del usuario
+                const userNameSpan = document.getElementById('userName');
+                const userAvatarImg = document.getElementById('userAvatar');
+                if (userNameSpan) {
+                    userNameSpan.textContent = user.displayName || user.email.split('@')[0];
+                }
+                if (userAvatarImg && user.photoURL) {
+                    userAvatarImg.src = user.photoURL;
+                }
+
+                // Aquí puedes cargar los datos específicos del cliente
+            } else {
+                // No hay usuario, lo expulsamos.
+                console.log("Usuario no autenticado, redirigiendo a login.");
+                window.location.href = 'index.html';
             }
         });
 
-        // Simulate notification click
-        document.getElementById('notificationsBtn').addEventListener('click', function() {
-            alert('Tienes 3 notificaciones nuevas');
-        });
-
-        // Sample class booking functionality
-        const bookButtons = document.querySelectorAll('button:contains("Reservar")');
-        bookButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const className = this.closest('.border').querySelector('h3').textContent;
-                alert(`Has reservado la clase: ${className}`);
-            });
+        // --- Funcionalidad de Cerrar Sesión ---
+        document.getElementById('logoutButton').addEventListener('click', (e) => {
+          e.preventDefault();
+          signOut(auth).catch(error => console.error('Error al cerrar sesión:', error));
         });
     </script>
 </body>

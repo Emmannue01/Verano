@@ -320,28 +320,51 @@
         </div>
     </div>
 
-    <script>
-        // Toggle sidebar
-        document.getElementById('toggleSidebar').addEventListener('click', function() {
-            const sidebar = document.querySelector('.sidebar');
-            const mainContent = document.querySelector('.main-content');
-            
-            sidebar.classList.toggle('sidebar-collapsed');
-            mainContent.classList.toggle('content-expanded');
-        });
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // Simulate data for charts (in a real app you would use a chart library)
-        function simulateChart() {
-            const chartContainer = document.querySelector('.chart-container');
-            if (chartContainer) {
-                chartContainer.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">Gráfico de estadísticas se mostraría aquí</div>';
+        const firebaseConfig = {
+            // IMPORTANTE: Reemplaza este objeto completo con la configuración de tu proyecto
+            apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
+            authDomain: "gymrats-d16eb.firebaseapp.com",
+            projectId: "gymrats-d16eb",
+            storageBucket: "gymrats-d16eb.appspot.com",
+            messagingSenderId: "106526343668278361492",
+            appId: "1:106526343668278361492:web:abcd1234efgh5678"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // --- Guardia de Autenticación y Roles para Recepción ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Usuario autenticado, ahora verificamos su rol
+                const userDocRef = doc(db, "usuarios", user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                // Permite el acceso si el rol es 'recepcion' O 'administrador' (los admins pueden ver todo)
+                if (userDoc.exists() && (userDoc.data().rol === 'recepcion' || userDoc.data().rol === 'administrador')) {
+                    console.log("Acceso de recepción concedido.");
+                    // Aquí puedes llamar a funciones para cargar datos específicos de recepción
+                } else {
+                    console.log("Acceso denegado. El usuario no tiene rol de recepción.");
+                    window.location.href = 'index.html';
+                }
+            } else {
+                console.log("Usuario no autenticado, redirigiendo a login.");
+                window.location.href = 'index.html';
             }
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            simulateChart();
         });
+
+        // Opcional: Añadir botón de cerrar sesión si lo necesitas en esta vista
+        // document.getElementById('logoutButtonRecepcion').addEventListener('click', (e) => {
+        //   e.preventDefault();
+        //   signOut(auth).catch(error => console.error('Error al cerrar sesión:', error));
+        // });
     </script>
 </body>
 </html>
