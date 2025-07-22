@@ -66,73 +66,17 @@
                             <i class="fas fa-lock text-white text-2xl"></i>
                         </div>
                     </div>
-                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-1">Iniciar Sesión</h2>
-                    <p class="text-center text-gray-600 mb-8">Ingresa tus credenciales para acceder</p>
-
-                    <form id="loginForm" class="space-y-6">
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fas fa-envelope text-gray-400"></i>
-                                </div>
-                                <input type="email" id="email" name="email" 
-                                    class="input-effect w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                                    placeholder="tu@email.com" required>
-                            </div>
-                            <p id="emailError" class="hidden text-red-500 text-xs mt-1"></p>
-                        </div>
-
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fas fa-lock text-gray-400"></i>
-                                </div>
-                                <input type="password" id="password" name="password" 
-                                    class="input-effect w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" 
-                                    placeholder="••••••••" required>
-                                <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                    <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
-                                </button>
-                            </div>
-                            <p id="passwordError" class="hidden text-red-500 text-xs mt-1"></p>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input id="remember" name="remember" type="checkbox" class="h-4 w-4 text-red-500 focus:ring-red-500 border-gray-300 rounded">
-                                <label for="remember" class="ml-2 block text-sm text-gray-700">Recordarme</label>
-                            </div>
-                            <div class="text-sm">
-                                <a href="#" class="font-medium text-blue-500 hover:text-blue-600">¿Olvidaste tu contraseña?</a>
-                            </div>
-                        </div>
-
-                        <div>
-                            <button type="submit" 
-                                class="btn-hover w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
-                                INGRESAR
-                            </button>
-                        </div>
-                    </form>
-
-                    <!-- Separador -->
-                    <div class="relative flex py-5 items-center">
-                        <div class="flex-grow border-t border-gray-300"></div>
-                        <span class="flex-shrink mx-4 text-gray-400">O inicia sesión con</span>
-                        <div class="flex-grow border-t border-gray-300"></div>
-                    </div>
+                    <h2 class="text-2xl font-bold text-center text-gray-800 mb-1">Bienvenido</h2>
+                    <p class="text-center text-gray-600 mb-8">Accede con tu cuenta de Google para continuar</p>
 
                     <!-- Botón de Google -->
-                    <div>
+                    <div class="mt-8">
                         <button id="googleLoginBtn"
                             class="btn-hover w-full flex items-center justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300">
                             <img class="w-5 h-5 mr-2" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo">
                             Ingresar con Google
                         </button>
                     </div>
-
                 </div>
 
             </div>
@@ -145,13 +89,12 @@
         import { 
             getAuth, 
             onAuthStateChanged,
-            signInWithEmailAndPassword,
             GoogleAuthProvider,
             signInWithPopup
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         
-          const firebaseConfig = {
+  const firebaseConfig = {
       apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
       authDomain: "gymrats-d16eb.firebaseapp.com",
       projectId: "gymrats-d16eb",
@@ -165,69 +108,31 @@
         const auth = getAuth(app);
 
         // Obtener elementos del DOM
-        const loginForm = document.getElementById('loginForm');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const togglePassword = document.getElementById('togglePassword');
         const googleLoginBtn = document.getElementById('googleLoginBtn');
-        const submitBtn = loginForm.querySelector('button[type="submit"]');
 
         // Función para manejar el estado de carga de los botones
         const setLoading = (isLoading) => {
             if (isLoading) {
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Cargando...';
-                submitBtn.disabled = true;
+                googleLoginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Cargando...';
                 googleLoginBtn.disabled = true;
             } else {
-                submitBtn.innerHTML = 'INGRESAR';
-                submitBtn.disabled = false;
+                googleLoginBtn.innerHTML = '<img class="w-5 h-5 mr-2" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo"> Ingresar con Google';
                 googleLoginBtn.disabled = false;
             }
         };
 
         // Función para mostrar errores
         const showError = (message) => {
-            alert(message); // Un alert simple es suficiente por ahora.
-            loginForm.classList.add('shake');
-            setTimeout(() => loginForm.classList.remove('shake'), 500);
+            alert(message);
         };
 
         // Observador del estado de autenticación: redirige si el usuario ya está logueado
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log('Usuario autenticado, redirigiendo a index.html');
-                window.location.href = 'index.html';
+                console.log('Usuario autenticado, redirigiendo a dashboard.html');
+                window.location.href = 'dashboard.html';
             } else {
                 console.log('No hay usuario autenticado.');
-            }
-        });
-
-        // Evento para el inicio de sesión con Correo y Contraseña
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            setLoading(true);
-
-            const email = emailInput.value;
-            const password = passwordInput.value;
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // La redirección la maneja onAuthStateChanged
-            } catch (error) {
-                let errorMessage = 'Ocurrió un error. Inténtalo de nuevo.';
-                switch (error.code) {
-                    case 'auth/invalid-credential':
-                    case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                        errorMessage = 'Correo o contraseña incorrectos.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'El formato del correo no es válido.';
-                        break;
-                }
-                showError(errorMessage);
-            } finally {
-                setLoading(false);
             }
         });
 
@@ -239,21 +144,23 @@
                 await signInWithPopup(auth, provider);
                 // La redirección la maneja onAuthStateChanged
             } catch (error) {
-                showError('No se pudo iniciar sesión con Google. Inténtalo de nuevo.');
+                // Mejoramos el log para ver el error específico de Firebase
+                console.error("--- ERROR DE AUTENTICACIÓN CON GOOGLE ---");
+                console.error("Código:", error.code);
+                console.error("Mensaje:", error.message);
+                console.error("Objeto de error completo:", error);
+                console.error("-----------------------------------------");
+
+                // Damos un mensaje más útil al usuario
+                let friendlyMessage = 'No se pudo iniciar sesión con Google. Revisa la consola para más detalles.';
+                if (error.code === 'auth/popup-closed-by-user') {
+                    friendlyMessage = 'La ventana de inicio de sesión fue cerrada antes de completar el proceso.';
+                } else if (error.code) {
+                    friendlyMessage = `Error: ${error.code}. Revisa la consola para más detalles.`;
+                }
+                showError(friendlyMessage);
             } finally {
                 setLoading(false);
-            }
-        });
-
-        // Funcionalidad para mostrar/ocultar contraseña
-        togglePassword.addEventListener('click', function() {
-            const icon = this.querySelector('i');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.replace('fa-eye', 'fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         });
     </script>
