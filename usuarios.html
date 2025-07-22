@@ -35,16 +35,15 @@
                     <span class="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
                 </button>
                 <div class="relative group">
-                    <button id="profileBtn" class="flex items-center space-x-2 focus:outline-none">
-                        <img id="userAvatar" class="h-10 w-10 rounded-full" src="https://i.pravatar.cc/40" alt="User profile">
-                        <span id="userName" class="hidden md:inline">Usuario</span>
-                        <i class="fas fa-chevron-down text-xs hidden md:inline"></i>
-                    </button>
-                    <div id="profileDropdown" class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Mi perfil</a>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Configuración</a>
-                        <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-100">Cerrar sesión</a>
-                    </div>
+                   <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">
+                                <img id="userAvatar" class="h-8 w-8 rounded-full" src="https://i.pravatar.cc/32" alt="User profile">
+                                <span id="userName" class="hidden md:block">Usuario</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            
+                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+                            </div>
                 </div>
             </div>
         </div>
@@ -56,11 +55,10 @@
         <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg p-6 mb-6 text-white">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
                 <div>
-                    <h2 class="text-2xl font-bold mb-2">¡Bienvenido de nuevo, <span id="userName" class="hidden md:inline">Usuario</span>!</h2>
-                    <p class="mb-4">Tu membresía está activa hasta el 15/12/2023</p>
+                    <h2 id="welcomeMessage" class="text-2xl font-bold mb-2">Cargando...</h2>
+                    <p id="membershipStatus" class="mb-4">Verificando estado de membresía...</p>
                     <div class="flex space-x-2">
-                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Entrenador: Carlos</span>
-                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Plan: Premium</span>
+                        <span id="membershipPlan" class="bg-white/20 px-3 py-1 rounded-full text-sm">Plan: ...</span>
                     </div>
                 </div>
                 <button class="mt-4 md:mt-0 bg-yellow-400 hover:bg-yellow-500 text-indigo-900 font-semibold px-6 py-2 rounded-lg transition flex items-center">
@@ -235,7 +233,7 @@
         const auth = getAuth(app);
 
         // --- Guardia de Autenticación para Clientes ---
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // Usuario autenticado, puede quedarse.
                 console.log("Acceso de cliente concedido.");
@@ -250,7 +248,28 @@
                     userAvatarImg.src = user.photoURL;
                 }
 
-                // Aquí puedes cargar los datos específicos del cliente
+                // Cargar datos específicos del cliente desde Firestore
+                try {
+                    const userDocRef = doc(db, "usuarios", user.uid);
+                    const userDoc = await getDoc(userDocRef);
+
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const welcomeMessage = document.getElementById('welcomeMessage');
+                        const membershipStatus = document.getElementById('membershipStatus');
+                        const membershipPlan = document.getElementById('membershipPlan');
+
+                        welcomeMessage.textContent = `¡Bienvenido de nuevo, ${userData.Nombre || 'Usuario'}!`;
+                        
+                        if (userData.SuscripcionHasta) {
+                            const fechaFin = userData.SuscripcionHasta.toDate();
+                            membershipStatus.textContent = `Tu membresía está activa hasta el ${fechaFin.toLocaleDateString('es-ES')}`;
+                        }
+                        membershipPlan.textContent = `Plan: ${userData.Tipo || 'Básico'}`;
+                    }
+                } catch (error) {
+                    console.error("Error al cargar datos del usuario:", error);
+                }
             } else {
                 // No hay usuario, lo expulsamos.
                 console.log("Usuario no autenticado, redirigiendo a login.");
