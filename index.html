@@ -47,7 +47,7 @@
                     </div>
                     <div class="bg-white bg-opacity-20 p-4 rounded-lg">
                         <i class="fas fa-users text-2xl mb-2"></i>
-                        <p>+1000 Miembros</p>
+                        <p>+100 Miembros</p>
                     </div>
                     <div class="bg-white bg-opacity-20 p-4 rounded-lg">
                         <i class="fas fa-trophy text-2xl mb-2"></i>
@@ -92,7 +92,16 @@
             GoogleAuthProvider,
             signInWithPopup
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            query, 
+            collection, 
+            where, 
+            getDocs, 
+            writeBatch 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         
   const firebaseConfig = {
@@ -134,8 +143,41 @@
             if (user) {
                 // Usuario autenticado, ahora verificamos su rol en Firestore
                 try {
-                    const userDocRef = doc(db, "usuarios", user.uid);
-                    const userDoc = await getDoc(userDocRef);
+                    let userDocRef = doc(db, "usuarios", user.uid);
+                    let userDoc = await getDoc(userDocRef);
+
+                    // Si no se encuentra por UID, buscar por email para migrar un usuario manual
+                    if (!userDoc.exists() && user.email) {
+                        console.log(`Usuario no encontrado por UID (${user.uid}). Buscando por email: ${user.email}`);
+                        const q = query(collection(db, "usuarios"), where("Email", "==", user.email));
+                        const querySnapshot = await getDocs(q);
+
+                        if (!querySnapshot.empty) {
+                            // Se encontró un usuario por email. Hay que migrar sus datos.
+                            const oldUserDoc = querySnapshot.docs[0];
+                            console.log(`Usuario encontrado por email con ID de documento: ${oldUserDoc.id}. Migrando a nuevo documento con ID = UID de Auth: ${user.uid}`);
+
+                            const batch = writeBatch(db);
+                            const oldData = oldUserDoc.data();
+                            
+                            // 1. Crear el nuevo documento con el UID de Auth como ID
+                            const newUserDocRef = doc(db, "usuarios", user.uid);
+                            batch.set(newUserDocRef, {
+                                ...oldData,
+                                uid: user.uid, // Asegurarse de que el campo uid también se actualice al de Auth
+                                Email: user.email // Actualizar con el email verificado de Auth
+                            });
+
+                            // 2. Eliminar el documento antiguo para no tener duplicados
+                            batch.delete(oldUserDoc.ref);
+
+                            await batch.commit();
+                            console.log("Migración de usuario completada exitosamente.");
+
+                            // Volver a leer el documento ya migrado para continuar el flujo normal
+                            userDoc = await getDoc(newUserDocRef);
+                        }
+                    }
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
@@ -160,7 +202,7 @@
                         window.location.href = 'usuarios.html';
                     }
                 } catch (error) {
-                    console.error("Error al obtener el rol del usuario:", error);
+                    console.error("Error al obtener o migrar el rol del usuario:", error);
                     showError("No se pudo verificar tu rol. Intenta de nuevo.");
                     // Opcional: cerrar sesión si hay un error crítico
                     // auth.signOut();

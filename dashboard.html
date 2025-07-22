@@ -108,10 +108,8 @@
                                 <span id="userName" class="hidden md:block">Usuario</span>
                                 <i class="fas fa-chevron-down text-xs"></i>
                             </button>
-                            <!-- Dropdown menu -->
+                            
                             <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Perfil</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Configuración</a>
                                 <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
                             </div>
                         </div>
@@ -357,6 +355,14 @@
                         <input id="nuevoMiembroUID" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="UID único">
                     </div>
                     <!-- Campo Género -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+                        <select id="nuevoMiembroRol" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="cliente">Cliente</option>
+                            <option value="recepcion">Recepción</option>
+                            <option value="administrador">Administrador</option>
+                        </select>
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
                         <select id="Genero" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -851,7 +857,8 @@ async function exportarExcel(rows, nombreArchivo) {
                     Telefono: data.Telefono || "Sin teléfono",
                     Tipo: data.Tipo || "Básica",
                     SuscripcionHasta: data.SuscripcionHasta ? data.SuscripcionHasta.toDate() : new Date(),
-                    Genero: data.Genero || "Masculino"
+                    Genero: data.Genero || "Masculino",
+                    rol: data.rol || "cliente"
                 });
             });
             filteredMembers = [...allMembers];
@@ -1082,6 +1089,14 @@ async function editarMiembro(id) {
             <input type="text" name="uid" value="${member.UID || member.id}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
           </div>
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+            <select name="rol" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="cliente"${member.rol === 'cliente' ? ' selected' : ''}>Cliente</option>
+              <option value="recepcion"${member.rol === 'recepcion' ? ' selected' : ''}>Recepción</option>
+              <option value="administrador"${member.rol === 'administrador' ? ' selected' : ''}>Administrador</option>
+            </select>
+          </div>
+          <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
             <select name="genero" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="Masculino"${member.Genero === 'Masculino' ? ' selected' : ''}>Masculino</option>
@@ -1133,6 +1148,7 @@ async function editarMiembro(id) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const uid = formData.get('uid').trim();
+    const rol = formData.get('rol');
     const genero = formData.get('genero');
     const nombre = formData.get('nombre').trim();
     const apellido = formData.get('apellido').trim();
@@ -1144,6 +1160,7 @@ async function editarMiembro(id) {
       const { updateDoc, doc, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
       await updateDoc(doc(db, 'usuarios', id), {
         uid: uid,
+        rol: rol,
         Genero: genero,
         Nombre: nombre,
         Apellido: apellido,
@@ -1190,7 +1207,8 @@ function verMiembro(id) {
             Tipo: data.Tipo || "Básica",
             SuscripcionHasta: data.SuscripcionHasta ? data.SuscripcionHasta.toDate() : new Date(),
             Creado: data.Creado ? data.Creado.toDate() : new Date(),
-            Genero: data.UID || ""
+            Genero: data.Genero || "",
+            rol: data.rol || "cliente"
           };
         }
       });
@@ -1568,13 +1586,14 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
     const email = form.querySelector('input[type="email"]')?.value.trim();
     const telefono = form.querySelector('input[type="tel"]')?.value.trim();
     const tipoSelect = form.querySelector('#tipoMembresia')?.value;
+    const rol = form.querySelector('#nuevoMiembroRol')?.value || "cliente";
     let tipo = "Basica";
     if (tipoSelect.includes('Básica') || tipoSelect.includes('basica')) tipo = "Basica";
     else if (tipoSelect.includes('Estándar') || tipoSelect.includes('Estandar')) tipo = "Estandar";
     else if (tipoSelect.includes('Premium')) tipo = "premium";
     else if (tipoSelect.includes('VIP')) tipo = "VIP";
     const genero = form.querySelector('#Genero')?.value || "Masculino";    
-    const fechaInicio = form.querySelector('input[type="date"]')?.value;    
+    const fechaInicio = form.querySelector('input[type="date"]')?.value;
     if (!nombre || !email || !fechaInicio || !uidManual) {
       alert('Por favor complete los campos obligatorios: Nombre, Email, Fecha de Inicio y UID');
       return;
@@ -1594,6 +1613,7 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
         Genero: genero,
         Creado: Timestamp.fromDate(new Date(fechaInicio)),
         SuscripcionHasta: Timestamp.fromDate(fechaFin),
+        rol: rol, // Guardar el rol
         uid: uidManual // Usar el UID manual
       });
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js').then(async ({ updateDoc, doc }) => {
