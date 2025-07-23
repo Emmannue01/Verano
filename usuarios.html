@@ -30,10 +30,6 @@
                 <h1 class="text-2xl font-bold">My<span class="text-yellow-400">Gym</span></h1>
             </div>
             <div class="flex items-center space-x-4">
-                <button id="notificationsBtn" class="relative text-white hover:text-yellow-400 transition">
-                    <i class="fas fa-bell text-xl"></i>
-                    <span class="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-                </button>
                 <div class="relative">
                     <button id="profileBtn" class="flex items-center space-x-2 focus:outline-none">
                         <img id="userAvatar" class="h-10 w-10 rounded-full" src="https://i.pravatar.cc/40" alt="User profile">
@@ -67,128 +63,132 @@
         </div>
 
         <!-- Dashboard Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <!-- Progress Card -->
-            <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="bg-white rounded-xl shadow-md p-6 flex flex-col">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-semibold text-lg">Tu progreso</h3>
-                    <span class="text-sm text-gray-500">Esta semana</span>
+                    <!-- Toggle Semana/Mes -->
+                    <div class="flex bg-gray-200 rounded-full p-1 text-sm">
+                        <button id="vistaSemanaBtn" class="px-3 py-1 rounded-full bg-white text-indigo-600 shadow">Semana</button>
+                        <button id="vistaMesBtn" class="px-3 py-1 rounded-full text-gray-600">Mes</button>
+                    </div>
                 </div>
-                <div class="flex flex-col items-center">
-                    <div class="relative w-32 h-32 mb-4">
+                <div class="flex flex-col items-center flex-grow justify-center">
+                    <div id="progressLoader" class="relative w-32 h-32 mb-4 flex items-center justify-center">
+                         <i class="fas fa-spinner fa-spin text-indigo-500 text-4xl"></i>
+                    </div>
+                    <div id="progressContent" class="hidden w-full flex flex-col items-center">
+                        <div class="relative w-32 h-32 mb-4">
                         <svg class="w-full h-full" viewBox="0 0 100 100">
                             <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" />
-                            <circle class="text-yellow-400 progress-ring__circle" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" 
-                                    stroke-dasharray="251.2" stroke-dashoffset="calc(251.2 - (251.2 * 75) / 100)" />
+                            <circle id="progressCircle" class="text-yellow-400 progress-ring__circle" stroke-width="8" stroke-linecap="round" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" 
+                                    stroke-dasharray="251.2" stroke-dashoffset="251.2" />
                         </svg>
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <span class="text-2xl font-bold">75%</span>
+                            <span id="progressPercentage" class="text-2xl font-bold">0%</span>
                         </div>
                     </div>
-                    <div class="w-full">
-                        <div class="flex justify-between text-sm mb-1">
-                            <span>Objetivo: 5 días</span>
-                            <span>3/5</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-indigo-600 h-2 rounded-full" style="width: 60%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Next Class Card -->
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-semibold text-lg">Próxima clase</h3>
-                    <span class="text-sm text-gray-500">Hoy</span>
-                </div>
-                <div class="bg-indigo-50 rounded-lg p-4 mb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-indigo-100 p-3 rounded-full">
-                            <i class="fas fa-heartbeat text-indigo-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-medium">HIIT Intenso</h4>
-                            <p class="text-sm text-gray-600">17:30 - 18:30</p>
+                        <div class="w-full">
+                            <div class="flex justify-between items-center text-sm mb-2">
+                                <span>Objetivo:</span>
+                                <div class="flex items-center space-x-2">
+                                    <button id="decreaseGoal" class="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center justify-center">-</button>
+                                    <span id="goalValue" class="font-bold w-4 text-center">5</span>
+                                    <span id="goalUnit">días</span>
+                                    <button id="increaseGoal" class="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 flex items-center justify-center">+</button>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span id="progressText">0/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div id="progressBar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="flex justify-between items-center">
-                    <div class="flex -space-x-2">
-                        <img class="w-8 h-8 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/32.jpg" alt="">
-                        <img class="w-8 h-8 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/75.jpg" alt="">
-                        <img class="w-8 h-8 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/63.jpg" alt="">
-                        <div class="w-8 h-8 rounded-full border-2 border-white bg-indigo-100 flex items-center justify-center text-xs font-medium">+5</div>
-                    </div>
-                    <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium flex items-center">
-                        Ver detalles <i class="fas fa-chevron-right ml-1 text-xs"></i>
-                    </button>
                 </div>
             </div>
 
             <!-- Metrics Card -->
-            <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="bg-white rounded-xl shadow-md p-6 flex flex-col">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="font-semibold text-lg">Tus métricas</h3>
-                    <span class="text-sm text-gray-500">Último mes</span>
+                    <span id="metricsMonth" class="text-sm text-gray-500">Cargando...</span>
                 </div>
-                <div class="space-y-4">
+                <div id="metricsLoader" class="text-center py-8 flex-grow flex items-center justify-center">
+                    <i class="fas fa-spinner fa-spin text-indigo-500 text-2xl"></i>
+                </div>
+                <div id="metricsContent" class="hidden space-y-4 flex-grow">
                     <div>
                         <div class="flex justify-between text-sm mb-1">
                             <span class="text-gray-600">Peso</span>
-                            <span class="font-medium">-2.5kg</span>
+                            <span id="pesoValor" class="font-medium">-- kg</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-green-500 h-2 rounded-full" style="width: 80%"></div>
+                            <div id="pesoBarra" class="bg-green-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
+                        <div id="pesoDiferencia" class="text-xs text-gray-500 mt-1 text-right">-- vs mes anterior</div>
                     </div>
                     <div>
                         <div class="flex justify-between text-sm mb-1">
                             <span class="text-gray-600">Grasa corporal</span>
-                            <span class="font-medium">-3.1%</span>
+                            <span id="grasaValor" class="font-medium">-- %</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-blue-500 h-2 rounded-full" style="width: 65%"></div>
+                            <div id="grasaBarra" class="bg-blue-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
+                        <div id="grasaDiferencia" class="text-xs text-gray-500 mt-1 text-right">-- vs mes anterior</div>
                     </div>
                     <div>
                         <div class="flex justify-between text-sm mb-1">
                             <span class="text-gray-600">Músculo</span>
-                            <span class="font-medium">+1.8kg</span>
+                            <span id="musculoValor" class="font-medium">-- kg</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-purple-500 h-2 rounded-full" style="width: 45%"></div>
+                            <div id="musculoBarra" class="bg-purple-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
+                        <div id="musculoDiferencia" class="text-xs text-gray-500 mt-1 text-right">-- vs mes anterior</div>
                     </div>
                 </div>
-                <button class="mt-4 w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-medium py-2 px-4 rounded-lg transition flex items-center justify-center">
-                    <i class="fas fa-chart-line mr-2"></i> Ver estadísticas completas
+                <button id="actualizarMetricasBtn" class="mt-4 w-full border border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-medium py-2 px-4 rounded-lg transition flex items-center justify-center">
+                    <i class="fas fa-pen mr-2"></i> Actualizar métricas
                 </button>
             </div>
         </div>
 
-        <!-- Personal Trainer Section -->
-        <div class="bg-gradient-to-r from-indigo-800 to-purple-700 rounded-xl shadow-lg p-6 mb-6 text-white">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div class="mb-4 md:mb-0">
-                    <h2 class="text-xl font-bold mb-2">¿Necesitas un entrenador personal?</h2>
-                    <p class="mb-4">Obtén un plan personalizado y alcanza tus objetivos más rápido</p>
-                    <div class="flex items-center space-x-3">
-                        <div class="flex -space-x-2">
-                            <img class="w-10 h-10 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
-                            <img class="w-10 h-10 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/44.jpg" alt="">
-                            <img class="w-10 h-10 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/75.jpg" alt="">
-                        </div>
-                        <span class="text-sm">+5 entrenadores disponibles</span>
-                    </div>
-                </div>
-                <button class="bg-white hover:bg-gray-100 text-indigo-800 font-semibold px-6 py-3 rounded-lg transition flex items-center animate-pulse-slow">
-                    <i class="fas fa-dumbbell mr-2"></i> Reservar ahora
+    </main>
+
+    <!-- Metrics Update Modal -->
+    <div id="metricsModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center pb-3">
+                <p class="text-2xl font-bold">Actualizar Métricas</p>
+                <button id="closeMetricsModal" class="cursor-pointer z-50">
+                    <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
+            <form id="metricsForm" class="mt-2">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="inputPeso">Peso (kg)</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="inputPeso" type="number" step="0.1" placeholder="Ej: 75.5" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="inputGrasa">Grasa Corporal (%)</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="inputGrasa" type="number" step="0.1" placeholder="Ej: 18.2" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="inputMusculo">Masa Muscular (kg)</label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="inputMusculo" type="number" step="0.1" placeholder="Ej: 35.0" required>
+                </div>
+                <div class="flex items-center justify-end">
+                    <button id="saveMetricsBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                        Guardar
+                    </button>
+                </div>
+            </form>
         </div>
-    </main>
+    </div>
 
     <!-- Bottom Navigation (Mobile) -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
@@ -214,8 +214,12 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { 
+            getFirestore, doc, getDoc, setDoc, addDoc,
+            collection, query, onSnapshot, orderBy
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
             // IMPORTANTE: Reemplaza este objeto completo con la configuración de tu proyecto
@@ -230,6 +234,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const dbRTDB = getDatabase(app);
 
         // --- Guardia de Autenticación para Clientes ---
         onAuthStateChanged(auth, async (user) => {
@@ -265,6 +270,12 @@
                             membershipStatus.textContent = `Tu membresía está activa hasta el ${fechaFin.toLocaleDateString('es-ES')}`;
                         }
                         membershipPlan.textContent = `Plan: ${userData.Tipo || 'Básico'}`;
+
+                        // El UID para las lecturas es el que está guardado en el documento (el manual),
+                        // no necesariamente el UID de autenticación de Google.
+                        const checkinUid = userData.uid || user.uid;
+                        inicializarProgreso(checkinUid);
+                        inicializarMetricas(checkinUid);
                     }
                 } catch (error) {
                     console.error("Error al cargar datos del usuario:", error);
@@ -296,6 +307,247 @@
                 profileDropdown.classList.add('hidden');
             }
         });
+
+        // --- Lógica para la tarjeta de Progreso ---
+        function inicializarProgreso(uid) {
+            const decreaseGoalBtn = document.getElementById('decreaseGoal');
+            const increaseGoalBtn = document.getElementById('increaseGoal');
+            const goalValueEl = document.getElementById('goalValue');
+            const goalUnitEl = document.getElementById('goalUnit');
+            const progressTextEl = document.getElementById('progressText');
+            const progressPercentageEl = document.getElementById('progressPercentage');
+            const progressBarEl = document.getElementById('progressBar');
+            const progressCircleEl = document.getElementById('progressCircle');
+            const progressLoader = document.getElementById('progressLoader');
+            const progressContent = document.getElementById('progressContent');
+
+            const circleCircumference = 251.2;
+            let vistaActual = 'semana';
+            // Cargar metas desde el almacenamiento local o usar valores por defecto
+            let metaSemanal = parseInt(localStorage.getItem(`metaSemanal_${uid}`)) || 5;
+            let metaMensual = parseInt(localStorage.getItem(`metaMensual_${uid}`)) || 20;
+            let allLecturasData = {}; // Almacena los datos de las lecturas en tiempo real
+
+            const cambiarVista = (nuevaVista) => {
+                vistaActual = nuevaVista;
+                if (vistaActual === 'semana') {
+                    vistaSemanaBtn.classList.add('bg-white', 'text-indigos-600', 'shadow');
+                    vistaMesBtn.classList.remove('bg-white', 'text-indigo-600', 'shadow');
+                    vistaMesBtn.classList.add('text-gray-600');
+                } else {
+                    vistaMesBtn.classList.add('bg-white', 'text-indigo-600', 'shadow');
+                    vistaSemanaBtn.classList.remove('bg-white', 'text-indigo-600', 'shadow');
+                    vistaSemanaBtn.classList.add('text-gray-600');
+                }
+                cargarDatosProgreso();
+            };
+
+            const ajustarMeta = (ajuste) => {
+                if (vistaActual === 'semana') {
+                    metaSemanal = Math.max(1, metaSemanal + ajuste);
+                    localStorage.setItem(`metaSemanal_${uid}`, metaSemanal);
+                } else {
+                    metaMensual = Math.max(1, metaMensual + ajuste);
+                    localStorage.setItem(`metaMensual_${uid}`, metaMensual);
+                }
+                cargarDatosProgreso(); // Recalcular y mostrar con la nueva meta
+            };
+
+            const actualizarUI = (progreso, meta) => {
+                const porcentaje = meta > 0 ? Math.min(100, (progreso / meta) * 100) : 0;
+                
+                goalValueEl.textContent = meta;
+                goalUnitEl.textContent = 'visitas';
+                progressTextEl.textContent = `${progreso}/${meta}`;
+                
+                progressPercentageEl.textContent = `${Math.round(porcentaje)}%`;
+                progressBarEl.style.width = `${porcentaje}%`;
+                
+                const offset = circleCircumference - (porcentaje / 100) * circleCircumference;
+                progressCircleEl.style.strokeDashoffset = offset;
+            };
+
+            const cargarDatosProgreso = () => {
+                progressLoader.style.display = 'flex';
+                progressContent.classList.add('hidden');
+
+                const ahora = new Date();
+                let inicio, fin;
+                const meta = vistaActual === 'semana' ? metaSemanal : metaMensual;
+
+                if (vistaActual === 'semana') {
+                    // Lógica de cálculo de semana corregida para mayor robustez.
+                    const hoy = new Date(ahora);
+                    const diaDeLaSemana = hoy.getDay(); // 0=Domingo, 1=Lunes...
+                    // Calcula el día del mes para el lunes de esta semana.
+                    const diaLunes = hoy.getDate() - diaDeLaSemana + (diaDeLaSemana === 0 ? -6 : 1);
+
+                    inicio = new Date(hoy.getFullYear(), hoy.getMonth(), diaLunes, 0, 0, 0, 0);
+                    fin = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + 6, 23, 59, 59, 999);
+                } else { // Mes
+                    inicio = new Date(ahora.getFullYear(), ahora.getMonth(), 1, 0, 0, 0, 0);
+                    fin = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0, 23, 59, 59, 999);
+                }
+
+                let progreso = 0;
+                if (allLecturasData) {
+                    const registrosUsuario = Object.values(allLecturasData).filter(reg => {
+                        const esUsuarioCorrecto = reg.uid === uid || reg.id === uid;
+                        if (!esUsuarioCorrecto || !reg.timestamp) return false;
+
+                        const fechaRegistro = new Date(reg.timestamp);
+                        return !isNaN(fechaRegistro) && fechaRegistro >= inicio && fechaRegistro <= fin;
+                    });
+
+                    // Se cuentan las visitas completas (entrada/salida), por eso se divide entre 2.
+                    progreso = Math.floor(registrosUsuario.length / 2);
+                }
+                actualizarUI(progreso, meta);
+
+                progressLoader.style.display = 'none';
+                progressContent.classList.remove('hidden');
+                progressContent.classList.add('w-full', 'flex', 'flex-col', 'items-center');
+            };
+
+            // Se establece un listener para obtener las lecturas en tiempo real.
+            const lecturasRef = ref(dbRTDB, 'lecturas');
+            onValue(lecturasRef, (snapshot) => {
+                allLecturasData = snapshot.val() || {};
+                cargarDatosProgreso(); // Actualiza la UI cada vez que los datos cambian.
+            }, (error) => {
+                console.error("Error al obtener el progreso en tiempo real:", error);
+                actualizarUI(0, vistaActual === 'semana' ? metaSemanal : metaMensual);
+            });
+
+            // Event Listeners
+            vistaSemanaBtn.addEventListener('click', () => cambiarVista('semana'));
+            vistaMesBtn.addEventListener('click', () => cambiarVista('mes'));
+            increaseGoalBtn.addEventListener('click', () => ajustarMeta(1));
+            decreaseGoalBtn.addEventListener('click', () => ajustarMeta(-1));
+
+            // Carga inicial
+            cambiarVista('semana');
+        }
+
+        // --- Lógica para la tarjeta de Métricas ---
+        function inicializarMetricas(uid) {
+            // Elementos de la tarjeta
+            const metricsLoader = document.getElementById('metricsLoader');
+            const metricsContent = document.getElementById('metricsContent');
+            const metricsMonthEl = document.getElementById('metricsMonth');
+            const pesoValorEl = document.getElementById('pesoValor');
+            const pesoDiferenciaEl = document.getElementById('pesoDiferencia');
+            const grasaValorEl = document.getElementById('grasaValor');
+            const grasaDiferenciaEl = document.getElementById('grasaDiferencia');
+            const musculoValorEl = document.getElementById('musculoValor');
+            const musculoDiferenciaEl = document.getElementById('musculoDiferencia');
+
+            // Elementos del Modal
+            const metricsModal = document.getElementById('metricsModal');
+            const openModalBtn = document.getElementById('actualizarMetricasBtn');
+            const closeModalBtn = document.getElementById('closeMetricsModal');
+            const metricsForm = document.getElementById('metricsForm');
+            const inputPeso = document.getElementById('inputPeso');
+            const inputGrasa = document.getElementById('inputGrasa');
+            const inputMusculo = document.getElementById('inputMusculo');
+
+            // Lógica del Modal
+            openModalBtn.addEventListener('click', () => metricsModal.classList.remove('hidden'));
+            closeModalBtn.addEventListener('click', () => metricsModal.classList.add('hidden'));
+            window.addEventListener('click', (e) => {
+                if (e.target === metricsModal) metricsModal.classList.add('hidden');
+            });
+
+            // Guardar métricas
+            metricsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const peso = parseFloat(inputPeso.value);
+                const grasa = parseFloat(inputGrasa.value);
+                const musculo = parseFloat(inputMusculo.value);
+
+                if (isNaN(peso) || isNaN(grasa) || isNaN(musculo)) {
+                    alert("Por favor, introduce valores numéricos válidos.");
+                    return;
+                }
+
+                const metricasCollectionRef = collection(db, 'usuarios', uid, 'metricas');
+
+                try {
+                    await addDoc(metricasCollectionRef, { peso, grasa, musculo, timestamp: new Date() });
+                    alert("Métricas actualizadas con éxito.");
+                    metricsModal.classList.add('hidden');
+                    metricsForm.reset();
+                } catch (error) {
+                    console.error("Error al guardar las métricas:", error);
+                    alert("Hubo un error al guardar tus métricas. Inténtalo de nuevo.");
+                }
+            });
+
+            // Cargar y mostrar métricas en tiempo real
+            const metricasCollectionRef = collection(db, 'usuarios', uid, 'metricas');
+            const q = query(metricasCollectionRef, orderBy('timestamp', 'desc'));
+
+            onSnapshot(q, (snapshot) => {
+                metricsLoader.style.display = 'none';
+                metricsContent.classList.remove('hidden');
+
+                const metricas = snapshot.docs.map(doc => doc.data());
+
+                const datosMasRecientes = metricas.length > 0 ? metricas[0] : null;
+                const datosAnteriores = metricas.length > 1 ? metricas[1] : null;
+
+                actualizarUIMetricas(datosMasRecientes, datosAnteriores);
+
+            }, (error) => {
+                console.error("Error al cargar métricas:", error);
+                metricsLoader.innerHTML = '<span class="text-red-500">Error al cargar</span>';
+            });
+
+            function actualizarUIMetricas(actual, anterior) {
+                const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                if (actual && actual.timestamp) {
+                    const fechaMetrica = actual.timestamp.toDate();
+                    metricsMonthEl.textContent = `${meses[fechaMetrica.getMonth()]} ${fechaMetrica.getFullYear()}`;
+                } else {
+                    metricsMonthEl.textContent = "Sin datos";
+                }
+
+                // Función auxiliar para actualizar una métrica
+                const actualizarMetricaUI = (valorEl, diffEl, valorActual, valorAnterior, unidad, esBuenoBajar) => {
+                    valorEl.textContent = valorActual !== null ? `${valorActual} ${unidad}` : `-- ${unidad}`;
+                    
+                    if (valorActual !== null && valorAnterior !== null) {
+                        const diferencia = valorActual - valorAnterior;
+                        diffEl.textContent = `${diferencia >= 0 ? '+' : ''}${diferencia.toFixed(1)} ${unidad} vs registro anterior`;
+                        
+                        if (diferencia === 0) {
+                            diffEl.className = 'text-xs text-gray-500 mt-1 text-right';
+                        } else if ((esBuenoBajar && diferencia < 0) || (!esBuenoBajar && diferencia > 0)) {
+                            diffEl.className = 'text-xs text-green-500 mt-1 text-right font-semibold';
+                        } else {
+                            diffEl.className = 'text-xs text-red-500 mt-1 text-right font-semibold';
+                        }
+                    } else {
+                        diffEl.textContent = '-- vs registro anterior';
+                        diffEl.className = 'text-xs text-gray-500 mt-1 text-right';
+                    }
+                };
+
+                // Actualizar Peso
+                actualizarMetricaUI(pesoValorEl, pesoDiferenciaEl, actual?.peso ?? null, anterior?.peso ?? null, 'kg', true);
+
+                // Actualizar Grasa
+                actualizarMetricaUI(grasaValorEl, grasaDiferenciaEl, actual?.grasa ?? null, anterior?.grasa ?? null, '%', true);
+
+                // Actualizar Músculo
+                actualizarMetricaUI(musculoValorEl, musculoDiferenciaEl, actual?.musculo ?? null, anterior?.musculo ?? null, 'kg', false);
+
+                // Actualizar barras (ejemplo simple, se puede mejorar)
+                document.getElementById('pesoBarra').style.width = `${Math.min(100, (actual?.peso || 0) / 1.5)}%`;
+                document.getElementById('grasaBarra').style.width = `${Math.min(100, (actual?.grasa || 0) * 2)}%`;
+                document.getElementById('musculoBarra').style.width = `${Math.min(100, (actual?.musculo || 0) * 2)}%`;
+            }
+        }
     </script>
 </body>
 </html>
