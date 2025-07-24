@@ -190,28 +190,6 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation (Mobile) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t">
-        <div class="flex justify-around">
-            <a href="#" class="flex flex-col items-center py-3 px-4 text-indigo-600">
-                <i class="fas fa-home text-xl"></i>
-                <span class="text-xs mt-1">Inicio</span>
-            </a>
-            <a href="#" class="flex flex-col items-center py-3 px-4 text-gray-500">
-                <i class="fas fa-calendar-alt text-xl"></i>
-                <span class="text-xs mt-1">Clases</span>
-            </a>
-            <a href="#" class="flex flex-col items-center py-3 px-4 text-gray-500">
-                <i class="fas fa-chart-line text-xl"></i>
-                <span class="text-xs mt-1">Progreso</span>
-            </a>
-            <a href="#" class="flex flex-col items-center py-3 px-4 text-gray-500">
-                <i class="fas fa-user text-xl"></i>
-                <span class="text-xs mt-1">Perfil</span>
-            </a>
-        </div>
-    </nav>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { 
@@ -470,7 +448,7 @@
                     return;
                 }
 
-                const metricasCollectionRef = collection(db, 'usuarios', uid, 'metricas');
+                const metricasCollectionRef = collection(db, 'metricas', uid, 'registros');
 
                 try {
                     await addDoc(metricasCollectionRef, { peso, grasa, musculo, timestamp: new Date() });
@@ -484,7 +462,7 @@
             });
 
             // Cargar y mostrar métricas en tiempo real
-            const metricasCollectionRef = collection(db, 'usuarios', uid, 'metricas');
+            const metricasCollectionRef = collection(db, 'metricas', uid, 'registros');
             const q = query(metricasCollectionRef, orderBy('timestamp', 'desc'));
 
             onSnapshot(q, (snapshot) => {

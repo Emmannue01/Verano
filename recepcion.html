@@ -53,13 +53,15 @@
                     <h1 class="text-2xl font-bold text-gray-800">Panel de Recepción</h1>
                     <div class="flex items-center space-x-4">
                         <div class="relative">
-                            <input type="text" placeholder="Buscar..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">
+                                <img id="userAvatar" class="h-8 w-8 rounded-full" src="https://i.pravatar.cc/32" alt="User profile">
+                                <span id="userName" class="hidden md:block">Usuario</span>
+                                <i class="fas fa-chevron-down text-xs hidden md:inline"></i>
+                            </button>
+                            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+                            </div>
                         </div>
-                        <button class="p-2 text-gray-500 hover:text-gray-700 focus:outline-none">
-                            <i class="fas fa-bell"></i>
-                            <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-                        </button>
                     </div>
                 </div>
             </header>
@@ -67,7 +69,7 @@
             <!-- Dashboard Content -->
             <main class="p-6">
                 <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
                         <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mr-4">
                             <i class="fas fa-users text-xl"></i>
@@ -89,45 +91,17 @@
                             <p class="text-green-500 text-xs"><i class="fas fa-arrow-up"></i> 5% ayer</p>
                         </div>
                     </div>
-                    
-                    <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
-                            <i class="fas fa-exclamation-circle text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-gray-500 text-sm">Pagos Pendientes</h3>
-                            <p class="text-2xl font-bold">24</p>
-                            <p class="text-red-500 text-xs"><i class="fas fa-arrow-up"></i> 3 desde ayer</p>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-xl shadow-md p-6 flex items-center">
-                        <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                            <i class="fas fa-dollar-sign text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-gray-500 text-sm">Ingresos Hoy</h3>
-                            <p class="text-2xl font-bold">$1,240</p>
-                            <p class="text-green-500 text-xs"><i class="fas fa-arrow-up"></i> 8% ayer</p>
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- Quick Actions -->
                 <div class="mb-8">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Acciones Rápidas</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <button class="bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-all">
                             <i class="fas fa-user-plus mr-2"></i> Nuevo Miembro
                         </button>
                         <button class="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-all">
                             <i class="fas fa-sync-alt mr-2"></i> Renovar Membresía
-                        </button>
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-all">
-                            <i class="fas fa-qrcode mr-2"></i> Registrar Acceso
-                        </button>
-                        <button class="bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-all">
-                            <i class="fas fa-file-invoice-dollar mr-2"></i> Generar Pago
                         </button>
                     </div>
                 </div>
@@ -140,39 +114,8 @@
                             <h2 class="text-xl font-bold text-gray-800">Nuevos Miembros</h2>
                             <a href="#" class="text-sm text-indigo-600 hover:underline">Ver todos</a>
                         </div>
-                        <div class="space-y-4">
-                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
-                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Member" class="w-10 h-10 rounded-full">
-                                <div class="ml-3">
-                                    <h4 class="font-medium">Carlos Méndez</h4>
-                                    <p class="text-sm text-gray-500">Registrado hoy</p>
-                                </div>
-                                <div class="ml-auto">
-                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Nuevo</span>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
-                                <img src="https://randomuser.me/api/portraits/women/28.jpg" alt="Member" class="w-10 h-10 rounded-full">
-                                <div class="ml-3">
-                                    <h4 class="font-medium">Ana Rodríguez</h4>
-                                    <p class="text-sm text-gray-500">Registrado ayer</p>
-                                </div>
-                                <div class="ml-auto">
-                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Activo</span>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
-                                <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Member" class="w-10 h-10 rounded-full">
-                                <div class="ml-3">
-                                    <h4 class="font-medium">Javier López</h4>
-                                    <p class="text-sm text-gray-500">Registrado hace 2 días</p>
-                                </div>
-                                <div class="ml-auto">
-                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Activo</span>
-                                </div>
-                            </div>
+                        <div id="nuevosMiembrosContainer" class="space-y-4">
+                            <!-- Contenido dinámico de nuevos miembros -->
                         </div>
                     </div>
                     
@@ -182,39 +125,8 @@
                             <h2 class="text-xl font-bold text-gray-800">Últimos Accesos</h2>
                             <a href="#" class="text-sm text-indigo-600 hover:underline">Ver todos</a>
                         </div>
-                        <div class="space-y-4">
-                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
-                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Member" class="w-10 h-10 rounded-full">
-                                <div class="ml-3">
-                                    <h4 class="font-medium">Laura Gómez</h4>
-                                    <p class="text-sm text-gray-500">Hace 15 minutos</p>
-                                </div>
-                                <div class="ml-auto text-green-500">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
-                                <img src="https://randomuser.me/api/portraits/men/68.jpg" alt="Member" class="w-10 h-10 rounded-full">
-                                <div class="ml-3">
-                                    <h4 class="font-medium">Roberto Sánchez</h4>
-                                    <p class="text-sm text-gray-500">Hace 32 minutos</p>
-                                </div>
-                                <div class="ml-auto text-green-500">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
-                                <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Member" class="w-10 h-10 rounded-full">
-                                <div class="ml-3">
-                                    <h4 class="font-medium">Patricia Ruiz</h4>
-                                    <p class="text-sm text-gray-500">Hace 1 hora</p>
-                                </div>
-                                <div class="ml-auto text-yellow-500">
-                                    <i class="fas fa-exclamation-circle"></i>
-                                </div>
-                            </div>
+                        <div id="ultimosAccesosContainer" class="space-y-4">
+                            <!-- Contenido dinámico de últimos accesos -->
                         </div>
                     </div>
                 </div>
@@ -322,8 +234,13 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { 
+            getFirestore, doc, getDoc, 
+            collection, query, orderBy, 
+            limit, getDocs 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getDatabase, ref, query as queryRTDB, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
             // IMPORTANTE: Reemplaza este objeto completo con la configuración de tu proyecto
@@ -338,6 +255,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const dbRTDB = getDatabase(app);
 
         // --- Guardia de Autenticación y Roles para Recepción ---
         onAuthStateChanged(auth, async (user) => {
@@ -349,7 +267,18 @@
                 // Permite el acceso si el rol es 'recepcion' O 'administrador' (los admins pueden ver todo)
                 if (userDoc.exists() && (userDoc.data().rol === 'recepcion' || userDoc.data().rol === 'administrador')) {
                     console.log("Acceso de recepción concedido.");
-                    // Aquí puedes llamar a funciones para cargar datos específicos de recepción
+                    // Actualizar UI con datos del usuario
+                    const userNameSpan = document.getElementById('userName');
+                    const userAvatarImg = document.getElementById('userAvatar');
+                    if (userNameSpan) {
+                        userNameSpan.textContent = user.displayName || user.email.split('@')[0];
+                    }
+                    if (userAvatarImg && user.photoURL) {
+                        userAvatarImg.src = user.photoURL;
+                    }
+                    // Cargar datos dinámicos del panel
+                    cargarNuevosMiembros();
+                    cargarUltimosAccesos();
                 } else {
                     console.log("Acceso denegado. El usuario no tiene rol de recepción.");
                     window.location.href = 'index.html';
@@ -360,11 +289,151 @@
             }
         });
 
-        // Opcional: Añadir botón de cerrar sesión si lo necesitas en esta vista
-        // document.getElementById('logoutButtonRecepcion').addEventListener('click', (e) => {
-        //   e.preventDefault();
-        //   signOut(auth).catch(error => console.error('Error al cerrar sesión:', error));
-        // });
+        // --- Funcionalidad de Cerrar Sesión y Menú de Usuario ---
+        document.getElementById('userMenuButton').addEventListener('click', function() {
+            document.getElementById('userMenu').classList.toggle('hidden');
+        });
+
+        document.getElementById('logoutButton').addEventListener('click', (e) => {
+            e.preventDefault();
+            signOut(auth).catch(error => console.error('Error al cerrar sesión:', error));
+        });
+
+        // Cerrar el dropdown si se hace clic fuera de él
+        window.addEventListener('click', function(e) {
+            const userMenuButton = document.getElementById('userMenuButton');
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu && userMenuButton && !userMenuButton.contains(e.target) && !userMenu.contains(e.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+
+        // --- Cargar Datos Dinámicos ---
+        async function cargarNuevosMiembros() {
+            const container = document.getElementById('nuevosMiembrosContainer');
+            if (!container) return;
+
+            container.innerHTML = '<p class="text-center text-gray-500">Cargando...</p>';
+
+            try {
+                const q = query(collection(db, "usuarios"), orderBy("Creado", "desc"), limit(3));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<p class="text-center text-gray-500">No hay miembros nuevos.</p>';
+                    return;
+                }
+
+                let membersHtml = '';
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const nombre = `${data.Nombre || ''} ${data.Apellido || ''}`.trim();
+                    const genero = data.Genero === 'Femenino' ? 'women' : 'men';
+                    const avatarUrl = `https://randomuser.me/api/portraits/${genero}/${Math.floor(Math.random() * 100)}.jpg`;
+                    
+                    const fechaCreacion = data.Creado ? data.Creado.toDate() : new Date();
+                    const hoy = new Date();
+                    const ayer = new Date(hoy.getTime() - (24 * 60 * 60 * 1000));
+                    let textoFecha = `Registrado el ${fechaCreacion.toLocaleDateString('es-ES')}`;
+                    if (fechaCreacion.toDateString() === hoy.toDateString()) textoFecha = 'Registrado hoy';
+                    else if (fechaCreacion.toDateString() === ayer.toDateString()) textoFecha = 'Registrado ayer';
+
+                    const esNuevo = fechaCreacion.toDateString() === hoy.toDateString();
+
+                    membersHtml += `
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                            <img src="${avatarUrl}" alt="Member" class="w-10 h-10 rounded-full">
+                            <div class="ml-3">
+                                <h4 class="font-medium">${nombre}</h4>
+                                <p class="text-sm text-gray-500">${textoFecha}</p>
+                            </div>
+                            <div class="ml-auto">
+                                <span class="${esNuevo ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'} text-xs px-2 py-1 rounded">${esNuevo ? 'Nuevo' : 'Activo'}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = membersHtml;
+
+            } catch (error) {
+                console.error("Error al cargar nuevos miembros:", error);
+                container.innerHTML = '<p class="text-center text-red-500">Error al cargar datos.</p>';
+            }
+        }
+
+        async function cargarUltimosAccesos() {
+            const container = document.getElementById('ultimosAccesosContainer');
+            if (!container) return;
+
+            container.innerHTML = '<p class="text-center text-gray-500">Cargando...</p>';
+
+            try {
+                // 1. Crear un mapa de UID a datos de usuario desde Firestore
+                const uidToUserMap = {};
+                const usuariosSnapshot = await getDocs(collection(db, "usuarios"));
+                usuariosSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const nombre = `${data.Nombre || ''} ${data.Apellido || ''}`.trim();
+                    const genero = data.Genero === 'Femenino' ? 'women' : 'men';
+                    const checkinUid = data.uid || doc.id; // Usar el UID de la tarjeta
+                    uidToUserMap[checkinUid] = { nombre, genero };
+                });
+
+                // 2. Consultar los últimos 3 accesos desde Realtime Database
+                const lecturasRef = ref(dbRTDB, 'lecturas');
+                const q = queryRTDB(lecturasRef, orderByChild('timestamp'), limitToLast(3));
+
+                onValue(q, (snapshot) => {
+                    if (!snapshot.exists()) {
+                        container.innerHTML = '<p class="text-center text-gray-500">No hay accesos recientes.</p>';
+                        return;
+                    }
+
+                    let accessHtml = '';
+                    const accesses = [];
+                    snapshot.forEach(childSnapshot => {
+                        accesses.push(childSnapshot.val());
+                    });
+
+                    // Invertir para mostrar el más reciente primero
+                    accesses.reverse();
+
+                    accesses.forEach(data => {
+                        const uid = data.uid || data.id;
+                        const userData = uidToUserMap[uid] || { nombre: 'Desconocido', genero: 'men' };
+                        const avatarUrl = `https://randomuser.me/api/portraits/${userData.genero}/${Math.floor(Math.random() * 100)}.jpg`;
+                        
+                        const now = new Date();
+                        const accessTime = new Date(data.timestamp);
+                        const diffSeconds = Math.round((now - accessTime) / 1000);
+                        let timeText = accessTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+                        if (diffSeconds < 60) timeText = `Hace ${diffSeconds} seg.`;
+                        else if (diffSeconds < 3600) timeText = `Hace ${Math.floor(diffSeconds / 60)} min.`;
+
+                        accessHtml += `
+                            <div class="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-all">
+                                <img src="${avatarUrl}" alt="Member" class="w-10 h-10 rounded-full">
+                                <div class="ml-3">
+                                    <h4 class="font-medium">${userData.nombre}</h4>
+                                    <p class="text-sm text-gray-500">${timeText}</p>
+                                </div>
+                                <div class="ml-auto text-green-500">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    container.innerHTML = accessHtml;
+                });
+
+            } catch (error) {
+                console.error("Error al cargar últimos accesos:", error);
+                container.innerHTML = '<p class="text-center text-red-500">Error al cargar datos.</p>';
+            }
+        }
     </script>
 </body>
 </html>
