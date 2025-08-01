@@ -167,18 +167,17 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Miembros Activos</p>
-                            <h3 class="text-2xl font-bold" id="totalMembers">342</h3>
+                            <h3 class="text-2xl font-bold" id="totalAccounts"></h3>
                         </div>
                     </div>
 
-                    <!-- Active Memberships -->
                     <div class="bg-white rounded-lg shadow p-6 flex items-center fade-in">
                         <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
                             <i class="fas fa-id-card text-xl"></i>
                         </div>
                         <div>
                             <p class="text-gray-500">Membresías Activas</p>
-                            <h3 class="text-2xl font-bold" id="activeMemberships">298</h3>
+                            <h3 class="text-2xl font-bold" id="activeMemberships"></h3>
                         </div>
                     </div>
 
@@ -189,7 +188,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Por Vencer</p>
-                            <h3 class="text-2xl font-bold" id="expiringSoon">24</h3>
+                            <h3 class="text-2xl font-bold" id="expiringSoon"></h3>
                         </div>
                     </div>
 
@@ -200,7 +199,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Ingresos Mensuales</p>
-                            <h3 class="text-2xl font-bold" id="totalAccounts">0</h3>
+                            <h3 class="text-2xl font-bold" id="totalMembers">342</h3>
                         </div>
                     </div>
                 </div>
@@ -1100,7 +1099,7 @@ async function editarMiembro(id) {
             <select name="genero" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="Masculino"${member.Genero === 'Masculino' ? ' selected' : ''}>Masculino</option>
               <option value="Femenino"${member.Genero === 'Femenino' ? ' selected' : ''}>Femenino</option>
-              <option value="Otro"${member.Genero === 'Otro' ? ' selected' : ''}>254 tipos de gays</option>
+              <option value="Otro"${member.Genero === 'Otro' ? ' selected' : ''}>No especificado</option>
             </select>
           </div>
           <div>
@@ -1485,8 +1484,8 @@ document.querySelector('a[href="#"]:has(i.fa-chart-bar)').addEventListener('clic
       totalActivos.textContent = activos;
       nuevosUsuarios.textContent = nuevos;
       expiringSoon.textContent = porVencer;
-       document.getElementById('totalAccounts').textContent = ingresosMensuales.toLocaleString('es-ES', { style: 'currency', currency: 'USD' });
-            animateValue(document.getElementById('totalMembers'), 0, activos, 2000);
+       document.getElementById('totalAccounts').textContent = ingresosMensuales.toLocaleString('es-ES', { style: 'currency', currency: 'MXN' });
+      animateValue(document.getElementById('totalMembers'), 0, activos, 2000);
       animateValue(document.getElementById('activeMemberships'), 0, nuevos, 2000);
       animateValue(document.getElementById('expiringSoon'), 0, porVencer, 2000);
       animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
