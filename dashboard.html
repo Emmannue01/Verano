@@ -1068,66 +1068,84 @@ async function editarMiembro(id) {
   const member = allMembers.find(m => m.id === id);
   if (!member) return;
   const modal = document.createElement('div');
-  modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+  modal.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto flex items-center justify-center p-4 z-50';
   modal.innerHTML = `
-    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative">
-      <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" id="closeEditModal"><i class="fas fa-times"></i></button>
-      <h3 class="text-xl font-semibold mb-4">Editar Miembro</h3>
-      <form id="editMemberForm">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">UID</label>
-            <input type="text" name="uid" value="${member.UID || member.id}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
-            <select name="rol" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="cliente"${member.rol === 'cliente' ? ' selected' : ''}>Cliente</option>
-              <option value="recepcion"${member.rol === 'recepcion' ? ' selected' : ''}>Recepción</option>
-              <option value="administrador"${member.rol === 'administrador' ? ' selected' : ''}>Administrador</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
-            <select name="genero" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="Masculino"${member.Genero === 'Masculino' ? ' selected' : ''}>Masculino</option>
-              <option value="Femenino"${member.Genero === 'Femenino' ? ' selected' : ''}>Femenino</option>
-              <option value="Otro"${member.Genero === 'Otro' ? ' selected' : ''}>No especificado</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <input type="text" name="nombre" value="${member.Nombre}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-            <input type="text" name="apellido" value="${member.Apellido}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-            <input type="email" name="email" value="${member.Email}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-            <input type="tel" name="telefono" value="${member.Telefono}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
-            <select name="tipo" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option${member.Tipo==='Básica'||member.Tipo==='Basica'?' selected':''}>Básica</option>
-              <option${member.Tipo==='Estándar'||member.Tipo==='Estandar'?' selected':''}>Estándar</option>
-              <option${member.Tipo==='Premium'?' selected':''}>Premium</option>
-              <option${member.Tipo==='VIP'?' selected':''}>VIP</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
-            <input type="date" name="suscripcionHasta" value="${member.SuscripcionHasta.toISOString().slice(0,10)}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto relative">
+      <div class="sticky top-0 bg-white px-6 py-4 border-b">
+        <button class="absolute right-4 top-4 text-gray-500 hover:text-gray-700" id="closeEditModal">
+          <i class="fas fa-times"></i>
+        </button>
+        <h3 class="text-lg font-semibold">Editar Miembro</h3>
+      </div>
+      <form id="editMemberForm" class="p-6">
+        <div class="grid grid-cols-1 gap-4">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">UID</label>
+              <input type="text" name="uid" value="${member.UID || member.id}" 
+                class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Rol</label>
+              <select name="rol" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="cliente"${member.rol === 'cliente' ? ' selected' : ''}>Cliente</option>
+                <option value="recepcion"${member.rol === 'recepcion' ? ' selected' : ''}>Recepción</option>
+                <option value="administrador"${member.rol === 'administrador' ? ' selected' : ''}>Administrador</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+              <select name="genero" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="Masculino"${member.Genero === 'Masculino' ? ' selected' : ''}>Masculino</option>
+                <option value="Femenino"${member.Genero === 'Femenino' ? ' selected' : ''}>Femenino</option>
+                <option value="Otro"${member.Genero === 'Otro' ? ' selected' : ''}>No especificado</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+              <input type="text" name="nombre" value="${member.Nombre}" 
+                class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+              <input type="text" name="apellido" value="${member.Apellido}" 
+                class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+              <input type="email" name="email" value="${member.Email}" 
+                class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+              <input type="tel" name="telefono" value="${member.Telefono}" 
+                class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
+              <select name="tipo" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option${member.Tipo==='Básica'||member.Tipo==='Basica'?' selected':''}>Básica</option>
+                <option${member.Tipo==='Estándar'||member.Tipo==='Estandar'?' selected':''}>Estándar</option>
+                <option${member.Tipo==='Premium'?' selected':''}>Premium</option>
+                <option${member.Tipo==='VIP'?' selected':''}>VIP</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
+              <input type="date" name="suscripcionHasta" value="${member.SuscripcionHasta.toISOString().slice(0,10)}" 
+                class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
           </div>
         </div>
-        <div class="mt-8 flex justify-end">
-          <button type="button" id="cancelEditMember" class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancelar</button>
-          <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Guardar Cambios</button>
+        <div class="mt-6 flex flex-col sm:flex-row justify-end gap-3">
+          <button type="button" id="cancelEditMember" 
+            class="w-full sm:w-auto px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Cancelar
+          </button>
+          <button type="submit" 
+            class="w-full sm:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Guardar Cambios
+          </button>
         </div>
       </form>
     </div>
