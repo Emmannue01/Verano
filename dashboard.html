@@ -880,7 +880,7 @@ async function exportarExcel(rows, nombreArchivo) {
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 h-10 w-10">
-                                <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${member.Genero === 'Femenino' ? 'women' : 'men'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
+                                <img class="h-10 w-10 rounded-full" src="https://i.pravatar.cc/40?u=${member.id}" alt="">
                             </div>
                             <div class="ml-4">
                                 <div class="text-sm font-medium text-gray-900">${member.Nombre} ${member.Apellido}</div>
@@ -1090,7 +1090,7 @@ async function editarMiembro(id) {
               <select name="rol" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="cliente"${member.rol === 'cliente' ? ' selected' : ''}>Cliente</option>
                 <option value="recepcion"${member.rol === 'recepcion' ? ' selected' : ''}>Recepción</option>
-                <option value="entrenador"${member.rol === 'entrenador' ? ' selected' : ''}>Exxxxxxxntrenador</option>
+                <option value="entrenador"${member.rol === 'entrenador' ? ' selected' : ''}>Entrenador</option>
                 <option value="administrador"${member.rol === 'administrador' ? ' selected' : ''}>Administrador</option>
               </select>
             </div>
@@ -1481,7 +1481,7 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 h-10 w-10">
-                                <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${data.Genero === 'Femenino' ? 'women' : 'men'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
+                                <img class="h-10 w-10 rounded-full" src="https://i.pravatar.cc/40?u=${doc.id}" alt="">
                             </div>
                             <div class="ml-4">
                                 <div class="text-sm font-medium text-gray-900">${data.Nombre} ${data.Apellido || ''}</div>
