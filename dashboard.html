@@ -199,7 +199,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Ingresos Mensuales</p>
-                            <h3 class="text-2xl font-bold" id="totalMembers">100</h3>
+                            <h3 class="text-2xl font-bold" id="monthlyRevenue">100</h3>
                         </div>
                     </div>
                 </div>
@@ -381,11 +381,11 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
                         <select id="tipoMembresia" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option>Seleccione una opción</option>
-                            <option>Básica (1 mes)</option>
-                            <option>Estándar (3 meses)</option>
-                            <option>Premium (6 meses)</option>
-                            <option>VIP (12 meses)</option>
+                            <option value="">Seleccione una opción</option>
+                            <option value="Basica">Básica (1 mes)</option>
+                            <option value="Estandar">Estándar (3 meses)</option>
+                            <option value="Premium">Premium (6 meses)</option>
+                            <option value="VIP">VIP (12 meses)</option>
                         </select>
                     </div>
                     <div>
@@ -1124,16 +1124,16 @@ async function editarMiembro(id) {
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Membresía</label>
-              <select name="tipo" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option${member.Tipo==='Básica'||member.Tipo==='Basica'?' selected':''}>Básica</option>
-                <option${member.Tipo==='Estándar'||member.Tipo==='Estandar'?' selected':''}>Estándar</option>
-                <option${member.Tipo==='Premium'?' selected':''}>Premium</option>
-                <option${member.Tipo==='VIP'?' selected':''}>VIP</option>
-              </select>
+                <select id="editMemberTipo" name="tipo" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="Basica"${member.Tipo.toLowerCase().includes('basica') ? ' selected' : ''}>Básica</option>
+                    <option value="Estandar"${member.Tipo.toLowerCase().includes('estandar') ? ' selected' : ''}>Estándar</option>
+                    <option value="Premium"${member.Tipo.toLowerCase().includes('premium') ? ' selected' : ''}>Premium</option>
+                    <option value="VIP"${member.Tipo.toLowerCase().includes('vip') ? ' selected' : ''}>VIP</option>
+                </select>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Fin</label>
-              <input type="date" name="suscripcionHasta" value="${member.SuscripcionHasta.toISOString().slice(0,10)}" 
+              <input id="editMemberFechaFin" type="date" name="suscripcionHasta" value="${member.SuscripcionHasta.toISOString().slice(0,10)}" 
                 class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
           </div>
@@ -1154,6 +1154,35 @@ async function editarMiembro(id) {
   document.body.appendChild(modal);
   document.getElementById('closeEditModal').onclick = () => modal.remove();
   document.getElementById('cancelEditMember').onclick = () => modal.remove();
+
+  // Al cambiar el tipo de membresía, calcula la nueva fecha de fin.
+  document.getElementById('editMemberTipo').addEventListener('change', function(e) {
+    const tipo = e.target.value;
+    const fechaFinInput = document.getElementById('editMemberFechaFin');
+    
+    const hoy = new Date();
+    // La fecha base para la renovación es el final de la membresía actual si aún está activa, o hoy si ya expiró.
+    const fechaBase = member.SuscripcionHasta > hoy ? member.SuscripcionHasta : hoy;
+    const nuevaFechaFin = new Date(fechaBase);
+
+    let mesesAAgregar = 0;
+    switch(tipo) {
+        case 'Estandar': mesesAAgregar = 3; break;
+        case 'Premium': mesesAAgregar = 6; break;
+        case 'VIP': mesesAAgregar = 12; break;
+        case 'Basica': default: mesesAAgregar = 1; break;
+    }
+    
+    nuevaFechaFin.setMonth(nuevaFechaFin.getMonth() + mesesAAgregar);
+    
+    // Formatear a YYYY-MM-DD para el input de fecha
+    const yyyy = nuevaFechaFin.getFullYear();
+    const mm = String(nuevaFechaFin.getMonth() + 1).padStart(2, '0');
+    const dd = String(nuevaFechaFin.getDate()).padStart(2, '0');
+    
+    fechaFinInput.value = `${yyyy}-${mm}-${dd}`;
+  });
+
   document.getElementById('editMemberForm').onsubmit = async function(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -1166,8 +1195,30 @@ async function editarMiembro(id) {
     const telefono = formData.get('telefono').trim();
     const tipo = formData.get('tipo');
     const suscripcionHasta = formData.get('suscripcionHasta');
+    const nuevaFechaFin = new Date(suscripcionHasta + 'T00:00:00');
+    const antiguaFechaFin = member.SuscripcionHasta;
+
     try {
-      const { updateDoc, doc, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+      const { updateDoc, doc, Timestamp, addDoc, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+      
+      // Si la fecha se extiende, es una renovación y se registra el pago
+      if (nuevaFechaFin > antiguaFechaFin) {
+          const costosSubscripcion = {};
+          const subsSnap = await getDocs(collection(db, 'subscripciones'));
+          subsSnap.forEach(doc => {
+              costosSubscripcion[doc.data().nombre] = doc.data().costo || 0;
+          });
+          const costoMembresia = costosSubscripcion[tipo] || 0;
+
+          await addDoc(collection(db, "pagos"), {
+              uid: uid,
+              Nombre: `${nombre} ${apellido}`,
+              Monto: costoMembresia,
+              Fecha: Timestamp.now(), // Se registra el pago en la fecha de la renovación
+              Concepto: `Renovación - Membresía ${tipo}`
+          });
+      }
+
       await updateDoc(doc(db, 'usuarios', id), {
         uid: uid,
         rol: rol,
@@ -1336,7 +1387,7 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { 
-    getFirestore, collection, getDocs, query, orderBy, limit, addDoc, Timestamp, doc, getDoc
+    getFirestore, collection, getDocs, query, orderBy, limit, addDoc, Timestamp, doc, getDoc, where
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -1416,6 +1467,14 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
 
   async function cargarUsuarios() {
     try {
+        // Obtener los costos de las suscripciones para calcular ingresos
+        const costosSubscripcion = {};
+        const subsSnap = await getDocs(collection(db, 'subscripciones'));
+        subsSnap.forEach(doc => {
+            const data = doc.data();
+            costosSubscripcion[data.nombre] = data.costo || 0;
+        });
+
         const allSnapshot = await getDocs(collection(db, "usuarios"));
         const q = query(collection(db, "usuarios"), orderBy("Creado", "desc"), limit(5));
         const snapshot = await getDocs(q);
@@ -1423,10 +1482,20 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
         const actividadReciente = document.querySelector('.space-y-4');
         cuentasTotales = allSnapshot.size;
         let membresiasActivas = 0;
+        let ingresosMensuales = 0;
         let membresiasPorVencer = 0;
         const hoy = new Date();
         const ochoDiasDespues = new Date();
         ochoDiasDespues.setDate(hoy.getDate() + 8);
+        
+        // Calcular ingresos del mes actual desde la colección 'pagos'
+        const inicioMesActual = new Date(hoy.getFullYear(), hoy.getMonth(), 1, 0, 0, 0);
+        const finMesActual = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0, 23, 59, 59);
+        const pagosQuery = query(collection(db, "pagos"), where("Fecha", ">=", Timestamp.fromDate(inicioMesActual)), where("Fecha", "<=", Timestamp.fromDate(finMesActual)));
+        const pagosSnapshot = await getDocs(pagosQuery);
+        pagosSnapshot.forEach(doc => {
+            ingresosMensuales += doc.data().Monto || 0;
+        });
 
         // Contar membresías activas y por vencer
         allSnapshot.forEach((doc) => {
@@ -1444,12 +1513,10 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
         });
 
         // Actualizar contadores
-        document.getElementById('totalAccounts').textContent = cuentasTotales;
-        document.getElementById('activeMemberships').textContent = membresiasActivas;
-        document.getElementById('expiringSoon').textContent = membresiasPorVencer;
-        animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
-        animateValue(document.getElementById('expiringSoon'), 0, membresiasPorVencer, 2000);
-        animateValue(document.getElementById('activeMemberships'), 0, membresiasActivas, 2000);
+        animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 1500);
+        animateValue(document.getElementById('activeMemberships'), 0, membresiasActivas, 1500);
+        animateValue(document.getElementById('expiringSoon'), 0, membresiasPorVencer, 1500);
+        animateValue(document.getElementById('monthlyRevenue'), 0, ingresosMensuales, 1500);
         // Reiniciar conteo de tipos de membresía
         conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
 
@@ -1539,6 +1606,7 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
         document.getElementById('totalAccounts').textContent = '0';
         document.getElementById('activeMemberships').textContent = '0';
         document.getElementById('expiringSoon').textContent = '0';
+        document.getElementById('monthlyRevenue').textContent = '0';
     }
   }
 
@@ -1700,36 +1768,6 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
     };
     window.requestAnimationFrame(step);
   }
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const options = {
-      root: null,
-      threshold: 0.1
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const target = entry.target;
-          const id = target.id;
-          const value = parseInt(target.textContent.replace(/,/g, ''));
-          target.textContent = '0';
-          animateValue(document.getElementById(id), 0, value, 2000);
-          observer.unobserve(target);
-        }
-      });
-    }, options);
-
-    const counters = ['totalMembers', 'activeMemberships', 'expiringSoon', 'monthlyRevenue'];
-    counters.forEach(id => {
-      const element = document.getElementById(id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
-
-    cargarUsuarios();
-  });
 
   window.db = db;
   window.query = query;
