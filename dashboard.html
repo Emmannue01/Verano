@@ -166,8 +166,8 @@
                             <i class="fas fa-users text-xl"></i>
                         </div>
                         <div>
-                            <p class="text-gray-500">Miembros Activos</p>
-                            <h3 class="text-2xl font-bold" id="totalAccounts"></h3>
+                            <p class="text-gray-500">Miembros</p>
+                            <h3 class="text-2xl font-bold" id="totalAccounts">100</h3>
                         </div>
                     </div>
 
@@ -177,7 +177,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Membresías Activas</p>
-                            <h3 class="text-2xl font-bold" id="activeMemberships"></h3>
+                            <h3 class="text-2xl font-bold" id="activeMemberships">100</h3>
                         </div>
                     </div>
 
@@ -188,7 +188,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Por Vencer</p>
-                            <h3 class="text-2xl font-bold" id="expiringSoon"></h3>
+                            <h3 class="text-2xl font-bold" id="expiringSoon">100</h3>
                         </div>
                     </div>
 
@@ -1415,13 +1415,13 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
 
   async function cargarUsuarios() {
     const totalActivos = document.getElementById('totalMembers');
-       const nuevosUsuarios = document.getElementById('activeMemberships');
+    const usuariosActivos = document.getElementById('activeMemberships');
     const expiringSoon = document.getElementById('expiringSoon');
     const miembrosTableBody = document.querySelector('tbody');
     const actividadReciente = document.querySelector('.space-y-4');
     
     let activos = 0;
-    let nuevos = 0;
+    let acti = 0;
     let porVencer = 0;
     let ingresosMensuales = 0;
     const hoy = new Date();
@@ -1458,7 +1458,7 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
       });
 
       // Procesar los últimos 5 registros para la tabla
-      snapshot.forEach((doc) => {
+       allSnapshot.forEach((doc) => {
         const data = doc.data();
         const fechaFin = data.SuscripcionHasta.toDate();
         const fechaInicio = data.Creado.toDate();
@@ -1469,7 +1469,7 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
         else if (tipo.includes("vip")) tipo = "VIP";
 
         if (fechaFin >= hoy) activos++;
-        nuevos++;
+        acti++;
 
         if (fechaFin > hoy && fechaFin <= cincoDiasDespues) {
           porVencer++;
@@ -1548,11 +1548,11 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
       });
 
       totalActivos.textContent = activos;
-      nuevosUsuarios.textContent = nuevos;
+      usuariosActivos.textContent = acti;
       expiringSoon.textContent = porVencer;
        document.getElementById('totalAccounts').textContent = ingresosMensuales.toLocaleString('es-ES', { style: 'currency', currency: 'MXN' });
       animateValue(document.getElementById('totalMembers'), 0, activos, 2000);
-      animateValue(document.getElementById('activeMemberships'), 0, nuevos, 2000);
+      animateValue(document.getElementById('activeMemberships'), 0, acti, 2000);
       animateValue(document.getElementById('expiringSoon'), 0, porVencer, 2000);
       animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
 
