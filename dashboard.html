@@ -199,7 +199,7 @@
                         </div>
                         <div>
                             <p class="text-gray-500">Ingresos Mensuales</p>
-                            <h3 class="text-2xl font-bold" id="totalMembers">342</h3>
+                            <h3 class="text-2xl font-bold" id="totalMembers">100</h3>
                         </div>
                     </div>
                 </div>
@@ -1090,6 +1090,7 @@ async function editarMiembro(id) {
               <select name="rol" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="cliente"${member.rol === 'cliente' ? ' selected' : ''}>Cliente</option>
                 <option value="recepcion"${member.rol === 'recepcion' ? ' selected' : ''}>Recepción</option>
+                <option value="entrenador"${member.rol === 'entrenador' ? ' selected' : ''}>Entrenador</option>
                 <option value="administrador"${member.rol === 'administrador' ? ' selected' : ''}>Administrador</option>
               </select>
             </div>
@@ -1414,154 +1415,123 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
   }
 
   async function cargarUsuarios() {
-    const totalActivos = document.getElementById('totalMembers');
-    const usuariosActivos = document.getElementById('activeMemberships');
-    const expiringSoon = document.getElementById('expiringSoon');
-    const miembrosTableBody = document.querySelector('tbody');
-    const actividadReciente = document.querySelector('.space-y-4');
-    
-    let activos = 0;
-    let acti = 0;
-    let porVencer = 0;
-    let ingresosMensuales = 0;
-    const hoy = new Date();
-    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-    const cincoDiasDespues = new Date();
-    cincoDiasDespues.setDate(hoy.getDate() + 5);
-
-     try {
-      const pagosSnapshot = await getDocs(collection(db, "pagos"));
-
-      const q = query(collection(db, "usuarios"), orderBy("Creado", "desc"), limit(5));
-      const snapshot = await getDocs(q);
-      const allSnapshot = await getDocs(collection(db, "usuarios"));
-      cuentasTotales = allSnapshot.size;
-
-      miembrosTableBody.innerHTML = '';
-      actividadReciente.innerHTML = '';
-
-      // Reiniciar conteoTipos antes de contar
-      conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
-
-      // Contar todos los tipos de membresía usando allSnapshot
-      allSnapshot.forEach((doc) => {
-        const data = doc.data();
-        let tipo = (data.Tipo || "Basica").toLowerCase();
-        if (tipo.includes("básica") || tipo.includes("basica")) tipo = "Basica";
-        else if (tipo.includes("estándar") || tipo.includes("estandar")) tipo = "Estandar";
-        else if (tipo.includes("premium")) tipo = "Premium";
-        else if (tipo.includes("vip")) tipo = "VIP";
+    try {
+        const allSnapshot = await getDocs(collection(db, "usuarios"));
+        const q = query(collection(db, "usuarios"), orderBy("Creado", "desc"), limit(5));
+        const snapshot = await getDocs(q);
+        const miembrosTableBody = document.querySelector('tbody');
+        const actividadReciente = document.querySelector('.space-y-4');
+        cuentasTotales = allSnapshot.size;
+        let membresiasActivas = 0;
+        const hoy = new Date();
         
-        if (conteoTipos.hasOwnProperty(tipo)) {
-          conteoTipos[tipo]++;
-        }
-      });
+        // Actualizar el contador total
+        document.getElementById('totalAccounts').textContent = cuentasTotales;
+        animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
 
-      // Procesar los últimos 5 registros para la tabla
-       allSnapshot.forEach((doc) => {
-        const data = doc.data();
-        const fechaFin = data.SuscripcionHasta.toDate();
-        const fechaInicio = data.Creado.toDate();
-        let tipo = (data.Tipo || "Basica").toLowerCase();
-        if (tipo.includes("básica") || tipo.includes("basica")) tipo = "Basica";
-        else if (tipo.includes("estándar") || tipo.includes("estandar")) tipo = "Estandar";
-        else if (tipo.includes("premium")) tipo = "Premium";
-        else if (tipo.includes("vip")) tipo = "VIP";
-
-        if (fechaFin >= hoy) activos++;
-        acti++;
-
-        if (fechaFin > hoy && fechaFin <= cincoDiasDespues) {
-          porVencer++;
-        }
-
-        pagosSnapshot.forEach((doc) => {
-            const pago = doc.data();
-            const fechaPago = pago.Fecha ? pago.Fecha.toDate() : null;
-            if (fechaPago && fechaPago >= inicioMes && fechaPago <= hoy) {
-                ingresosMensuales += pago.Monto || 0;
+        // Contar membresías activas
+        allSnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.SuscripcionHasta) {
+                const fechaFin = data.SuscripcionHasta.toDate();
+                if (fechaFin >= hoy) {
+                    membresiasActivas++;
+                }
             }
-      });
+        });
 
-     
+        // Actualizar contador de membresías activas
+        document.getElementById('activeMemberships').textContent = membresiasActivas;
+        animateValue(document.getElementById('activeMemberships'), 0, membresiasActivas, 2000);
 
-        const fechaFinStr = fechaFin.toLocaleDateString('es-ES');
-        const fechaInicioStr = fechaInicio.toLocaleDateString('es-ES');
+        // Reiniciar conteo de tipos de membresía
+        conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
 
-        let estado = '';
-        let estadoClass = '';
-        if (fechaFin >= hoy) {
-          estado = 'Activa';
-          estadoClass = 'bg-green-100 text-green-800';
-               } else {
-          estado = 'Expirada';
-          estadoClass = 'bg-red-100 text-red-800';
-        }
+        // Procesar todos los usuarios para el conteo
+        allSnapshot.forEach((doc) => {
+            const data = doc.data();
+            let tipo = (data.Tipo || "Basica").toLowerCase();
+            if (tipo.includes("básica") || tipo.includes("basica")) tipo = "Basica";
+            else if (tipo.includes("estándar") || tipo.includes("estandar")) tipo = "Estandar";
+            else if (tipo.includes("premium")) tipo = "Premium";
+            else if (tipo.includes("vip")) tipo = "VIP";
+            
+            if (conteoTipos.hasOwnProperty(tipo)) {
+                conteoTipos[tipo]++;
+            }
+        });
 
-       
+        // Actualizar tabla de últimos miembros
+        miembrosTableBody.innerHTML = '';
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const fechaFin = data.SuscripcionHasta.toDate();
+            const fechaInicio = data.Creado.toDate();
+            const estado = fechaFin >= new Date() ? 'Activa' : 'Expirada';
+            const estadoClass = estado === 'Activa' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+            
+            miembrosTableBody.innerHTML += `
+                <tr class="fade-in">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${data.Genero === 'Femenino' ? 'women' : 'men'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${data.Nombre} ${data.Apellido || ''}</div>
+                                <div class="text-sm text-gray-500">${data.Email || 'Sin email'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${data.Tipo || 'Básica'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${fechaInicio.toLocaleDateString('es-ES')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${fechaFin.toLocaleDateString('es-ES')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${estadoClass}">
+                            ${estado}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+                        <button onclick="verMiembro('${doc.id}')" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-eye"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
 
-        miembrosTableBody.innerHTML += `
-          <tr class="fade-in">
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="flex items-center">
-                <div class="flex-shrink-0 h-10 w-10">
-                  <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/${data.Genero === 'Femenino' ? 'women' : 'men'}/${Math.floor(Math.random() * 100)}.jpg" alt="">
+        // Actualizar actividad reciente
+        actividadReciente.innerHTML = '';
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const fechaInicio = data.Creado.toDate();
+            let tipo = (data.Tipo || "Basica");
+            
+            actividadReciente.innerHTML += `
+                <div class="flex items-start">
+                    <div class="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium">Nuevo miembro registrado</p>
+                        <p class="text-xs text-gray-500">${data.Nombre} ${data.Apellido || ''} ha adquirido la membresía ${tipo}</p>
+                        <p class="text-xs text-gray-400 mt-1">${fechaInicio.toLocaleString('es-ES')}</p>
+                    </div>
                 </div>
-                <div class="ml-4">
-                  <div class="text-sm font-medium text-gray-900">${data.Nombre} ${data.Apellido || ''}</div>
-                  <div class="text-sm text-gray-500">${data.Email || 'Sin email'}</div>
-                </div>
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-900">${tipo}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              ${fechaInicioStr}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              ${fechaFinStr}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${estadoClass}">
-                ${estado}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
-              <button onclick="verMiembro('${doc.id}')" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-eye"></i></button>
-            </td>
-          </tr>
-        `;
+            `;
+        });
 
-        actividadReciente.innerHTML += `
-          <div class="flex items-start">
-            <div class="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
-              <i class="fas fa-user-plus"></i>
-            </div>
-            <div>
-              <p class="text-sm font-medium">Nuevo miembro registrado</p>
-              <p class="text-xs text-gray-500">${data.Nombre} ${data.Apellido || ''} ha adquirido la membresía ${tipo}</p>
-              <p class="text-xs text-gray-400 mt-1">${fechaInicio.toLocaleString('es-ES')}</p>
-            </div>
-          </div>
-        `;
-      });
-
-      totalActivos.textContent = activos;
-      usuariosActivos.textContent = acti;
-      expiringSoon.textContent = porVencer;
-       document.getElementById('totalAccounts').textContent = ingresosMensuales.toLocaleString('es-ES', { style: 'currency', currency: 'MXN' });
-      animateValue(document.getElementById('totalMembers'), 0, activos, 2000);
-      animateValue(document.getElementById('activeMemberships'), 0, acti, 2000);
-      animateValue(document.getElementById('expiringSoon'), 0, porVencer, 2000);
-      animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
-
-      // Sincroniza todos los estados de membresía con la Realtime Database
-      sincronizarEstadosDeMembresia();
-      actualizarGraficoMembresias();
-
+        // Actualizar la gráfica
+        actualizarGraficoMembresias();
+        
     } catch (err) {
-      console.error("Error al cargar usuarios:", err);
+        console.error("Error al cargar usuarios:", err);
+        document.getElementById('totalAccounts').textContent = '0';
+        document.getElementById('activeMemberships').textContent = '0';
     }
   }
 
