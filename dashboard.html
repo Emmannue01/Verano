@@ -1443,20 +1443,30 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
       // Reiniciar conteoTipos antes de contar
       conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
 
-      snapshot.forEach((doc) => {
+      // Contar todos los tipos de membresía usando allSnapshot
+      allSnapshot.forEach((doc) => {
         const data = doc.data();
-        const fechaFin = data.SuscripcionHasta.toDate();
-        const fechaInicio = data.Creado.toDate();
-        // Normalizar tipo para evitar errores de escritura
         let tipo = (data.Tipo || "Basica").toLowerCase();
         if (tipo.includes("básica") || tipo.includes("basica")) tipo = "Basica";
         else if (tipo.includes("estándar") || tipo.includes("estandar")) tipo = "Estandar";
         else if (tipo.includes("premium")) tipo = "Premium";
         else if (tipo.includes("vip")) tipo = "VIP";
-        // Sumar correctamente cada tipo
+        
         if (conteoTipos.hasOwnProperty(tipo)) {
           conteoTipos[tipo]++;
         }
+      });
+
+      // Procesar los últimos 5 registros para la tabla
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const fechaFin = data.SuscripcionHasta.toDate();
+        const fechaInicio = data.Creado.toDate();
+        let tipo = (data.Tipo || "Basica").toLowerCase();
+        if (tipo.includes("básica") || tipo.includes("basica")) tipo = "Basica";
+        else if (tipo.includes("estándar") || tipo.includes("estandar")) tipo = "Estandar";
+        else if (tipo.includes("premium")) tipo = "Premium";
+        else if (tipo.includes("vip")) tipo = "VIP";
 
         if (fechaFin >= hoy) activos++;
         nuevos++;
