@@ -61,7 +61,7 @@
                     </nav>
                     
                     <div class="mt-auto mb-4">
-                        <a href="#" class="flex items-center px-4 py-3 text-white hover:bg-indigo-600 rounded-lg">
+                        <a href="#" id="sidebarLogoutButton" class="flex items-center px-4 py-3 text-white hover:bg-indigo-600 rounded-lg">
                             <i class="fas fa-sign-out-alt mr-3"></i>
                             <span>Cerrar sesión</span>
                         </a>
@@ -88,10 +88,10 @@
             <div id="mobile-menu" class="hidden md:hidden bg-indigo-800 text-white">
                 <div class="px-4 py-3 border-b border-indigo-700">
                     <div class="flex items-center">
-                        <img class="w-10 h-10 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+                        <img id="mobileUserAvatar" class="w-10 h-10 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
                         <div class="ml-3">
-                            <p class="text-sm font-medium">Juan Pérez</p>
-                            <p class="text-xs text-indigo-200">Entrenador certificado</p>
+                            <p id="mobileUserName" class="text-sm font-medium">Cargando...</p>
+                            <p id="mobileUserTitle" class="text-xs text-indigo-200">Entrenador</p>
                         </div>
                     </div>
                 </div>
@@ -99,19 +99,24 @@
                     <a href="#" class="block px-3 py-2 text-white bg-indigo-700 rounded-md">Calendario</a>
                     <a href="#" class="block px-3 py-2 mt-1 text-white hover:bg-indigo-600 rounded-md">Progresos</a>
                     <a href="#" class="block px-3 py-2 mt-1 text-white hover:bg-indigo-600 rounded-md">Configuración</a>
-                    <a href="#" class="block px-3 py-2 mt-1 text-white hover:bg-indigo-600 rounded-md">Cerrar sesión</a>
+                    <a href="#" id="mobileLogoutButton" class="block px-3 py-2 mt-1 text-white hover:bg-indigo-600 rounded-md">Cerrar sesión</a>
                 </nav>
             </div>
             
             <!-- Content header -->
             <div class="flex items-center justify-between px-6 py-4 border-b bg-white">
                 <h1 class="text-2xl font-bold text-gray-800">Clases Programadas</h1>
-                <div class="flex items-center">
-                    <div class="text-right mr-3">
-                        <p class="text-sm font-medium">Juan Pérez</p>
-                        <p class="text-xs text-gray-500">Entrenador certificado</p>
+                <div class="relative">
+                    <button id="userMenuButton" class="flex items-center space-x-3 focus:outline-none">
+                        <div class="text-right hidden md:block">
+                            <p id="userName" class="text-sm font-medium">Cargando...</p>
+                            <p id="userTitle" class="text-xs text-gray-500">Entrenador</p>
+                        </div>
+                        <img id="userAvatar" class="w-10 h-10 rounded-full" src="https://i.pravatar.cc/40" alt="Profile">
+                    </button>
+                    <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+                        <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
                     </div>
-                    <img class="w-10 h-10 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
                 </div>
             </div>
             
@@ -475,5 +480,86 @@
             });
         });
     </script>
+	<script type="module">
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+		import { 
+			getFirestore, doc, getDoc
+		} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+		import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+		const firebaseConfig = {
+			// IMPORTANTE: Reemplaza este objeto completo con la configuración de tu proyecto
+			apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
+			authDomain: "gymrats-d16eb.firebaseapp.com",
+			projectId: "gymrats-d16eb",
+			storageBucket: "gymrats-d16eb.appspot.com",
+			messagingSenderId: "106526343668278361492",
+			appId: "1:106526343668278361492:web:abcd1234efgh5678"
+		};
+
+		const app = initializeApp(firebaseConfig);
+		const db = getFirestore(app);
+		const auth = getAuth(app);
+
+		// --- Guardia de Autenticación y Roles para Entrenador ---
+		onAuthStateChanged(auth, async (user) => {
+			if (user) {
+				// Usuario autenticado, ahora verificamos su rol
+				const userDocRef = doc(db, "usuarios", user.uid);
+				const userDoc = await getDoc(userDocRef);
+
+				// Permite el acceso si el rol es 'entrenador' O 'administrador'
+				if (userDoc.exists() && (userDoc.data().rol === 'entrenador' || userDoc.data().rol === 'administrador')) {
+					console.log("Acceso de entrenador concedido.");
+					
+					// --- Importar datos del perfil de Google ---
+					const userNameEl = document.getElementById('userName');
+					const userAvatarEl = document.getElementById('userAvatar');
+					const mobileUserNameEl = document.getElementById('mobileUserName');
+					const mobileUserAvatarEl = document.getElementById('mobileUserAvatar');
+					
+					const displayName = user.displayName || user.email.split('@')[0];
+					const photoURL = user.photoURL || `https://i.pravatar.cc/40?u=${user.uid}`;
+
+					if (userNameEl) userNameEl.textContent = displayName;
+					if (userAvatarEl) userAvatarEl.src = photoURL;
+					if (mobileUserNameEl) mobileUserNameEl.textContent = displayName;
+					if (mobileUserAvatarEl) mobileUserAvatarEl.src = photoURL;
+
+				} else {
+					console.log("Acceso denegado. El usuario no tiene rol de entrenador.");
+					window.location.href = 'index.html';
+				}
+			} else {
+				console.log("Usuario no autenticado, redirigiendo a login.");
+				window.location.href = 'index.html';
+			}
+		});
+
+		// --- Funcionalidad del Menú de Usuario ---
+		const userMenuButton = document.getElementById('userMenuButton');
+		const userMenu = document.getElementById('userMenu');
+
+		userMenuButton.addEventListener('click', () => {
+			userMenu.classList.toggle('hidden');
+		});
+
+		// Cerrar el menú si se hace clic fuera
+		window.addEventListener('click', (e) => {
+			if (userMenuButton && userMenu && !userMenuButton.contains(e.target) && !userMenu.contains(e.target)) {
+				userMenu.classList.add('hidden');
+			}
+		});
+
+		// --- Funcionalidad de Cerrar Sesión ---
+		const handleLogout = (e) => {
+			e.preventDefault();
+			signOut(auth).catch(error => console.error('Error al cerrar sesión:', error));
+		};
+
+		document.getElementById('logoutButton').addEventListener('click', handleLogout);
+		document.getElementById('sidebarLogoutButton').addEventListener('click', handleLogout);
+		document.getElementById('mobileLogoutButton').addEventListener('click', handleLogout);
+	</script>
 </body>
 </html>

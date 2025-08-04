@@ -1090,7 +1090,7 @@ async function editarMiembro(id) {
               <select name="rol" class="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="cliente"${member.rol === 'cliente' ? ' selected' : ''}>Cliente</option>
                 <option value="recepcion"${member.rol === 'recepcion' ? ' selected' : ''}>Recepción</option>
-                <option value="entrenador"${member.rol === 'entrenador' ? ' selected' : ''}>Entrenador</option>
+                <option value="entrenador"${member.rol === 'entrenador' ? ' selected' : ''}>Exxxxxxxntrenador</option>
                 <option value="administrador"${member.rol === 'administrador' ? ' selected' : ''}>Administrador</option>
               </select>
             </div>
@@ -1423,27 +1423,33 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
         const actividadReciente = document.querySelector('.space-y-4');
         cuentasTotales = allSnapshot.size;
         let membresiasActivas = 0;
+        let membresiasPorVencer = 0;
         const hoy = new Date();
-        
-        // Actualizar el contador total
-        document.getElementById('totalAccounts').textContent = cuentasTotales;
-        animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
+        const ochoDiasDespues = new Date();
+        ochoDiasDespues.setDate(hoy.getDate() + 8);
 
-        // Contar membresías activas
+        // Contar membresías activas y por vencer
         allSnapshot.forEach((doc) => {
             const data = doc.data();
             if (data.SuscripcionHasta) {
                 const fechaFin = data.SuscripcionHasta.toDate();
                 if (fechaFin >= hoy) {
                     membresiasActivas++;
+                    // Comprobar si vence en los próximos 8 días
+                    if (fechaFin <= ochoDiasDespues) {
+                        membresiasPorVencer++;
+                    }
                 }
             }
         });
 
-        // Actualizar contador de membresías activas
+        // Actualizar contadores
+        document.getElementById('totalAccounts').textContent = cuentasTotales;
         document.getElementById('activeMemberships').textContent = membresiasActivas;
+        document.getElementById('expiringSoon').textContent = membresiasPorVencer;
+        animateValue(document.getElementById('totalAccounts'), 0, cuentasTotales, 2000);
+        animateValue(document.getElementById('expiringSoon'), 0, membresiasPorVencer, 2000);
         animateValue(document.getElementById('activeMemberships'), 0, membresiasActivas, 2000);
-
         // Reiniciar conteo de tipos de membresía
         conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
 
@@ -1532,6 +1538,7 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
         console.error("Error al cargar usuarios:", err);
         document.getElementById('totalAccounts').textContent = '0';
         document.getElementById('activeMemberships').textContent = '0';
+        document.getElementById('expiringSoon').textContent = '0';
     }
   }
 
