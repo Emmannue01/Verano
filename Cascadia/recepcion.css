@@ -1,0 +1,32 @@
+.sidebar {
+            transition: all 0.3s;
+        }
+        .sidebar-collapsed {
+            width: 80px;
+        }
+        .sidebar-collapsed .nav-text {
+            display: none;
+        }
+        .sidebar-collapsed .logo-text {
+            display: none;
+        }
+        .sidebar-collapsed .logo-icon {
+            margin-right: 0;
+        }
+        .main-content {
+            transition: all 0.3s;
+        }
+        .content-expanded {
+            margin-left: 80px;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
