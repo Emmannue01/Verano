@@ -3,563 +3,1143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FitTrainer - Panel de Entrenador</title>
+    <title>Dashboard de Entrenador</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .sidebar {
+            transition: transform 0.3s ease;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        @media (max-width: 767px) {
+            .sidebar {
+                width: 80%;
+                height: 100%;
+                z-index: 1000;
+            }
         }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
+        .tab-content {
+            display: none;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        .tab-content.active {
+            display: block;
         }
-        
-        /* Animation for cards */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
         }
-        
-        .fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
+        #beforeAfterContainer {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+        }
+        #beforeImage, #afterImage {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #slider {
+            position: absolute;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: ew-resize;
+        }
+        #sliderButton {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            pointer-events: none;
         }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <div class="hidden md:flex md:flex-shrink-0">
-            <div class="flex flex-col w-64 bg-indigo-700 text-white">
-                <div class="flex items-center justify-center h-16 px-4 bg-indigo-800">
-                    <div class="flex items-center">
-                        <i class="fas fa-dumbbell text-2xl mr-2 text-yellow-400"></i>
-                        <span class="text-xl font-bold">FitTrainer</span>
-                    </div>
+        <div class="sidebar bg-indigo-800 text-white w-64 flex-shrink-0 fixed md:relative z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+            <button class="md:hidden absolute right-4 top-4 text-white" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="p-4 flex items-center space-x-2 border-b border-indigo-700">
+                <i class="fas fa-dumbbell text-2xl"></i>
+                <h1 class="text-xl font-bold">FitCoach Pro</h1>
+            </div>
+            <nav class="p-4">
+                <div class="mb-6">
+                    <h2 class="text-xs uppercase tracking-wider text-indigo-300 mb-2">Clientes</h2>
+                    <ul>
+                        <li class="mb-1">
+                            <button onclick="openTab('client-tab')" class="w-full text-left px-3 py-2 rounded hover:bg-indigo-700 flex items-center space-x-2 bg-indigo-700">
+                                <i class="fas fa-users"></i>
+                                <span>Mis Clientes</span>
+                            </button>
+                        </li>
+                    </ul>
                 </div>
-                <div class="flex flex-col flex-grow px-4 py-4 overflow-y-auto">
-                    <nav class="mt-2">
-                        <a href="#" class="flex items-center px-4 py-3 text-white bg-indigo-800 rounded-lg">
-                            <i class="fas fa-calendar-alt mr-3"></i>
-                            <span>Calendario</span>
-                        </a>
-                        <a href="#" class="flex items-center px-4 py-3 mt-2 text-white hover:bg-indigo-600 rounded-lg">
-                            <i class="fas fa-chart-line mr-3"></i>
-                            <span>Progresos</span>
-                        </a>
-                        <a href="#" class="flex items-center px-4 py-3 mt-2 text-white hover:bg-indigo-600 rounded-lg">
-                            <i class="fas fa-cog mr-3"></i>
-                            <span>Configuración</span>
-                        </a>
-                    </nav>
-                    
-                    <div class="mt-auto mb-4">
-                        <a href="#" id="sidebarLogoutButton" class="flex items-center px-4 py-3 text-white hover:bg-indigo-600 rounded-lg">
-                            <i class="fas fa-sign-out-alt mr-3"></i>
-                            <span>Cerrar sesión</span>
-                        </a>
+                <div class="mb-6">
+                    <h2 class="text-xs uppercase tracking-wider text-indigo-300 mb-2">Administración</h2>
+                    <ul>
+                        <li class="mb-1">
+                            <button onclick="openTab('certifications-tab')" class="w-full text-left px-3 py-2 rounded hover:bg-indigo-700 flex items-center space-x-2">
+                                <i class="fas fa-certificate"></i>
+                                <span>Certificaciones</span>
+                            </button>
+                        </li>
+                        <li class="mb-1">
+                            <button onclick="openTab('bmi-tab')" class="w-full text-left px-3 py-2 rounded hover:bg-indigo-700 flex items-center space-x-2">
+                                <i class="fas fa-calculator"></i>
+                                <span>Calculadora IMC</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-indigo-700">
+                <div class="flex items-center space-x-3">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="w-10 h-10 rounded-full">
+                    <div>
+                        <p class="font-medium">Juan Pérez</p>
+                        <p class="text-xs text-indigo-300">Entrenador Certificado</p>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Main content -->
-        <div class="flex flex-col flex-1 overflow-hidden">
-            <!-- Mobile header -->
-            <div class="md:hidden flex items-center justify-between px-4 py-3 bg-indigo-700 text-white">
-                <button id="mobile-menu-button" class="text-white focus:outline-none">
-                    <i class="fas fa-bars text-xl"></i>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <button class="md:hidden text-gray-600" onclick="showSidebar()">
+                    <i class="fas fa-bars"></i>
                 </button>
-                <div class="flex items-center">
-                    <i class="fas fa-dumbbell text-xl mr-2 text-yellow-400"></i>
-                    <span class="text-lg font-bold">Trainer</span>
+                <h2 class="text-xl font-semibold text-gray-800" id="tab-title">Mis Clientes</h2>
+                <div class="flex items-center space-x-4">
                 </div>
-                <img class="w-8 h-8 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
-            </div>
-            
-            <!-- Mobile sidebar (hidden by default) -->
-            <div id="mobile-menu" class="hidden md:hidden bg-indigo-800 text-white">
-                <div class="px-4 py-3 border-b border-indigo-700">
-                    <div class="flex items-center">
-                        <img id="mobileUserAvatar" class="w-10 h-10 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
-                        <div class="ml-3">
-                            <p id="mobileUserName" class="text-sm font-medium">Cargando...</p>
-                            <p id="mobileUserTitle" class="text-xs text-indigo-200">Entrenador</p>
+            </header>
+
+            <!-- Tab Contents -->
+            <main class="p-6">
+                <!-- Clients Tab -->
+                <div id="client-tab" class="tab-content active">
+                    <div class="mb-6 flex justify-between items-center">
+                        <h3 class="text-lg font-medium">Lista de Clientes</h3>
+                        <div class="relative">
+                            <input type="text" placeholder="Buscar cliente..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                         </div>
                     </div>
-                </div>
-                <nav class="px-2 py-2">
-                    <a href="#" class="block px-3 py-2 text-white bg-indigo-700 rounded-md">Calendario</a>
-                    <a href="#" class="block px-3 py-2 mt-1 text-white hover:bg-indigo-600 rounded-md">Progresos</a>
-                    <a href="#" class="block px-3 py-2 mt-1 text-white hover:bg-indigo-600 rounded-md">Configuración</a>
-                    <a href="#" id="mobileLogoutButton" class="block px-3 py-2 mt-1 text-white hover:bg-indigo-600 rounded-md">Cerrar sesión</a>
-                </nav>
-            </div>
-            
-            <!-- Content header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b bg-white">
-                <h1 class="text-2xl font-bold text-gray-800">Clases Programadas</h1>
-                <div class="relative">
-                    <button id="userMenuButton" class="flex items-center space-x-3 focus:outline-none">
-                        <div class="text-right hidden md:block">
-                            <p id="userName" class="text-sm font-medium">Cargando...</p>
-                            <p id="userTitle" class="text-xs text-gray-500">Entrenador</p>
-                        </div>
-                        <img id="userAvatar" class="w-10 h-10 rounded-full" src="https://i.pravatar.cc/40" alt="Profile">
-                    </button>
-                    <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-                        <a href="#" id="logoutButton" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Cerrar sesión</a>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="clients-container">
+                        <!-- Client cards will be populated by JavaScript -->
                     </div>
                 </div>
-            </div>
-            
-            <!-- Main content area -->
-            <div class="flex-1 overflow-auto p-6">
-                
-                <!-- Schedule -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Today's schedule -->
-                    <div class="bg-white rounded-xl shadow overflow-hidden fade-in">
-                        <div class="bg-indigo-600 text-white px-4 py-3">
-                            <h2 class="text-lg font-semibold flex items-center">
-                                <i class="fas fa-calendar-day mr-2"></i> Hoy, 15 Jun
-                            </h2>
-                        </div>
-                        <div class="p-4">
-                            <div class="space-y-4">
-                                <!-- Class 1 -->
-                                <div class="border-l-4 border-green-500 bg-green-50 p-3 rounded-r-lg">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-medium text-gray-800">Entrenamiento personal</h3>
-                                            <p class="text-sm text-gray-600">María González</p>
-                                        </div>
-                                        <span class="text-sm font-medium bg-green-100 text-green-800 px-2 py-1 rounded">08:00 - 09:00</span>
-                                    </div>
-                                    <div class="mt-2 flex items-center text-sm text-gray-500">
-                                        <i class="fas fa-dumbbell mr-2"></i>
-                                        <span>Fuerza y resistencia</span>
-                                    </div>
-                                    <div class="mt-2 flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-800">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-800">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Class 2 -->
-                                <div class="border-l-4 border-blue-500 bg-blue-50 p-3 rounded-r-lg">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-medium text-gray-800">Yoga</h3>
-                                            <p class="text-sm text-gray-600">Carlos Rodríguez</p>
-                                        </div>
-                                        <span class="text-sm font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded">12:00 - 13:00</span>
-                                    </div>
-                                    <div class="mt-2 flex items-center text-sm text-gray-500">
-                                        <i class="fas fa-spa mr-2"></i>
-                                        <span>Yoga restaurativo</span>
-                                    </div>
-                                    <div class="mt-2 flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-800">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-800">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Class 3 -->
-                                <div class="border-l-4 border-purple-500 bg-purple-50 p-3 rounded-r-lg">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-medium text-gray-800">CrossFit</h3>
-                                            <p class="text-sm text-gray-600">Grupo avanzado</p>
-                                        </div>
-                                        <span class="text-sm font-medium bg-purple-100 text-purple-800 px-2 py-1 rounded">18:00 - 19:30</span>
-                                    </div>
-                                    <div class="mt-2 flex items-center text-sm text-gray-500">
-                                        <i class="fas fa-fire-alt mr-2"></i>
-                                        <span>WOD: "Fran"</span>
-                                    </div>
-                                    <div class="mt-2 flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-800">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-800">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Tomorrow's schedule -->
-                    <div class="bg-white rounded-xl shadow overflow-hidden fade-in">
-                        <div class="bg-indigo-600 text-white px-4 py-3">
-                            <h2 class="text-lg font-semibold flex items-center">
-                                <i class="fas fa-calendar-alt mr-2"></i> Mañana, 16 Jun
-                            </h2>
-                        </div>
-                        <div class="p-4">
-                            <div class="space-y-4">
-                                <!-- Class 1 -->
-                                <div class="border-l-4 border-yellow-500 bg-yellow-50 p-3 rounded-r-lg">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-medium text-gray-800">Pilates</h3>
-                                            <p class="text-sm text-gray-600">Ana Martínez</p>
-                                        </div>
-                                        <span class="text-sm font-medium bg-yellow-100 text-yellow-800 px-2 py-1 rounded">09:30 - 10:30</span>
-                                    </div>
-                                    <div class="mt-2 flex items-center text-sm text-gray-500">
-                                        <i class="fas fa-procedures mr-2"></i>
-                                        <span>Rehabilitación lumbar</span>
-                                    </div>
-                                    <div class="mt-2 flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-800">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-800">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Class 2 -->
-                                <div class="border-l-4 border-red-500 bg-red-50 p-3 rounded-r-lg">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-medium text-gray-800">Spinning</h3>
-                                            <p class="text-sm text-gray-600">Grupo intermedio</p>
-                                        </div>
-                                        <span class="text-sm font-medium bg-red-100 text-red-800 px-2 py-1 rounded">17:00 - 18:00</span>
-                                    </div>
-                                    <div class="mt-2 flex items-center text-sm text-gray-500">
-                                        <i class="fas fa-bicycle mr-2"></i>
-                                        <span>Intervalos de alta intensidad</span>
-                                    </div>
-                                    <div class="mt-2 flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-800">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-800">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Upcoming schedule -->
-                    <div class="bg-white rounded-xl shadow overflow-hidden fade-in">
-                        <div class="bg-indigo-600 text-white px-4 py-3">
-                            <h2 class="text-lg font-semibold flex items-center">
-                                <i class="fas fa-calendar-week mr-2"></i> Próximas clases
-                            </h2>
-                        </div>
-                        <div class="p-4">
-                            <div class="space-y-4">
-                                <!-- Class 1 -->
-                                <div class="border-l-4 border-indigo-500 bg-indigo-50 p-3 rounded-r-lg">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-medium text-gray-800">Entrenamiento personal</h3>
-                                            <p class="text-sm text-gray-600">Luis Sánchez</p>
-                                        </div>
-                                        <span class="text-sm font-medium bg-indigo-100 text-indigo-800 px-2 py-1 rounded">17 Jun, 10:00</span>
-                                    </div>
-                                    <div class="mt-2 flex items-center text-sm text-gray-500">
-                                        <i class="fas fa-running mr-2"></i>
-                                        <span>Preparación maratón</span>
-                                    </div>
-                                    <div class="mt-2 flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-800">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-800">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Class 2 -->
-                                <div class="border-l-4 border-pink-500 bg-pink-50 p-3 rounded-r-lg">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-medium text-gray-800">Entrenamiento funcional</h3>
-                                            <p class="text-sm text-gray-600">Sofía Pérez</p>
-                                        </div>
-                                        <span class="text-sm font-medium bg-pink-100 text-pink-800 px-2 py-1 rounded">18 Jun, 11:00</span>
-                                    </div>
-                                    <div class="mt-2 flex items-center text-sm text-gray-500">
-                                        <i class="fas fa-heartbeat mr-2"></i>
-                                        <span>Entrenamiento postparto</span>
-                                    </div>
-                                    <div class="mt-2 flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-800">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-800">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <!-- Class 3 -->
-                                <div class="border-l-4 border-teal-500 bg-teal-50 p-3 rounded-r-lg">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-medium text-gray-800">Yoga</h3>
-                                            <p class="text-sm text-gray-600">Grupo principiante</p>
-                                        </div>
-                                        <span class="text-sm font-medium bg-teal-100 text-teal-800 px-2 py-1 rounded">19 Jun, 19:00</span>
-                                    </div>
-                                    <div class="mt-2 flex items-center text-sm text-gray-500">
-                                        <i class="fas fa-om mr-2"></i>
-                                        <span>Yoga para principiantes</span>
-                                    </div>
-                                    <div class="mt-2 flex justify-end space-x-2">
-                                        <button class="text-indigo-600 hover:text-indigo-800">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="text-red-600 hover:text-red-800">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Student details modal (hidden by default) -->
-                <div id="student-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div class="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <div class="flex justify-between items-center border-b px-6 py-4">
-                            <h3 class="text-xl font-bold text-gray-800">Detalles del alumno</h3>
-                            <button id="close-modal" class="text-gray-500 hover:text-gray-700">
-                                <i class="fas fa-times text-xl"></i>
+
+                <!-- Client Details Modal -->
+                <div id="client-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-2 sm:p-4">
+                    <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-auto mx-2 sm:mx-0">
+                        <div class="p-4 border-b flex justify-between items-center">
+                            <h3 class="text-xl font-semibold" id="client-modal-title">Detalles del Cliente</h3>
+                            <button onclick="closeClientModal()" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
                             </button>
                         </div>
                         <div class="p-6">
-                            <div class="flex flex-col md:flex-row gap-6">
+                            <!-- Client Info -->
+                            <div class="flex flex-col md:flex-row gap-6 mb-8">
                                 <div class="flex-shrink-0">
-                                    <img class="w-32 h-32 rounded-full object-cover border-4 border-indigo-100" src="https://randomuser.me/api/portraits/women/44.jpg" alt="Student">
-                                    <div class="mt-4 text-center">
-                                        <h4 class="text-lg font-semibold">María González</h4>
-                                        <p class="text-sm text-gray-600">Cliente desde: Ene 2023</p>
+                                    <img id="client-modal-image" src="" alt="Client" class="w-32 h-32 rounded-full object-cover border-4 border-indigo-100">
+                                </div>
+                                <div class="flex-1">
+                                    <h4 id="client-modal-name" class="text-2xl font-bold mb-2"></h4>
+                                    <div class="grid grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <p class="text-sm text-gray-500">Objetivo</p>
+                                            <p id="client-modal-goal" class="font-medium"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500">Duración</p>
+                                            <p id="client-modal-duration" class="font-medium"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500">Telfono</p>
+                                            <p id="client-modal-tel" class="font-medium"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500">Edad</p>
+                                            <p id="client-modal-age" class="font-medium"></p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Notas</p>
+                                        <textarea id="client-modal-notes" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" rows="2"></textarea>
                                     </div>
                                 </div>
-                                <div class="flex-grow">
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <h5 class="font-medium text-gray-700 mb-2">Información personal</h5>
-                                            <div class="space-y-2">
-                                                <p class="text-sm"><span class="font-medium">Edad:</span> 32 años</p>
-                                                <p class="text-sm"><span class="font-medium">Género:</span> Femenino</p>
-                                                <p class="text-sm"><span class="font-medium">Teléfono:</span> +34 612 345 678</p>
-                                                <p class="text-sm"><span class="font-medium">Email:</span> maria.gonzalez@example.com</p>
+                            </div>
+
+                            <!-- Tabs -->
+                            <div class="border-b border-gray-200 mb-6">
+                                <nav class="flex space-x-8">
+                                    <button onclick="openClientTab('metrics-tab')" class="client-tab-button py-4 px-1 border-b-2 font-medium text-sm border-indigo-500 text-indigo-600">Métricas</button>
+                                    <button onclick="openClientTab('progress-tab')" class="client-tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Progreso</button>
+                                    <button onclick="openClientTab('medical-tab')" class="client-tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Historial Médico</button>
+                                    <button onclick="openClientTab('routine-tab')" class="client-tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Rutina</button>
+                                </nav>
+                            </div>
+
+                            <!-- Tab Contents -->
+                            <div id="metrics-tab" class="client-tab-content">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div class="bg-white p-4 rounded-lg border">
+                                        <h5 class="font-medium mb-4">Medidas Corporales</h5>
+                                        <div class="space-y-3">
+                                            <div class="flex justify-between">
+                                                <span>Peso</span>
+                                                <div class="flex items-center">
+                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="kg">
+                                                    <span>kg</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div>
-                                            <h5 class="font-medium text-gray-700 mb-2">Objetivos</h5>
-                                            <div class="space-y-2">
-                                                <p class="text-sm"><span class="font-medium">Principal:</span> Pérdida de peso</p>
-                                                <p class="text-sm"><span class="font-medium">Secundario:</span> Mejorar resistencia</p>
-                                                <p class="text-sm"><span class="font-medium">Fecha objetivo:</span> Sep 2023</p>
+                                            <div class="flex justify-between">
+                                                <span>Altura</span>
+                                                <div class="flex items-center">
+                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="cm">
+                                                    <span>cm</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span>IMC</span>
+                                                <span id="bmi-value">24.9</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span>% Grasa</span>
+                                                <div class="flex items-center">
+                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="%">
+                                                    <span>%</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="mt-6">
-                                        <h5 class="font-medium text-gray-700 mb-2">Próximas clases</h5>
+                                    <div class="bg-white p-4 rounded-lg border">
+                                        <h5 class="font-medium mb-4">Rendimiento</h5>
                                         <div class="space-y-3">
-                                            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                                                <div>
-                                                    <p class="font-medium">Hoy, 15 Jun</p>
-                                                    <p class="text-sm text-gray-600">08:00 - 09:00 (Entrenamiento personal)</p>
+                                            <div class="flex justify-between">
+                                                <span>RM Press Banca</span>
+                                                <div class="flex items-center">
+                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="kg">
+                                                    <span>kg</span>
                                                 </div>
-                                                <button class="text-indigo-600 hover:text-indigo-800">
-                                                    <i class="fas fa-chevron-right"></i>
-                                                </button>
                                             </div>
-                                            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                                                <div>
-                                                    <p class="font-medium">19 Jun</p>
-                                                    <p class="text-sm text-gray-600">08:00 - 09:00 (Entrenamiento personal)</p>
+                                            <div class="flex justify-between">
+                                                <span>RM Sentadilla</span>
+                                                <div class="flex items-center">
+                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="kg">
+                                                    <span>kg</span>
                                                 </div>
-                                                <button class="text-indigo-600 hover:text-indigo-800">
-                                                    <i class="fas fa-chevron-right"></i>
-                                                </button>
                                             </div>
-                                            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                                                <div>
-                                                    <p class="font-medium">22 Jun</p>
-                                                    <p class="text-sm text-gray-600">08:00 - 09:00 (Entrenamiento personal)</p>
+                                            <div class="flex justify-between">
+                                                <span>Flexiones máx.</span>
+                                                <div class="flex items-center">
+                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="rep.">
+                                                    <span>rep.</span>
                                                 </div>
-                                                <button class="text-indigo-600 hover:text-indigo-800">
-                                                    <i class="fas fa-chevron-right"></i>
-                                                </button>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span>5km tiempo</span>
+                                                <div class="flex items-center">
+                                                    <input type="text" class="w-16 p-1 border rounded text-right mr-2" placeholder="mm:ss">
+                                                    <span>min</span>
+                                                </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button onclick="saveClientChanges()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Guardar Cambios</button>
+                                </div>
+                            </div>
+
+                            <div id="progress-tab" class="client-tab-content hidden">
+                                <div class="mb-6">
+                                    <h5 class="font-medium mb-4">Fotos de Progreso</h5>
+                                    <div id="beforeAfterContainer" class="mx-auto">
+                                        <img id="beforeImage" src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Before">
+                                        <img id="afterImage" src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="After">
+                                        <input type="range" min="0" max="100" value="50" id="slider" oninput="moveSlider()">
+                                        <div id="sliderButton">
+                                            <i class="fas fa-arrows-alt-h text-gray-600"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Subir foto inicial</label>
+                                        <div class="flex items-center">
+                                            <input type="file" class="hidden" id="before-upload">
+                                            <button onclick="document.getElementById('before-upload').click()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-l-lg hover:bg-gray-200">
+                                                <i class="fas fa-upload mr-2"></i>Seleccionar
+                                            </button>
+                                            <span class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Subir foto actual</label>
+                                        <div class="flex items-center">
+                                            <input type="file" class="hidden" id="after-upload">
+                                            <button onclick="document.getElementById('after-upload').click()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-l-lg hover:bg-gray-200">
+                                                <i class="fas fa-upload mr-2"></i>Seleccionar
+                                            </button>
+                                            <span class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Actualizar Fotos</button>
+                                </div>
+                            </div>
+
+                            <div id="medical-tab" class="client-tab-content hidden">
+                                <div class="bg-white p-4 rounded-lg border mb-6">
+                                    <h5 class="font-medium mb-4">Historial Médico</h5>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <p class="text-sm text-gray-500 mb-1">Condiciones médicas</p>
+                                            <p class="font-medium">Ninguna conocida</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 mb-1">Lesiones previas</p>
+                                            <p class="font-medium">Esguince de tobillo derecho (2020)</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 mb-1">Alergias</p>
+                                            <p class="font-medium">Ninguna conocida</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 mb-1">Medicamentos</p>
+                                            <p class="font-medium">Ninguno actualmente</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500 mb-1">Notas adicionales</p>
+                                            <p class="font-medium">El cliente reporta molestias ocasionales en la rodilla izquierda durante ejercicios de impacto.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    <p><i class="fas fa-info-circle mr-2"></i>El historial médico solo puede ser editado por el cliente desde su perfil.</p>
+                                </div>
+                            </div>
+
+                            <div id="routine-tab" class="client-tab-content hidden">
+                                <div class="mb-6">
+                                    <h5 class="font-medium mb-4">Rutina Actual</h5>
+                                    <div class="bg-white p-4 rounded-lg border">
+                                        <div class="mb-4">
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Objetivo de la rutina</label>
+                                            <select class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                                <option>Pérdida de peso</option>
+                                                <option selected>Ganancia muscular</option>
+                                                <option>Tonificación</option>
+                                                <option>Preparación física</option>
+                                                <option>Rehabilitación</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Frecuencia semanal</label>
+                                            <select class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                                <option>2 días</option>
+                                                <option selected>3 días</option>
+                                                <option>4 días</option>
+                                                <option>5 días</option>
+                                                <option>6 días</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Detalles de la rutina</label>
+                                            <textarea class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" rows="6">
+Lunes (Pierna):
+- Sentadillas 4x12
+- Peso muerto 3x10
+- Prensa 3x12
+- Elevación de talones 4x15
+
+Miércoles (Espalda/Bíceps):
+- Dominadas asistidas 3x8
+- Remo con barra 4x10
+- Curl de bíceps 3x12
+- Jalón al pecho 3x12
+
+Viernes (Pecho/Tríceps):
+- Press banca 4x10
+- Fondos 3x12
+- Aperturas 3x12
+- Extensión de tríceps 3x15
+
+Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los ejercicios.
+                                            </textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Actualizar Rutina</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certifications Tab -->
+                <div id="certifications-tab" class="tab-content hidden">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium">Certificaciones</h3>
+                        <p class="text-gray-500">Sube tus certificaciones como entrenador y de entrenamiento médico.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border">
+                            <h4 class="font-medium mb-4 flex items-center">
+                                <i class="fas fa-certificate text-indigo-500 mr-2"></i>
+                                Certificaciones de Entrenador
+                            </h4>
+                            <div class="space-y-4 mb-6">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                        <i class="fas fa-file-pdf text-indigo-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="font-medium">Certificación NSCA-CPT</p>
+                                        <p class="text-sm text-gray-500">Válido hasta: 15/06/2025</p>
+                                    </div>
+                                    <button class="ml-auto text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                        <i class="fas fa-file-pdf text-indigo-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="font-medium">Certificación de Primeros Auxilios</p>
+                                        <p class="text-sm text-gray-500">Válido hasta: 10/12/2023</p>
+                                    </div>
+                                    <button class="ml-auto text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Subir nueva certificación</label>
+                                <div class="flex items-center">
+                                    <input type="file" class="hidden" id="certification-upload">
+                                    <button onclick="document.getElementById('certification-upload').click()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-l-lg hover:bg-gray-200">
+                                        <i class="fas fa-upload mr-2"></i>Seleccionar
+                                    </button>
+                                    <span class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border">
+                            <h4 class="font-medium mb-4 flex items-center">
+                                <i class="fas fa-heartbeat text-red-500 mr-2"></i>
+                                Certificaciones Médicas
+                            </h4>
+                            <div class="space-y-4 mb-6">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                                        <i class="fas fa-file-pdf text-red-600"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="font-medium">Certificación en Rehabilitación</p>
+                                        <p class="text-sm text-gray-500">Válido hasta: 22/03/2026</p>
+                                    </div>
+                                    <button class="ml-auto text-gray-400 hover:text-gray-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Subir nueva certificación médica</label>
+                                <div class="flex items-center">
+                                    <input type="file" class="hidden" id="medical-certification-upload">
+                                    <button onclick="document.getElementById('medical-certification-upload').click()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-l-lg hover:bg-gray-200">
+                                        <i class="fas fa-upload mr-2"></i>Seleccionar
+                                    </button>
+                                    <span class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border">
+                        <h4 class="font-medium mb-4 flex items-center">
+                            <i class="fas fa-graduation-cap text-yellow-500 mr-2"></i>
+                            Otras Credenciales
+                        </h4>
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Descripción profesional</label>
+                            <textarea class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" rows="4">Entrenador personal certificado con 5 años de experiencia en fitness y rehabilitación. Especializado en entrenamiento funcional, pérdida de peso y preparación física para deportes. Enfoque en técnicas seguras y efectivas adaptadas a las necesidades individuales de cada cliente.</textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule Tab -->
+                <div id="schedule-tab" class="tab-content hidden">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium">Horario de Atención</h3>
+                        <p class="text-gray-500">Establece tus horarios disponibles para atender a clientes.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-medium mb-4">Horario Semanal</h4>
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="w-24">Lunes</span>
+                                        <div class="flex-1 flex items-center space-x-2">
+                                            <input type="time" value="08:00" class="p-2 border rounded-lg">
+                                            <span>a</span>
+                                            <input type="time" value="14:00" class="p-2 border rounded-lg">
+                                        </div>
+                                        <button class="ml-4 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="w-24">Martes</span>
+                                        <div class="flex-1 flex items-center space-x-2">
+                                            <input type="time" value="08:00" class="p-2 border rounded-lg">
+                                            <span>a</span>
+                                            <input type="time" value="14:00" class="p-2 border rounded-lg">
+                                        </div>
+                                        <button class="ml-4 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="w-24">Miércoles</span>
+                                        <div class="flex-1 flex items-center space-x-2">
+                                            <input type="time" value="08:00" class="p-2 border rounded-lg">
+                                            <span>a</span>
+                                            <input type="time" value="14:00" class="p-2 border rounded-lg">
+                                        </div>
+                                        <button class="ml-4 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="w-24">Jueves</span>
+                                        <div class="flex-1 flex items-center space-x-2">
+                                            <input type="time" value="08:00" class="p-2 border rounded-lg">
+                                            <span>a</span>
+                                            <input type="time" value="14:00" class="p-2 border rounded-lg">
+                                        </div>
+                                        <button class="ml-4 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="w-24">Viernes</span>
+                                        <div class="flex-1 flex items-center space-x-2">
+                                            <input type="time" value="08:00" class="p-2 border rounded-lg">
+                                            <span>a</span>
+                                            <input type="time" value="14:00" class="p-2 border rounded-lg">
+                                        </div>
+                                        <button class="ml-4 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="w-24">Sábado</span>
+                                        <div class="flex-1 flex items-center space-x-2">
+                                            <input type="time" value="09:00" class="p-2 border rounded-lg">
+                                            <span>a</span>
+                                            <input type="time" value="12:00" class="p-2 border rounded-lg">
+                                        </div>
+                                        <button class="ml-4 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="w-24">Domingo</span>
+                                        <div class="flex items-center">
+                                            <span class="text-gray-400">No disponible</span>
+                                        </div>
+                                        <button class="ml-4 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-4">Horario Especial</h4>
+                                <div class="space-y-4">
+                                    <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <p class="font-medium">Día festivo</p>
+                                                <p class="text-sm text-gray-500">15 de septiembre</p>
+                                            </div>
+                                            <button class="text-gray-400 hover:text-gray-600">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <input type="time" value="10:00" class="p-2 border rounded-lg">
+                                            <span>a</span>
+                                            <input type="time" value="13:00" class="p-2 border rounded-lg">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Agregar horario especial</label>
+                                    <div class="flex space-x-2">
+                                        <input type="date" class="p-2 border rounded-lg flex-1">
+                                        <input type="time" class="p-2 border rounded-lg">
+                                        <span class="flex items-center">a</span>
+                                        <input type="time" class="p-2 border rounded-lg">
+                                        <button class="px-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="border-t px-6 py-4 flex justify-end space-x-3">
-                            <button class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
-                            <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Enviar recordatorio</button>
+                        <div class="flex justify-end mt-6">
+                            <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Guardar Horario</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border">
+                        <h4 class="font-medium mb-4">Próximas Sesiones</h4>
+                        <div class="overflow-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hora</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/44.jpg" alt="">
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">María González</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">15/09/2023</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">09:00 - 10:00</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Entrenamiento</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
+                                            <button class="text-red-600 hover:text-red-900">Cancelar</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/men/22.jpg" alt="">
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">Carlos Ruiz</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">16/09/2023</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">11:00 - 12:00</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Evaluación</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
+                                            <button class="text-red-600 hover:text-red-900">Cancelar</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/68.jpg" alt="">
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">Ana Martínez</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">17/09/2023</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">16:00 - 17:00</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Entrenamiento</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
+                                            <button class="text-red-600 hover:text-red-900">Cancelar</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <!-- BMI Calculator Tab -->
+                <div id="bmi-tab" class="tab-content hidden">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium">Calculadora de IMC</h3>
+                        <p class="text-gray-500">Calcula el Índice de Masa Corporal de tus clientes.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border">
+                            <h4 class="font-medium mb-4">Calculadora</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Peso (kg)</label>
+                                    <input type="number" id="weight" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ej. 70">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Altura (cm)</label>
+                                    <input type="number" id="height" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ej. 175">
+                                </div>
+                                <div class="pt-2">
+                                    <button onclick="calculateBMI()" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Calcular IMC</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border">
+                            <h4 class="font-medium mb-4">Resultado</h4>
+                            <div id="bmi-result" class="text-center py-8">
+                                <div class="text-gray-400">
+                                    <i class="fas fa-calculator text-4xl mb-2"></i>
+                                    <p>Ingresa los datos para calcular el IMC</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <h5 class="font-medium mb-2">Clasificación del IMC</h5>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                                        <span class="text-sm flex-1">Menos de 18.5 - Bajo peso</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                                        <span class="text-sm flex-1">18.5 a 24.9 - Peso normal</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+                                        <span class="text-sm flex-1">25.0 a 29.9 - Sobrepeso</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                                        <span class="text-sm flex-1">30.0 o más - Obesidad</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 bg-white p-6 rounded-xl shadow-sm border">
+                        <h4 class="font-medium mb-4">Registro de Cálculos</h4>
+                        <div class="overflow-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peso</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Altura</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IMC</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clasificación</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12/09/2023</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/44.jpg" alt="">
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">María González</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">68 kg</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">165 cm</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">24.9</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Peso normal</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">05/09/2023</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/men/22.jpg" alt="">
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">Carlos Ruiz</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">85 kg</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">178 cm</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">26.8</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sobrepeso</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">29/08/2023</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-10 w-10">
+                                                    <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/68.jpg" alt="">
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900">Ana Martínez</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">62 kg</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">170 cm</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">21.4</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Peso normal</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
 
-    <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        });
+<script type="module">
+    import { 
+        initializeApp 
+    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    
+    import { 
+        getFirestore, 
+        collection, 
+        getDocs, 
+        doc, 
+        getDoc,
+        updateDoc,
+        setDoc,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-        // Student modal toggle
-        const classCards = document.querySelectorAll('.rounded-r-lg');
-        const studentModal = document.getElementById('student-modal');
-        const closeModal = document.getElementById('close-modal');
+    const firebaseConfig = {
+        apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
+        authDomain: "gymrats-d16eb.firebaseapp.com",
+        projectId: "gymrats-d16eb",
+        storageBucket: "gymrats-d16eb.appspot.com",
+        messagingSenderId: "106526343668278361492",
+        appId: "1:106526343668278361492:web:abcd1234efgh5678"
+    };
 
-        // Add click event to all class cards to open modal
-        classCards.forEach(card => {
-            card.addEventListener('click', function(e) {
-                // Don't open modal if clicking on edit/delete buttons
-                if (!e.target.closest('button')) {
-                    studentModal.classList.remove('hidden');
-                }
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let currentClientId = null;
+
+    // Función para obtener elementos del DOM de manera segura
+    function getElement(selector) {
+        const element = document.querySelector(selector);
+        if (!element) {
+            console.error(`Elemento no encontrado: ${selector}`);
+            throw new Error(`Elemento no encontrado: ${selector}`);
+        }
+        return element;
+    }
+
+    // Función para abrir pestañas dentro del modal
+    function openClientTab(tabId) {
+        try {
+            document.querySelectorAll('.client-tab-button').forEach(button => {
+                button.classList.remove('border-indigo-500', 'text-indigo-600');
+                button.classList.add('border-transparent', 'text-gray-500');
             });
-        });
-
-        // Close modal when clicking X button
-        closeModal.addEventListener('click', function() {
-            studentModal.classList.add('hidden');
-        });
-
-        // Close modal when clicking outside
-        studentModal.addEventListener('click', function(e) {
-            if (e.target === studentModal) {
-                studentModal.classList.add('hidden');
+            
+            const activeButton = document.querySelector(`.client-tab-button[onclick*="${tabId}"]`);
+            if (activeButton) {
+                activeButton.classList.add('border-indigo-500', 'text-indigo-600');
+                activeButton.classList.remove('border-transparent', 'text-gray-500');
             }
-        });
-
-        // Filter functionality (example)
-        document.querySelectorAll('select, input[type="date"]').forEach(element => {
-            element.addEventListener('change', function() {
-                // In a real app, this would filter the classes
-                console.log('Filtering classes...');
+            
+            document.querySelectorAll('.client-tab-content').forEach(tab => {
+                tab.classList.add('hidden');
             });
-        });
+            getElement(`#${tabId}`).classList.remove('hidden');
+        } catch (error) {
+            console.error("Error al cambiar pestaña:", error);
+        }
+    }
 
-        // Animation for cards
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.fade-in');
-            cards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
+    // Función para cerrar el modal
+    function closeClientModal() {
+        getElement('#client-modal').classList.add('hidden');
+    }
+
+    // Función para obtener datos de clientes
+    async function getClientsData() {
+        try {
+            const clientsCollection = collection(db, "usuarios");
+            const clientsSnapshot = await getDocs(clientsCollection);
+            return clientsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        } catch (error) {
+            console.error("Error getting clients data:", error);
+            return [];
+        }
+    }
+
+    // Función para ver detalles del cliente
+    async function viewClientDetails(clientId) {
+        if (!clientId) {
+            alert("No se proporcionó un ID de cliente válido");
+            return;
+        }
+        
+        currentClientId = clientId;
+        
+        try {
+            const clientDoc = await getDoc(doc(db, "usuarios", clientId));
+            
+            if (!clientDoc.exists()) {
+                alert("Cliente no encontrado");
+                return;
+            }
+            
+            const client = clientDoc.data();
+            
+            // Actualizar campos del modal
+            getElement('#client-modal-title').textContent = `Detalles de ${client.Nombre || ''} ${client.Apellido || ''}`.trim();
+            getElement('#client-modal-name').textContent = `${client.Nombre || ''} ${client.Apellido || ''}`.trim();
+            getElement('#client-modal-tel').textContent = client.Telefono || 'No especificado';
+            getElement('#client-modal-age').textContent = client.Estado || 'Sin estado';
+            getElement('#client-modal-notes').value = client.Notas || '';
+            
+            if (client.Genero) {
+                getElement('#client-modal-goal').textContent = client.Genero;
+            }
+            
+            if (client.SuscripcionHasta) {
+                const fechaSuscripcion = new Date(client.SuscripcionHasta.seconds * 1000);
+                getElement('#client-modal-duration').textContent = fechaSuscripcion.toLocaleDateString();
+            }
+            
+            // Cargar imagen
+            const imgElement = getElement('#client-modal-image');
+            imgElement.src = client.fotoURL || (client.Genero === 'Femenino' ? 
+                'https://randomuser.me/api/portraits/women/44.jpg' : 
+                'https://randomuser.me/api/portraits/men/44.jpg');
+            
+            // Cargar métricas
+            await loadClientMetrics(clientId);
+            
+            // Mostrar el modal
+            getElement('#client-modal').classList.remove('hidden');
+            openClientTab('metrics-tab');
+            
+        } catch (error) {
+            console.error("Error al cargar detalles del cliente:", error);
+            alert("Error al cargar los detalles del cliente");
+        }
+    }
+
+    // Cargar métricas del cliente
+    async function loadClientMetrics(clientId) {
+        if (!clientId) return;
+        
+        try {
+            const metricsDoc = await getDoc(doc(db, 'metricas', clientId));
+            if (!metricsDoc.exists()) return;
+            
+            const metrics = metricsDoc.data();
+            const metricsTab = getElement('#metrics-tab');
+            
+            // Función auxiliar para establecer valores seguros
+            const setValue = (selector, value) => {
+                const element = metricsTab.querySelector(selector);
+                if (element && value !== undefined) element.value = value;
+            };
+            
+            setValue('input[type="number"][placeholder="kg"]', metrics.peso);
+            setValue('input[type="number"][placeholder="cm"]', metrics.altura);
+            setValue('input[type="number"][placeholder="%"]', metrics.grasa);
+            setValue('input[type="number"][placeholder="kg"]:nth-of-type(3)', metrics.pressBanca);
+            setValue('input[type="number"][placeholder="kg"]:nth-of-type(4)', metrics.sentadilla);
+            setValue('input[type="number"][placeholder="rep."]', metrics.flexiones);
+            setValue('input[type="text"]', metrics.tiempo5km);
+            
+            if (metrics.peso && metrics.altura) {
+                const bmi = (metrics.peso / Math.pow(metrics.altura/100, 2)).toFixed(1);
+                getElement('#bmi-value').textContent = bmi;
+            }
+        } catch (error) {
+            console.error("Error al cargar métricas:", error);
+        }
+    }
+
+    // Guardar cambios del cliente (VERSIÓN CORREGIDA)
+    async function saveClientChanges() {
+        if (!currentClientId) {
+            alert("No hay un cliente seleccionado");
+            return;
+        }
+        
+        try {
+            // Obtener elementos de manera segura
+            const metricsTab = getElement('#metrics-tab');
+            const getInputValue = (selector) => {
+                const input = metricsTab.querySelector(selector);
+                return input ? input.value : null;
+            };
+            
+            // Obtener valores con validación
+            const peso = parseFloat(getInputValue('input[type="number"][placeholder="kg"]')) || 0;
+            const altura = parseFloat(getInputValue('input[type="number"][placeholder="cm"]')) || 0;
+            const grasa = parseFloat(getInputValue('input[type="number"][placeholder="%"]')) || 0;
+            
+            if (peso <= 0 || altura <= 0) {
+                alert("Por favor ingresa valores válidos para peso y altura");
+                return;
+            }
+            
+            // Calcular IMC
+            const bmi = (peso / Math.pow(altura/100, 2)).toFixed(1);
+            getElement('#bmi-value').textContent = bmi;
+
+            // Preparar datos para guardar
+            const clientData = {
+                Notas: getElement('#client-modal-notes').value,
+                ultimaActualizacion: serverTimestamp()
+            };
+            
+            const metricsData = {
+                peso: peso,
+                altura: altura,
+                grasa: grasa,
+                pressBanca: parseFloat(getInputValue('input[type="number"][placeholder="kg"]:nth-of-type(3)')) || 0,
+                sentadilla: parseFloat(getInputValue('input[type="number"][placeholder="kg"]:nth-of-type(4)')) || 0,
+                flexiones: parseInt(getInputValue('input[type="number"][placeholder="rep."]')) || 0,
+                tiempo5km: getInputValue('input[type="text"]') || '00:00',
+                imc: bmi,
+                fechaActualizacion: serverTimestamp()
+            };
+            
+            // Guardar datos
+            await updateDoc(doc(db, "usuarios", currentClientId), clientData);
+            await setDoc(doc(db, 'metricas', currentClientId), metricsData, { merge: true });
+            
+            alert("Cambios guardados exitosamente!");
+        } catch (error) {
+            console.error("Error al guardar cambios:", error);
+            alert("Error al guardar cambios. Por favor verifica los datos.");
+        }
+    }
+
+    // Función para mostrar los clientes en la UI
+    async function displayClients() {
+        try {
+            const clients = await getClientsData();
+            const container = getElement('#clients-container');
+            container.innerHTML = '';
+            
+            if (clients.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No hay clientes registrados</p>';
+                return;
+            }
+            
+            clients.forEach(client => {
+                const nombreCompleto = `${client.Nombre || ''} ${client.Apellido || ''}`.trim();
+                const clientCard = document.createElement('div');
+                clientCard.className = 'bg-white rounded-lg shadow-md p-4 flex flex-col';
+                clientCard.innerHTML = `
+                    <div class="flex-1 flex items-center space-x-4 mb-4">
+                        <img src="${client.fotoURL || 'https://randomuser.me/api/portraits/men/47.jpg'}" 
+                             alt="Client Image" class="w-16 h-16 rounded-full object-cover">
+                        <div class="flex-1">
+                            <p class="text-md font-semibold text-gray-800">${nombreCompleto || 'Sin nombre'}</p>
+                            <p class="text-sm text-gray-500">Género: ${client.Genero || 'No especificado'}</p>
+                            <p class="text-sm text-gray-500">Teléfono: ${client.Telefono || 'No especificado'}</p>
+                            <p class="text-sm text-gray-500">Suscripción hasta: ${
+                                client.SuscripcionHasta ? 
+                                new Date(client.SuscripcionHasta.seconds * 1000).toLocaleDateString() : 
+                                'No especificado'
+                            }</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <button onclick="viewClientDetails('${client.id}')" 
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                            Ver Detalles
+                        </button>
+                    </div>
+                `;
+                container.appendChild(clientCard);
             });
-        });
-    </script>
-	<script type="module">
-		import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-		import { 
-			getFirestore, doc, getDoc
-		} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-		import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        } catch (error) {
+            console.error("Error al mostrar clientes:", error);
+            getElement('#clients-container').innerHTML = '<p class="text-red-500">Error al cargar los clientes</p>';
+        }
+    }
 
-		const firebaseConfig = {
-			// IMPORTANTE: Reemplaza este objeto completo con la configuración de tu proyecto
-			apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
-			authDomain: "gymrats-d16eb.firebaseapp.com",
-			projectId: "gymrats-d16eb",
-			storageBucket: "gymrats-d16eb.appspot.com",
-			messagingSenderId: "106526343668278361492",
-			appId: "1:106526343668278361492:web:abcd1234efgh5678"
-		};
+    // Hacer las funciones disponibles globalmente
+    window.viewClientDetails = viewClientDetails;
+    window.saveClientChanges = saveClientChanges;
+    window.openClientTab = openClientTab;
+    window.closeClientModal = closeClientModal;
+    window.displayClients = displayClients;
 
-		const app = initializeApp(firebaseConfig);
-		const db = getFirestore(app);
-		const auth = getAuth(app);
-
-		// --- Guardia de Autenticación y Roles para Entrenador ---
-		onAuthStateChanged(auth, async (user) => {
-			if (user) {
-				// Usuario autenticado, ahora verificamos su rol
-				const userDocRef = doc(db, "usuarios", user.uid);
-				const userDoc = await getDoc(userDocRef);
-
-				// Permite el acceso si el rol es 'entrenador' O 'administrador'
-				if (userDoc.exists() && (userDoc.data().rol === 'entrenador' || userDoc.data().rol === 'administrador')) {
-					console.log("Acceso de entrenador concedido.");
-					
-					// --- Importar datos del perfil de Google ---
-					const userNameEl = document.getElementById('userName');
-					const userAvatarEl = document.getElementById('userAvatar');
-					const mobileUserNameEl = document.getElementById('mobileUserName');
-					const mobileUserAvatarEl = document.getElementById('mobileUserAvatar');
-					
-					const displayName = user.displayName || user.email.split('@')[0];
-					const photoURL = user.photoURL || `https://i.pravatar.cc/40?u=${user.uid}`;
-
-					if (userNameEl) userNameEl.textContent = displayName;
-					if (userAvatarEl) userAvatarEl.src = photoURL;
-					if (mobileUserNameEl) mobileUserNameEl.textContent = displayName;
-					if (mobileUserAvatarEl) mobileUserAvatarEl.src = photoURL;
-
-				} else {
-					console.log("Acceso denegado. El usuario no tiene rol de entrenador.");
-					window.location.href = 'index.html';
-				}
-			} else {
-				console.log("Usuario no autenticado, redirigiendo a login.");
-				window.location.href = 'index.html';
-			}
-		});
-
-		// --- Funcionalidad del Menú de Usuario ---
-		const userMenuButton = document.getElementById('userMenuButton');
-		const userMenu = document.getElementById('userMenu');
-
-		userMenuButton.addEventListener('click', () => {
-			userMenu.classList.toggle('hidden');
-		});
-
-		// Cerrar el menú si se hace clic fuera
-		window.addEventListener('click', (e) => {
-			if (userMenuButton && userMenu && !userMenuButton.contains(e.target) && !userMenu.contains(e.target)) {
-				userMenu.classList.add('hidden');
-			}
-		});
-
-		// --- Funcionalidad de Cerrar Sesión ---
-		const handleLogout = (e) => {
-			e.preventDefault();
-			signOut(auth).catch(error => console.error('Error al cerrar sesión:', error));
-		};
-
-		document.getElementById('logoutButton').addEventListener('click', handleLogout);
-		document.getElementById('sidebarLogoutButton').addEventListener('click', handleLogout);
-		document.getElementById('mobileLogoutButton').addEventListener('click', handleLogout);
-	</script>
+    // Inicializar la aplicación
+    document.addEventListener('DOMContentLoaded', displayClients);
+</script>1
 </body>
 </html>
