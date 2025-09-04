@@ -385,12 +385,30 @@
             // Util: sanitizar clave para ids
             const keyToId = (k) => `metric_${k.replace(/[^a-zA-Z0-9]/g, '_')}`;
 
-            // Deducir unidad según clave
+            // NUEVO: convertir keys tipo CamelCase o con números a etiquetas legibles
+            function humanizeKey(key) {
+                if (!key) return '';
+                // Reemplaza underscores por espacios
+                let s = key.replace(/_/g, ' ');
+                // Inserta espacio entre lower->Upper (CamelCase)
+                s = s.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+                // Inserta espacio entre letra y número
+                s = s.replace(/([a-zA-Z])([0-9])/g, '$1 $2');
+                // Poner cada palabra capitalizada
+                s = s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                return s;
+            }
+
+            // Deducir unidad según clave (ampliada)
             const inferUnit = (key) => {
-                const k = key.toLowerCase();
+                const k = (key || '').toLowerCase();
                 if (k.includes('peso') || k.includes('kg') || k.includes('mass') || k.includes('masa')) return 'kg';
                 if (k.includes('grasa') || k.includes('%')) return '%';
                 if (k.includes('musculo') || k.includes('músculo') || k.includes('muscle')) return 'kg';
+                // Fuerza / rendimiento
+                if (k.includes('press') || k.includes('banca') || k.includes('sentad') || k.includes('sentadilla') || k.includes('rm')) return 'kg';
+                // Tiempo (mostrar tal cual si viene como "mm:ss")
+                if (k.includes('tiempo') || k.includes('5km') || k.match(/\bmin\b/)) return ''; // sin unidad visible
                 if (k.includes('imc')) return '';
                 // default vacío
                 return '';
@@ -402,13 +420,14 @@
                 if (document.getElementById(baseId)) return; // ya existe
 
                 const unidad = inferUnit(key);
+                const humanLabel = humanizeKey(label || key);
                 const row = document.createElement('div');
                 row.className = 'metric-row mb-3';
                 row.id = baseId;
 
                 row.innerHTML = `
                     <div class="flex justify-between text-sm mb-1">
-                        <span class="text-gray-600">${label} <small class="text-xs text-indigo-600 ml-2 trainer-badge hidden"></small></span>
+                        <span class="text-gray-600">${humanLabel} <small class="text-xs text-indigo-600 ml-2 trainer-badge hidden"></small></span>
                         <span id="${baseId}_valor" class="font-medium">-- ${unidad}</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
@@ -428,21 +447,41 @@
                 const diffEl = document.getElementById(`${baseId}_diff`);
                 const badge = document.querySelector(`#${baseId} .trainer-badge`);
 
-                if (valorEl) valorEl.textContent = (valorActual !== null && valorActual !== undefined) ? `${valorActual} ${unidad}` : `-- ${unidad}`;
+                // Mostrar valor: si es string con ":" (tiempo) mostrar tal cual sin unidad
+                const isTimeString = (v) => (typeof v === 'string' && v.indexOf(':') !== -1);
+
+                if (valorEl) {
+                    if (valorActual !== null && valorActual !== undefined) {
+                        if (isTimeString(valorActual) || unidad === '') {
+                            valorEl.textContent = `${valorActual}`; // mostrar tal cual
+                        } else {
+                            valorEl.textContent = `${valorActual} ${unidad}`;
+                        }
+                    } else {
+                        valorEl.textContent = `-- ${unidad}`;
+                    }
+                }
+
                 if (barraEl) {
                     // heurística simple para porcentaje visual: normalizar según tipo
                     let percent = 0;
-                    if (unidad === 'kg') percent = Math.min(100, (valorActual || 0) / 1.5);
-                    else if (unidad === '%') percent = Math.min(100, (valorActual || 0) * 2);
-                    else percent = Math.min(100, (valorActual || 0));
+                    if (unidad === 'kg') {
+                        // si valorActual es no numérico tratar como 0
+                        const num = parseFloat(valorActual) || 0;
+                        percent = Math.min(100, (num / 1.5));
+                    } else if (unidad === '%') {
+                        percent = Math.min(100, (parseFloat(valorActual) || 0) * 2);
+                    } else {
+                        // si es tiempo o string, usar 0 o 50 por defecto visual
+                        percent = isTimeString(valorActual) ? 50 : Math.min(100, (parseFloat(valorActual) || 0));
+                    }
                     barraEl.style.width = `${percent}%`;
                 }
 
                 if (diffEl) {
-                    if (valorActual !== null && valorActual !== undefined && valorAnterior !== null && valorAnterior !== undefined) {
-                        const diferencia = valorActual - valorAnterior;
+                    if (valorActual !== null && valorActual !== undefined && valorAnterior !== null && valorAnterior !== undefined && !isTimeString(valorActual)) {
+                        const diferencia = (parseFloat(valorActual) || 0) - (parseFloat(valorAnterior) || 0);
                         diffEl.textContent = `${diferencia >= 0 ? '+' : ''}${diferencia.toFixed(1)} ${unidad} vs registro anterior`;
-                        // estilo: si es buena reducción, marcar en verde (fallback heurístico)
                         if ((unidad === '%' || unidad === 'kg') && diferencia < 0) {
                             diffEl.className = 'text-xs text-green-500 mt-1 text-right font-semibold';
                         } else if (diferencia === 0) {
@@ -451,8 +490,14 @@
                             diffEl.className = 'text-xs text-red-500 mt-1 text-right font-semibold';
                         }
                     } else {
-                        diffEl.textContent = '-- vs registro anterior';
-                        diffEl.className = 'text-xs text-gray-500 mt-1 text-right';
+                        // para tiempos o falta de anterior mostramos texto neutro (pero si es tiempo no añadimos unidad)
+                        if (isTimeString(valorActual)) {
+                            diffEl.textContent = '-- vs registro anterior';
+                            diffEl.className = 'text-xs text-gray-500 mt-1 text-right';
+                        } else {
+                            diffEl.textContent = '-- vs registro anterior';
+                            diffEl.className = 'text-xs text-gray-500 mt-1 text-right';
+                        }
                     }
                 }
 
@@ -474,17 +519,45 @@
 
                 if (snap.exists()) {
                     trainerMetrics = snap.data();
-                    // Ignorar cualquier clave que sea fecha / timestamp / última actualización
-                    // y además evitar crear filas para peso/altura/imc (se muestran en la card separada)
+
+                    // Helper: decide si clave debe ignorarse (fechas / peso / altura / imc)
+                    const ignoreKey = (k) => /(fecha|ultima|last|timestamp|^peso$|^altura$|^imc$)/i.test(k);
+
+                    // Procesar entradas: admitir valores primitivos y objetos anidados (una capa)
                     Object.keys(trainerMetrics).forEach(key => {
-                        if (/(fecha|ultima|last|timestamp|^peso$|^altura$|^imc$)/i.test(key)) return;
-                        const label = key.charAt(0).toUpperCase() + key.slice(1);
-                        ensureMetricRow(key, label);
+                        if (ignoreKey(key)) return;
+
+                        const value = trainerMetrics[key];
+                        if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+                            // iterar subclaves (ej: fuerza: { PressBanca: 80, Sentadilla: 100 })
+                            Object.keys(value).forEach(subKey => {
+                                if (ignoreKey(subKey)) return;
+                                const composedKey = `${key}_${subKey}`; // id único
+                                const composedLabel = `${subKey}`; // el humanizeKey lo convertirá
+                                ensureMetricRow(composedKey, composedLabel);
+                            });
+                        } else {
+                            // valor primitivo directo
+                            ensureMetricRow(key, key);
+                        }
                     });
+
+                    // Actualizar valores: misma lógica (soporta objetos anidados)
                     Object.keys(trainerMetrics).forEach(key => {
-                        if (/(fecha|ultima|last|timestamp|^peso$|^altura$|^imc$)/i.test(key)) return;
-                        const unidad = inferUnit(key);
-                        updateMetricRow(key, trainerMetrics[key], null, unidad, true);
+                        if (ignoreKey(key)) return;
+
+                        const value = trainerMetrics[key];
+                        if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+                            Object.keys(value).forEach(subKey => {
+                                if (ignoreKey(subKey)) return;
+                                const composedKey = `${key}_${subKey}`;
+                                const unidad = inferUnit(subKey);
+                                updateMetricRow(composedKey, value[subKey], null, unidad, true);
+                            });
+                        } else {
+                            const unidad = inferUnit(key);
+                            updateMetricRow(key, value, null, unidad, true);
+                        }
                     });
 
                     // Rellenar la nueva card con peso/altura/imc si están definidos por el entrenador

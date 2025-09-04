@@ -219,14 +219,14 @@
                                             <div class="flex justify-between">
                                                 <span>Peso</span>
                                                 <div class="flex items-center">
-                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="kg">
+                                                    <input id="input-peso" type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="kg">
                                                     <span>kg</span>
                                                 </div>
                                             </div>
                                             <div class="flex justify-between">
                                                 <span>Altura</span>
                                                 <div class="flex items-center">
-                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="cm">
+                                                    <input id="input-altura" type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="cm">
                                                     <span>cm</span>
                                                 </div>
                                             </div>
@@ -237,7 +237,7 @@
                                             <div class="flex justify-between">
                                                 <span>% Grasa</span>
                                                 <div class="flex items-center">
-                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="%">
+                                                    <input id="input-grasa" type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="%">
                                                     <span>%</span>
                                                 </div>
                                             </div>
@@ -249,28 +249,28 @@
                                             <div class="flex justify-between">
                                                 <span>RM Press Banca</span>
                                                 <div class="flex items-center">
-                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="kg">
+                                                    <input id="input-press-banca" type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="kg">
                                                     <span>kg</span>
                                                 </div>
                                             </div>
                                             <div class="flex justify-between">
                                                 <span>RM Sentadilla</span>
                                                 <div class="flex items-center">
-                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="kg">
+                                                    <input id="input-sentadilla" type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="kg">
                                                     <span>kg</span>
                                                 </div>
                                             </div>
                                             <div class="flex justify-between">
                                                 <span>Flexiones máx.</span>
                                                 <div class="flex items-center">
-                                                    <input type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="rep.">
+                                                    <input id="input-flexiones" type="number" class="w-16 p-1 border rounded text-right mr-2" placeholder="rep.">
                                                     <span>rep.</span>
                                                 </div>
                                             </div>
                                             <div class="flex justify-between">
                                                 <span>5km tiempo</span>
                                                 <div class="flex items-center">
-                                                    <input type="text" class="w-16 p-1 border rounded text-right mr-2" placeholder="mm:ss">
+                                                    <input id="input-tiempo5km" type="text" class="w-16 p-1 border rounded text-right mr-2" placeholder="mm:ss">
                                                     <span>min</span>
                                                 </div>
                                             </div>
@@ -1045,21 +1045,14 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
             if (!metricsDoc.exists()) return;
             
             const metrics = metricsDoc.data();
-            const metricsTab = getElement('#metrics-tab');
-            
-            // Función auxiliar para establecer valores seguros
-            const setValue = (selector, value) => {
-                const element = metricsTab.querySelector(selector);
-                if (element && value !== undefined) element.value = value;
-            };
-            
-            setValue('input[type="number"][placeholder="kg"]', metrics.peso);
-            setValue('input[type="number"][placeholder="cm"]', metrics.altura);
-            setValue('input[type="number"][placeholder="%"]', metrics.grasa);
-            setValue('input[type="number"][placeholder="kg"]:nth-of-type(3)', metrics.pressBanca);
-            setValue('input[type="number"][placeholder="kg"]:nth-of-type(4)', metrics.sentadilla);
-            setValue('input[type="number"][placeholder="rep."]', metrics.flexiones);
-            setValue('input[type="text"]', metrics.tiempo5km);
+            // Usar ids directos para mayor fiabilidad
+            if (metrics.peso !== undefined && document.getElementById('input-peso')) document.getElementById('input-peso').value = metrics.peso;
+            if (metrics.altura !== undefined && document.getElementById('input-altura')) document.getElementById('input-altura').value = metrics.altura;
+            if (metrics.grasa !== undefined && document.getElementById('input-grasa')) document.getElementById('input-grasa').value = metrics.grasa;
+            if (metrics.pressBanca !== undefined && document.getElementById('input-press-banca')) document.getElementById('input-press-banca').value = metrics.pressBanca;
+            if (metrics.sentadilla !== undefined && document.getElementById('input-sentadilla')) document.getElementById('input-sentadilla').value = metrics.sentadilla;
+            if (metrics.flexiones !== undefined && document.getElementById('input-flexiones')) document.getElementById('input-flexiones').value = metrics.flexiones;
+            if (metrics.tiempo5km !== undefined && document.getElementById('input-tiempo5km')) document.getElementById('input-tiempo5km').value = metrics.tiempo5km;
             
             if (metrics.peso && metrics.altura) {
                 const bmi = (metrics.peso / Math.pow(metrics.altura/100, 2)).toFixed(1);
@@ -1193,17 +1186,10 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
         }
         
         try {
-            // Obtener elementos de manera segura
-            const metricsTab = getElement('#metrics-tab');
-            const getInputValue = (selector) => {
-                const input = metricsTab.querySelector(selector);
-                return input ? input.value : null;
-            };
-            
-            // Obtener valores con validación
-            const peso = parseFloat(getInputValue('input[type="number"][placeholder="kg"]')) || 0;
-            const altura = parseFloat(getInputValue('input[type="number"][placeholder="cm"]')) || 0;
-            const grasa = parseFloat(getInputValue('input[type="number"][placeholder="%"]')) || 0;
+            // Obtener valores con ids
+            const peso = parseFloat(getElement('#input-peso').value) || 0;
+            const altura = parseFloat(getElement('#input-altura').value) || 0;
+            const grasa = parseFloat(getElement('#input-grasa').value) || 0;
             
             if (peso <= 0 || altura <= 0) {
                 alert("Por favor ingresa valores válidos para peso y altura");
@@ -1224,10 +1210,10 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
                 peso: peso,
                 altura: altura,
                 grasa: grasa,
-                pressBanca: parseFloat(getInputValue('input[type="number"][placeholder="kg"]:nth-of-type(3)')) || 0,
-                sentadilla: parseFloat(getInputValue('input[type="number"][placeholder="kg"]:nth-of-type(4)')) || 0,
-                flexiones: parseInt(getInputValue('input[type="number"][placeholder="rep."]')) || 0,
-                tiempo5km: getInputValue('input[type="text"]') || '00:00',
+                pressBanca: parseFloat(getElement('#input-press-banca').value) || 0,
+                sentadilla: parseFloat(getElement('#input-sentadilla').value) || 0,
+                flexiones: parseInt(getElement('#input-flexiones').value) || 0,
+                tiempo5km: getElement('#input-tiempo5km').value || '00:00',
                 imc: bmi,
                 fechaActualizacion: serverTimestamp()
             };
