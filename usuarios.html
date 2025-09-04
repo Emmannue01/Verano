@@ -433,18 +433,16 @@
                     <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
                         <div id="${baseId}_barra" class="bg-indigo-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
-                    <div id="${baseId}_diff" class="text-xs text-gray-500 mt-1 text-right">-- vs registro anterior</div>
                 `;
                 // Añadimos al contenedor dinámico (arriba)
                 dynamicContainer.appendChild(row);
             }
 
-            // Actualizar fila con datos
+            // Actualizar fila con datos (SIN comparación)
             function updateMetricRow(key, valorActual, valorAnterior, unidad, marcadoEntrenador) {
                 const baseId = keyToId(key);
                 const valorEl = document.getElementById(`${baseId}_valor`);
                 const barraEl = document.getElementById(`${baseId}_barra`);
-                const diffEl = document.getElementById(`${baseId}_diff`);
                 const badge = document.querySelector(`#${baseId} .trainer-badge`);
 
                 // Mostrar valor: si es string con ":" (tiempo) mostrar tal cual sin unidad
@@ -466,39 +464,14 @@
                     // heurística simple para porcentaje visual: normalizar según tipo
                     let percent = 0;
                     if (unidad === 'kg') {
-                        // si valorActual es no numérico tratar como 0
                         const num = parseFloat(valorActual) || 0;
                         percent = Math.min(100, (num / 1.5));
                     } else if (unidad === '%') {
                         percent = Math.min(100, (parseFloat(valorActual) || 0) * 2);
                     } else {
-                        // si es tiempo o string, usar 0 o 50 por defecto visual
                         percent = isTimeString(valorActual) ? 50 : Math.min(100, (parseFloat(valorActual) || 0));
                     }
                     barraEl.style.width = `${percent}%`;
-                }
-
-                if (diffEl) {
-                    if (valorActual !== null && valorActual !== undefined && valorAnterior !== null && valorAnterior !== undefined && !isTimeString(valorActual)) {
-                        const diferencia = (parseFloat(valorActual) || 0) - (parseFloat(valorAnterior) || 0);
-                        diffEl.textContent = `${diferencia >= 0 ? '+' : ''}${diferencia.toFixed(1)} ${unidad} vs registro anterior`;
-                        if ((unidad === '%' || unidad === 'kg') && diferencia < 0) {
-                            diffEl.className = 'text-xs text-green-500 mt-1 text-right font-semibold';
-                        } else if (diferencia === 0) {
-                            diffEl.className = 'text-xs text-gray-500 mt-1 text-right';
-                        } else {
-                            diffEl.className = 'text-xs text-red-500 mt-1 text-right font-semibold';
-                        }
-                    } else {
-                        // para tiempos o falta de anterior mostramos texto neutro (pero si es tiempo no añadimos unidad)
-                        if (isTimeString(valorActual)) {
-                            diffEl.textContent = '-- vs registro anterior';
-                            diffEl.className = 'text-xs text-gray-500 mt-1 text-right';
-                        } else {
-                            diffEl.textContent = '-- vs registro anterior';
-                            diffEl.className = 'text-xs text-gray-500 mt-1 text-right';
-                        }
-                    }
                 }
 
                 if (badge) {
