@@ -62,6 +62,17 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.3);
             pointer-events: none;
         }
+
+        /* NUEVA REGLA: imágenes dentro de la pestaña Progreso se muestran estáticas y más pequeñas */
+        #progress-tab #beforeImage,
+        #progress-tab #afterImage {
+            position: static !important;
+            width: 100%;
+            max-width: 100%;
+            height: 12rem; /* aprox h-48 */
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -150,9 +161,11 @@
                     <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-auto mx-2 sm:mx-0">
                         <div class="p-4 border-b flex justify-between items-center">
                             <h3 class="text-xl font-semibold" id="client-modal-title">Detalles del Cliente</h3>
-                            <button onclick="closeClientModal()" class="text-gray-500 hover:text-gray-700">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="closeClientModal()" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="p-6">
                             <!-- Client Info -->
@@ -272,40 +285,55 @@
                             <div id="progress-tab" class="client-tab-content hidden">
                                 <div class="mb-6">
                                     <h5 class="font-medium mb-4">Fotos de Progreso</h5>
-                                    <div id="beforeAfterContainer" class="mx-auto">
-                                        <img id="beforeImage" src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Before">
-                                        <img id="afterImage" src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="After">
-                                        <input type="range" min="0" max="100" value="50" id="slider" oninput="moveSlider()">
-                                        <div id="sliderButton">
-                                            <i class="fas fa-arrows-alt-h text-gray-600"></i>
+                                    <!-- Muestra: foto inicial (primera subida) y última foto subida -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div class="bg-white p-4 rounded-lg border flex flex-col items-center">
+                                            <p class="text-sm text-gray-600 mb-2">Foto inicial (primera subida)</p>
+                                            <img id="beforeImage" src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=80" alt="Before" class="w-full object-cover rounded">
+                                        </div>
+                                        <div class="bg-white p-4 rounded-lg border flex flex-col items-center">
+                                            <p class="text-sm text-gray-600 mb-2">Última foto subida</p>
+                                            <img id="afterImage" src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=80" alt="After" class="w-full object-cover rounded">
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Mantener indicador mínimo de progreso -->
+                                <div id="upload-progress" class="hidden text-sm text-gray-600 mt-2">Cargando: <span id="upload-percent">0%</span></div>
+
+                                <!-- Subir sólo: inputs para before/after -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Subir foto inicial</label>
                                         <div class="flex items-center">
-                                            <input type="file" class="hidden" id="before-upload">
+                                            <input type="file" class="hidden" id="before-upload" accept="image/*">
                                             <button onclick="document.getElementById('before-upload').click()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-l-lg hover:bg-gray-200">
                                                 <i class="fas fa-upload mr-2"></i>Seleccionar
                                             </button>
-                                            <span class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                            <span id="before-filename" class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                        </div>
+                                        <!-- Añadido: botón visible para confirmar la subida -->
+                                        <div class="mt-2">
+                                            <button id="before-upload-submit" disabled class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Subir foto inicial</button>
                                         </div>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Subir foto actual</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Subir última foto</label>
                                         <div class="flex items-center">
-                                            <input type="file" class="hidden" id="after-upload">
+                                            <input type="file" class="hidden" id="after-upload" accept="image/*">
                                             <button onclick="document.getElementById('after-upload').click()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-l-lg hover:bg-gray-200">
                                                 <i class="fas fa-upload mr-2"></i>Seleccionar
                                             </button>
-                                            <span class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                            <span id="after-filename" class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                        </div>
+                                        <!-- Añadido: botón visible para confirmar la subida -->
+                                        <div class="mt-2">
+                                            <button id="after-upload-submit" disabled class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Subir última foto</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="flex justify-end">
-                                    <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Actualizar Fotos</button>
-                                </div>
+
+                                <!-- Sin botón extra: la subida se realiza al seleccionar archivo -->
                             </div>
 
                             <div id="medical-tab" class="client-tab-content hidden">
@@ -856,7 +884,7 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
         </div>
     </div>
 
-<script type="module">
+    <script type="module">
     import { 
         initializeApp 
     } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
@@ -872,6 +900,14 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
         serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
+    // Añadido: importaciones de Storage
+    import {
+        getStorage,
+        ref,
+        uploadBytes,
+        getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-storage.js";
+
     const firebaseConfig = {
         apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
         authDomain: "gymrats-d16eb.firebaseapp.com",
@@ -884,7 +920,12 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    // Añadido: inicializar storage
+    const storage = getStorage(app);
     let currentClientId = null;
+    // Añadido: variables para guardar selección antes de subir
+    let beforeSelectedFile = null;
+    let afterSelectedFile = null;
 
     // Función para obtener elementos del DOM de manera segura
     function getElement(selector) {
@@ -982,7 +1023,9 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
             
             // Cargar métricas
             await loadClientMetrics(clientId);
-            
+            // Añadido: cargar fotos de progreso si existen
+            await loadClientProgress(clientId);
+
             // Mostrar el modal
             getElement('#client-modal').classList.remove('hidden');
             openClientTab('metrics-tab');
@@ -1026,6 +1069,121 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
             console.error("Error al cargar métricas:", error);
         }
     }
+
+    // Añadido: cargar fotos de progreso guardadas en Firestore y mostrarlas
+    async function loadClientProgress(clientId) {
+        if (!clientId) return;
+        try {
+            const progDoc = await getDoc(doc(db, 'progresos', clientId));
+            if (!progDoc.exists()) return;
+            const data = progDoc.data();
+            if (data.beforeURL) getElement('#beforeImage').src = data.beforeURL;
+            if (data.afterURL) getElement('#afterImage').src = data.afterURL;
+        } catch (error) {
+            console.error("Error al cargar progreso:", error);
+        }
+    }
+
+    // Reemplazo de la función uploadImage para usar uploadBytes (más simple) y mejor manejo de errores
+    async function uploadImage(file, clientId, type) {
+		if (!file || !clientId) throw new Error('Falta archivo o clientId');
+
+		// Comprobar doc existente para comportamiento de "before"
+		const progDocRef = doc(db, 'progresos', clientId);
+		const progSnap = await getDoc(progDocRef);
+		const progData = progSnap.exists() ? progSnap.data() : {};
+
+		if (type === 'before' && progData && progData.beforeURL) {
+			throw new Error('Ya existe una foto inicial. Si deseas reemplazarla elimina primero la existente.');
+		}
+
+		// Si tienes configurado un endpoint para subir a Drive, usarlo
+		if (DRIVE_UPLOAD_URL && DRIVE_UPLOAD_URL.trim() !== "") {
+			try {
+				// Leer archivo como base64 (para enviar JSON fácilmente)
+				const base64 = await new Promise((resolve, reject) => {
+					const reader = new FileReader();
+					reader.onload = () => {
+						const result = reader.result.split(',')[1]; // quitar prefijo data:*/*;base64,
+						resolve(result);
+					};
+					reader.onerror = reject;
+					reader.readAsDataURL(file);
+				});
+
+				// Enviar JSON con filename, contentType y base64
+				const payload = {
+					filename: file.name,
+					contentType: file.type || 'image/jpeg',
+					fileBase64: base64,
+					type: type,
+					clientId: clientId
+				};
+
+				const resp = await fetch(DRIVE_UPLOAD_URL, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(payload)
+				});
+
+				if (!resp.ok) {
+					const text = await resp.text();
+					throw new Error('Error en upload a Drive: ' + resp.status + ' ' + text);
+				}
+
+				const data = await resp.json();
+				if (!data || !data.url) throw new Error('Respuesta inválida del servidor de Drive');
+
+				// Guardar la URL devuelta en Firestore (igual que antes)
+				const update = { fecha: serverTimestamp() };
+				if (type === 'before' && !progData.beforeURL) update.beforeURL = data.url;
+				if (type === 'after') update.afterURL = data.url;
+				await setDoc(progDocRef, update, { merge: true });
+
+				// Actualizar UI
+				if (type === 'before' && !progData.beforeURL) {
+					const beforeImg = document.getElementById('beforeImage');
+					if (beforeImg) beforeImg.src = data.url;
+				}
+				if (type === 'after') {
+					const afterImg = document.getElementById('afterImage');
+					if (afterImg) afterImg.src = data.url;
+				}
+
+				return data.url;
+			} catch (err) {
+				console.error('Error subiendo a Drive:', err);
+				throw err;
+			}
+		}
+
+		// Fallback: subir a Firebase Storage (implementación previa)
+		const filename = `${type}_${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+		const storageRef = ref(storage, `progresos/${clientId}/${filename}`);
+		const metadata = { contentType: file.type || 'image/jpeg' };
+
+		try {
+			await uploadBytes(storageRef, file, metadata);
+			const downloadURL = await getDownloadURL(storageRef);
+			const update = { fecha: serverTimestamp() };
+			if (type === 'before' && !progData.beforeURL) update.beforeURL = downloadURL;
+			if (type === 'after') update.afterURL = downloadURL;
+			await setDoc(progDocRef, update, { merge: true });
+
+			if (type === 'before' && !progData.beforeURL) {
+				const beforeImg = document.getElementById('beforeImage');
+				if (beforeImg) beforeImg.src = downloadURL;
+			}
+			if (type === 'after') {
+				const afterImg = document.getElementById('afterImage');
+				if (afterImg) afterImg.src = downloadURL;
+			}
+			return downloadURL;
+		} catch (err) {
+			console.error('Error en upload a Firebase:', err);
+			throw err;
+		}
+	}
 
     // Guardar cambios del cliente (VERSIÓN CORREGIDA)
     async function saveClientChanges() {
@@ -1137,9 +1295,131 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
     window.openClientTab = openClientTab;
     window.closeClientModal = closeClientModal;
     window.displayClients = displayClients;
+    window.showProgressTab = showProgressTab; // Exponer la nueva función
 
     // Inicializar la aplicación
-    document.addEventListener('DOMContentLoaded', displayClients);
-</script>1
+    document.addEventListener('DOMContentLoaded', () => {
+        displayClients();
+
+        const beforeInput = document.getElementById('before-upload');
+        const afterInput = document.getElementById('after-upload');
+        const beforeFilename = document.getElementById('before-filename');
+        const afterFilename = document.getElementById('after-filename');
+
+        // Obtener botones de subida añadidos
+        const beforeSubmitBtn = document.getElementById('before-upload-submit');
+        const afterSubmitBtn = document.getElementById('after-upload-submit');
+
+        // Nuevo comportamiento: al seleccionar archivo, sólo almacenar y habilitar botón "Subir"
+        if (beforeInput) {
+            beforeInput.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                if (!file.type.startsWith('image/')) {
+                    alert('Selecciona una imagen válida.');
+                    e.target.value = '';
+                    return;
+                }
+                if (!currentClientId) {
+                    alert('Selecciona un cliente primero para subir la foto de progreso.');
+                    e.target.value = '';
+                    return;
+                }
+                beforeSelectedFile = file;
+                if (beforeFilename) beforeFilename.textContent = file.name;
+                if (beforeSubmitBtn) beforeSubmitBtn.disabled = false;
+            });
+        }
+
+        if (afterInput) {
+            afterInput.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                if (!file.type.startsWith('image/')) {
+                    alert('Selecciona una imagen válida.');
+                    e.target.value = '';
+                    return;
+                }
+                if (!currentClientId) {
+                    alert('Selecciona un cliente primero para subir la foto de progreso.');
+                    e.target.value = '';
+                    return;
+                }
+                afterSelectedFile = file;
+                if (afterFilename) afterFilename.textContent = file.name;
+                if (afterSubmitBtn) afterSubmitBtn.disabled = false;
+            });
+        }
+
+        // Click en botones "Subir" realiza la subida real
+        if (beforeSubmitBtn) {
+            beforeSubmitBtn.addEventListener('click', async () => {
+                if (!beforeSelectedFile) {
+                    alert('Selecciona un archivo primero.');
+                    return;
+                }
+                try {
+                    beforeSubmitBtn.disabled = true;
+                    await uploadImage(beforeSelectedFile, currentClientId, 'before');
+                    alert('Foto inicial subida correctamente.');
+                    // limpiar estado
+                    beforeSelectedFile = null;
+                    if (beforeFilename) beforeFilename.textContent = 'Ningún archivo seleccionado';
+                } catch (err) {
+                    console.error(err);
+                    alert('Error al subir la foto inicial: ' + (err.message || err));
+                    if (beforeSubmitBtn) beforeSubmitBtn.disabled = false;
+                } finally {
+                    if (beforeInput) beforeInput.value = '';
+                }
+            });
+        }
+
+        if (afterSubmitBtn) {
+            afterSubmitBtn.addEventListener('click', async () => {
+                if (!afterSelectedFile) {
+                    alert('Selecciona un archivo primero.');
+                    return;
+                }
+                try {
+                    afterSubmitBtn.disabled = true;
+                    await uploadImage(afterSelectedFile, currentClientId, 'after');
+                    alert('Última foto subida correctamente.');
+                    // limpiar estado
+                    afterSelectedFile = null;
+                    if (afterFilename) afterFilename.textContent = 'Ningún archivo seleccionado';
+                } catch (err) {
+                    console.error(err);
+                    alert('Error al subir la foto actual: ' + (err.message || err));
+                    if (afterSubmitBtn) afterSubmitBtn.disabled = false;
+                } finally {
+                    if (afterInput) afterInput.value = '';
+                }
+            });
+        }
+    });
+    // Nueva función: abre la pestaña de progreso y enfoca los inputs de subida
+	function showProgressTab() {
+		try {
+			openClientTab('progress-tab');
+			// esperar un tick para que el DOM muestre la pestaña
+			setTimeout(() => {
+				// desplazar la vista dentro del modal hacia la sección de progreso si existe
+				const progressEl = document.getElementById('progress-tab');
+				if (progressEl) progressEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+				// intentar enfocar el botón de subir inicial para facilitar la acción
+				const beforeBtn = document.querySelector('#before-upload') || document.getElementById('before-upload');
+				if (beforeBtn) {
+					// mostrar nombre del archivo no aplica aquí; trigger visual opcional
+					const uploadTrigger = document.querySelector("button[onclick*=\"before-upload\"]");
+					if (uploadTrigger) uploadTrigger.focus();
+				}
+			}, 150);
+		} catch (e) {
+			console.error('Error al abrir pestaña Progreso:', e);
+		}
+	}
+</script>
 </body>
 </html>
