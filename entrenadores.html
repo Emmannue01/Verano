@@ -117,11 +117,19 @@
                 </div>
             </nav>
             <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-indigo-700">
-                <div class="flex items-center space-x-3">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="w-10 h-10 rounded-full">
-                    <div>
-                        <p class="font-medium">Juan Pérez</p>
-                        <p class="text-xs text-indigo-300">Entrenador Certificado</p>
+                <div id="sidebar-profile" class="relative flex items-center space-x-3 cursor-pointer" title="Mostrar opciones de perfil">
+                    <img id="sidebar-profile-img" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-100">
+                    <div class="flex-1">
+                        <p id="sidebar-profile-name" class="font-medium">Juan Pérez</p>
+                        <p id="sidebar-profile-role" class="text-xs text-indigo-300">Entrenador Certificado</p>
+                    </div>
+                    <!-- Menú desplegable similar a "usuarios" (oculto por defecto) -->
+                    <div id="profile-menu" class="absolute bottom-14 right-0 w-44 bg-white text-indigo-800 rounded-md shadow-lg hidden z-50 overflow-hidden">
+                        <div class="px-3 py-2 border-b border-gray-100">
+                            <p id="menu-name" class="text-sm font-medium">Juan Pérez</p>
+                            <p id="menu-email" class="text-xs text-gray-500">usuario@ejemplo.com</p>
+                        </div>
+                        <button id="menu-signout" class="w-full text-left px-3 py-2 hover:bg-gray-100">Cerrar sesión</button>
                     </div>
                 </div>
             </div>
@@ -146,7 +154,9 @@
                     <div class="mb-6 flex justify-between items-center">
                         <h3 class="text-lg font-medium">Lista de Clientes</h3>
                         <div class="relative">
-                            <input type="text" placeholder="Buscar cliente..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="text" id="search-client" 
+                                   placeholder="Buscar cliente..." 
+                                   class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                         </div>
                     </div>
@@ -471,7 +481,7 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
                                     <button onclick="document.getElementById('certification-upload').click()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-l-lg hover:bg-gray-200">
                                         <i class="fas fa-upload mr-2"></i>Seleccionar
                                     </button>
-                                    <span class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                    <span id="cert-filename" class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
                                 </div>
                             </div>
                         </div>
@@ -502,7 +512,7 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
                                     <button onclick="document.getElementById('medical-certification-upload').click()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-l-lg hover:bg-gray-200">
                                         <i class="fas fa-upload mr-2"></i>Seleccionar
                                     </button>
-                                    <span class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                    <span id="medical-cert-filename" class="px-4 py-2 bg-gray-50 border-l border-gray-200 text-sm text-gray-500">Ningún archivo seleccionado</span>
                                 </div>
                             </div>
                         </div>
@@ -802,89 +812,13 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
                             </div>
                         </div>
                     </div>
-
-                    <div class="mt-6 bg-white p-6 rounded-xl shadow-sm border">
-                        <h4 class="font-medium mb-4">Registro de Cálculos</h4>
-                        <div class="overflow-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peso</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Altura</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IMC</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Clasificación</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12/09/2023</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/44.jpg" alt="">
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900">María González</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">68 kg</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">165 cm</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">24.9</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Peso normal</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">05/09/2023</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/men/22.jpg" alt="">
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900">Carlos Ruiz</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">85 kg</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">178 cm</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">26.8</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Sobrepeso</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">29/08/2023</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/68.jpg" alt="">
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900">Ana Martínez</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">62 kg</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">170 cm</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">21.4</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Peso normal</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </div>
             </main>
         </div>
     </div>
 
     <script type="module">
+    // filepath: c:\Users\joabe\OneDrive\Documents\GitHub\Verano\entrenadores.html
     import { 
         initializeApp 
     } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
@@ -897,7 +831,8 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
         getDoc,
         updateDoc,
         setDoc,
-        serverTimestamp
+        serverTimestamp,
+        addDoc
     } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
     // Añadido: importaciones de Storage
@@ -907,6 +842,13 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
         uploadBytes,
         getDownloadURL
     } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-storage.js";
+
+    // Añadido: importaciones de Auth (Firebase)
+    import {
+        getAuth,
+        onAuthStateChanged,
+        signOut
+    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
@@ -922,6 +864,10 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
     const db = getFirestore(app);
     // Añadido: inicializar storage
     const storage = getStorage(app);
+
+    // Añadido: inicializar auth y manejar estado de sesión
+    const auth = getAuth(app);
+
     let currentClientId = null;
     // Añadido: variables para guardar selección antes de subir
     let beforeSelectedFile = null;
@@ -1275,114 +1221,313 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
         }
     }
 
+    // Función para filtrar clientes
+    async function searchClients(searchTerm) {
+        try {
+            const clients = await getClientsData();
+            const filteredClients = clients.filter(client => {
+                const fullName = `${client.Nombre || ''} ${client.Apellido || ''}`.toLowerCase();
+                return fullName.includes(searchTerm.toLowerCase());
+            });
+            
+            const container = getElement('#clients-container');
+            container.innerHTML = '';
+            
+            if (filteredClients.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No se encontraron clientes</p>';
+                return;
+            }
+            
+            filteredClients.forEach(client => {
+                // Reutilizar el mismo formato de tarjeta que displayClients
+                const nombreCompleto = `${client.Nombre || ''} ${client.Apellido || ''}`.trim();
+                const clientCard = document.createElement('div');
+                clientCard.className = 'bg-white rounded-lg shadow-md p-4 flex flex-col';
+                clientCard.innerHTML = `
+                    <div class="flex-1 flex items-center space-x-4 mb-4">
+                        <img src="${client.fotoURL || 'https://randomuser.me/api/portraits/men/47.jpg'}" 
+                             alt="Client Image" class="w-16 h-16 rounded-full object-cover">
+                        <div class="flex-1">
+                            <p class="text-md font-semibold text-gray-800">${nombreCompleto || 'Sin nombre'}</p>
+                            <p class="text-sm text-gray-500">Género: ${client.Genero || 'No especificado'}</p>
+                            <p class="text-sm text-gray-500">Teléfono: ${client.Telefono || 'No especificado'}</p>
+                            <p class="text-sm text-gray-500">Suscripción hasta: ${
+                                client.SuscripcionHasta ? 
+                                new Date(client.SuscripcionHasta.seconds * 1000).toLocaleDateString() : 
+                                'No especificado'
+                            }</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <button onclick="viewClientDetails('${client.id}')" 
+                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                            Ver Detalles
+                        </button>
+                    </div>
+                `;
+                container.appendChild(clientCard);
+            });
+        } catch (error) {
+            console.error("Error al buscar clientes:", error);
+            getElement('#clients-container').innerHTML = '<p class="text-red-500">Error al buscar clientes</p>';
+        }
+    }
+
+    // Listener para mostrar nombre y foto de Google en el sidebar (y en el menú)
+    onAuthStateChanged(auth, (user) => {
+        const nameEl = document.getElementById('sidebar-profile-name');
+        const imgEl = document.getElementById('sidebar-profile-img');
+        const menuName = document.getElementById('menu-name');
+        const menuEmail = document.getElementById('menu-email');
+
+        if (user) {
+            if (nameEl) nameEl.textContent = user.displayName || user.email || 'Usuario';
+            if (imgEl) imgEl.src = user.photoURL || imgEl.src;
+            if (menuName) menuName.textContent = user.displayName || user.email || 'Usuario';
+            if (menuEmail) menuEmail.textContent = user.email || '';
+        } else {
+            if (nameEl) nameEl.textContent = 'Invitado';
+            if (imgEl) imgEl.src = 'https://randomuser.me/api/portraits/lego/1.jpg';
+            if (menuName) menuName.textContent = 'Invitado';
+            if (menuEmail) menuEmail.textContent = '';
+        }
+    });
+    
+    // Función para cerrar sesión
+    async function signOutUser() {
+        try {
+            await signOut(auth);
+            // Después de cerrar sesión, redirigir a la página principal (index)
+            location.replace('index.html');
+        } catch (err) {
+            console.error('Error cerrando sesión:', err);
+            alert('No se pudo cerrar sesión. Intenta nuevamente.');
+        }
+    }
+
+    // Hacer disponible globalmente
+    window.signOutUser = signOutUser;
+
+    // Mostrar/ocultar el menú desplegable al hacer click sobre el perfil; ocultar al click fuera
+    function setupProfileToggle() {
+        const profile = document.getElementById('sidebar-profile');
+        const menu = document.getElementById('profile-menu');
+        const menuSignout = document.getElementById('menu-signout');
+        if (!profile || !menu) return;
+
+        // Asegurar oculto inicial
+        menu.classList.add('hidden');
+
+        profile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('hidden');
+        });
+
+        // Click sobre "Cerrar sesión" del menú
+        if (menuSignout) {
+            menuSignout.addEventListener('click', (e) => {
+                e.stopPropagation();
+                signOutUser();
+            });
+        }
+
+        // Click fuera: ocultar menú
+        document.addEventListener('click', (e) => {
+            if (!profile.contains(e.target)) {
+                if (!menu.classList.contains('hidden')) {
+                    menu.classList.add('hidden');
+                }
+            }
+        });
+    }
+
     // Hacer las funciones disponibles globalmente
-    window.viewClientDetails = viewClientDetails;
-    window.saveClientChanges = saveClientChanges;
-    window.openClientTab = openClientTab;
-    window.closeClientModal = closeClientModal;
-    window.displayClients = displayClients;
-    window.showProgressTab = showProgressTab; // Exponer la nueva función
+    // Función para cambiar pestañas principales (cliente, certificaciones, IMC, etc.)
+    function openTab(tabId) {
+        try {
+            // Ocultar todas las pestañas y remover 'active'
+            document.querySelectorAll('.tab-content').forEach(tc => {
+                tc.classList.add('hidden');
+                tc.classList.remove('active');
+            });
+
+            // Mostrar la pestaña seleccionada
+            const target = document.getElementById(tabId);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('active');
+            }
+
+            // Resetear estilo de todos los botones del sidebar
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('bg-indigo-700');
+                btn.classList.add('hover:bg-indigo-700');
+            });
+
+            // Activar el botón correspondiente
+            const activeBtn = document.querySelector(`button[onclick*="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-indigo-700');
+                activeBtn.classList.remove('hover:bg-indigo-700');
+            }
+
+            // Actualizar título del header
+            const titleMap = {
+                'client-tab': 'Mis Clientes',
+                'certifications-tab': 'Certificaciones',
+                'bmi-tab': 'Calculadora IMC',
+                'schedule-tab': 'Horario de Atención'
+            };
+            const tabTitleEl = document.getElementById('tab-title');
+            if (tabTitleEl) {
+                tabTitleEl.textContent = titleMap[tabId] || activeBtn?.querySelector('span')?.textContent || tabTitleEl.textContent;
+            }
+        } catch (err) {
+            console.error('openTab error:', err);
+        }
+    }
+
+    // Mostrar/ocultar sidebar en móviles
+    function toggleSidebar() {
+        const sb = document.querySelector('.sidebar');
+        if (!sb) return;
+        sb.classList.toggle('-translate-x-full');
+    }
+
+    // Forzar mostrar sidebar (usado en algunos botones)
+    function showSidebar() {
+        const sb = document.querySelector('.sidebar');
+        if (!sb) return;
+        sb.classList.remove('-translate-x-full');
+    }
+     window.viewClientDetails = viewClientDetails;
+     window.saveClientChanges = saveClientChanges;
+     window.openClientTab = openClientTab;
+     window.openTab = openTab;
+     window.toggleSidebar = toggleSidebar;
+     window.showSidebar = showSidebar;
+     window.closeClientModal = closeClientModal;
+     window.displayClients = displayClients;
+     window.showProgressTab = showProgressTab; // Exponer la nueva función
+
+    // Calculadora de IMC: lee weight/height, muestra resultado y clasificación
+    function calculateBMI() {
+        const wEl = document.getElementById('weight');
+        const hEl = document.getElementById('height');
+        const resEl = document.getElementById('bmi-result');
+        if (!wEl || !hEl || !resEl) return;
+        const weight = parseFloat(wEl.value);
+        const height = parseFloat(hEl.value);
+        if (!(weight > 0) || !(height > 0)) {
+            resEl.innerHTML = '<div class="text-red-500">Ingresa peso y altura válidos</div>';
+            return;
+        }
+        const bmi = weight / Math.pow(height/100, 2);
+        const bmiStr = bmi.toFixed(1);
+        let clas = '';
+        if (bmi < 18.5) clas = 'Bajo peso';
+        else if (bmi < 25) clas = 'Peso normal';
+        else if (bmi < 30) clas = 'Sobrepeso';
+        else clas = 'Obesidad';
+        resEl.innerHTML = `
+            <div class="text-indigo-800">
+                <div class="text-3xl font-bold mb-1">${bmiStr}</div>
+                <div class="text-sm">${clas}</div>
+            </div>
+        `;
+    }
+    window.calculateBMI = calculateBMI;
+    
+    // Subir certificaciones: sube a Storage y guarda referencia en Firestore
+    async function uploadCertification(file, type = 'general') {
+        if (!file) throw new Error('No hay archivo');
+        const user = auth.currentUser;
+        if (!user) {
+            alert('Debes iniciar sesión para subir certificaciones.');
+            return;
+        }
+        const uid = user.uid;
+        const filename = `${type}_${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
+        const storageRef = ref(storage, `certificaciones/${uid}/${filename}`);
+        try {
+            await uploadBytes(storageRef, file, { contentType: file.type || 'application/octet-stream' });
+            const url = await getDownloadURL(storageRef);
+            // Guardar registro en Firestore (colección 'certificaciones')
+            await addDoc(collection(db, 'certificaciones'), {
+                uid,
+                type,
+                filename: file.name,
+                url,
+                uploadedAt: serverTimestamp()
+            });
+            return url;
+        } catch (err) {
+            console.error('Error subiendo certificación:', err);
+            throw err;
+        }
+    }
+
+
 
     // Inicializar la aplicación
     document.addEventListener('DOMContentLoaded', () => {
         displayClients();
-
-        const beforeInput = document.getElementById('before-upload');
-        const afterInput = document.getElementById('after-upload');
-        const beforeFilename = document.getElementById('before-filename');
-        const afterFilename = document.getElementById('after-filename');
-
-        // Obtener botones de subida añadidos
-        const beforeSubmitBtn = document.getElementById('before-upload-submit');
-        const afterSubmitBtn = document.getElementById('after-upload-submit');
-
-        // Nuevo comportamiento: al seleccionar archivo, sólo almacenar y habilitar botón "Subir"
-        if (beforeInput) {
-            beforeInput.addEventListener('change', (e) => {
-                const file = e.target.files && e.target.files[0];
-                if (!file) return;
-                if (!file.type.startsWith('image/')) {
-                    alert('Selecciona una imagen válida.');
-                    e.target.value = '';
-                    return;
-                }
-                if (!currentClientId) {
-                    alert('Selecciona un cliente primero para subir la foto de progreso.');
-                    e.target.value = '';
-                    return;
-                }
-                beforeSelectedFile = file;
-                if (beforeFilename) beforeFilename.textContent = file.name;
-                if (beforeSubmitBtn) beforeSubmitBtn.disabled = false;
-            });
-        }
-
-        if (afterInput) {
-            afterInput.addEventListener('change', (e) => {
-                const file = e.target.files && e.target.files[0];
-                if (!file) return;
-                if (!file.type.startsWith('image/')) {
-                    alert('Selecciona una imagen válida.');
-                    e.target.value = '';
-                    return;
-                }
-                if (!currentClientId) {
-                    alert('Selecciona un cliente primero para subir la foto de progreso.');
-                    e.target.value = '';
-                    return;
-                }
-                afterSelectedFile = file;
-                if (afterFilename) afterFilename.textContent = file.name;
-                if (afterSubmitBtn) afterSubmitBtn.disabled = false;
-            });
-        }
-
-        // Click en botones "Subir" realiza la subida real
-        if (beforeSubmitBtn) {
-            beforeSubmitBtn.addEventListener('click', async () => {
-                if (!beforeSelectedFile) {
-                    alert('Selecciona un archivo primero.');
-                    return;
-                }
-                try {
-                    beforeSubmitBtn.disabled = true;
-                    await uploadImage(beforeSelectedFile, currentClientId, 'before');
-                    alert('Foto inicial subida correctamente.');
-                    // limpiar estado
-                    beforeSelectedFile = null;
-                    if (beforeFilename) beforeFilename.textContent = 'Ningún archivo seleccionado';
-                } catch (err) {
-                    console.error(err);
-                    alert('Error al subir la foto inicial: ' + (err.message || err));
-                    if (beforeSubmitBtn) beforeSubmitBtn.disabled = false;
-                } finally {
-                    if (beforeInput) beforeInput.value = '';
+        setupProfileToggle();
+        
+        // Añadir listener para búsqueda
+        const searchInput = document.getElementById('search-client');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.trim();
+                if (searchTerm === '') {
+                    displayClients(); // Mostrar todos si no hay término de búsqueda
+                } else {
+                    searchClients(searchTerm);
                 }
             });
         }
+        
+        // Listeners para inputs de certificaciones
+       const certInput = document.getElementById('certification-upload');
+       const medCertInput = document.getElementById('medical-certification-upload');
+       const certFilename = document.getElementById('cert-filename');
+       const medCertFilename = document.getElementById('medical-cert-filename');
 
-        if (afterSubmitBtn) {
-            afterSubmitBtn.addEventListener('click', async () => {
-                if (!afterSelectedFile) {
-                    alert('Selecciona un archivo primero.');
-                    return;
-                }
-                try {
-                    afterSubmitBtn.disabled = true;
-                    await uploadImage(afterSelectedFile, currentClientId, 'after');
-                    alert('Última foto subida correctamente.');
-                    // limpiar estado
-                    afterSelectedFile = null;
-                    if (afterFilename) afterFilename.textContent = 'Ningún archivo seleccionado';
-                } catch (err) {
-                    console.error(err);
-                    alert('Error al subir la foto actual: ' + (err.message || err));
-                    if (afterSubmitBtn) afterSubmitBtn.disabled = false;
-                } finally {
-                    if (afterInput) afterInput.value = '';
-                }
-            });
-        }
+       if (certInput) {
+           certInput.addEventListener('change', async (e) => {
+               const file = e.target.files && e.target.files[0];
+               if (!file) return;
+               certFilename.textContent = file.name;
+               try {
+                   certFilename.textContent = 'Subiendo...';
+                   await uploadCertification(file, 'general');
+                   certFilename.textContent = 'Subida correctamente';
+               } catch (err) {
+                   certFilename.textContent = 'Error al subir';
+                   alert('Error al subir certificación: ' + (err.message || err));
+               } finally {
+                   certInput.value = '';
+               }
+           });
+       }
+
+       if (medCertInput) {
+           medCertInput.addEventListener('change', async (e) => {
+               const file = e.target.files && e.target.files[0];
+               if (!file) return;
+               medCertFilename.textContent = file.name;
+               try {
+                   medCertFilename.textContent = 'Subiendo...';
+                   await uploadCertification(file, 'medical');
+                   medCertFilename.textContent = 'Subida correctamente';
+               } catch (err) {
+                   medCertFilename.textContent = 'Error al subir';
+                   alert('Error al subir certificación médica: ' + (err.message || err));
+               } finally {
+                                     medCertInput.value = '';
+               }
+           });
+       }
     });
     // Nueva función: abre la pestaña de progreso y enfoca los inputs de subida
 	function showProgressTab() {
@@ -1396,7 +1541,7 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
 
 				// intentar enfocar el botón de subir inicial para facilitar la acción
 				const beforeBtn = document.querySelector('#before-upload') || document.getElementById('before-upload');
-				if (beforeBtn) {
+							if (beforeBtn) {
 					// mostrar nombre del archivo no aplica aquí; trigger visual opcional
 					const uploadTrigger = document.querySelector("button[onclick*=\"before-upload\"]");
 					if (uploadTrigger) uploadTrigger.focus();
