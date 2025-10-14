@@ -279,6 +279,7 @@
     </div>
 
     <script type="module">
+        import { firebaseConfig } from './firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { 
             getFirestore, doc, getDoc, setDoc, 
@@ -294,15 +295,6 @@
             orderByChild, limitToLast, onValue, 
             set, push, get
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
-            authDomain: "gymrats-d16eb.firebaseapp.com",
-            projectId: "gymrats-d16eb",
-            storageBucket: "gymrats-d16eb.appspot.com",
-            messagingSenderId: "106526343668278361492",
-            appId: "1:106526343668278361492:web:abcd1234efgh5678"
-        };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);

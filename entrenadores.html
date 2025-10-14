@@ -118,7 +118,7 @@
             </nav>
             <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-indigo-700">
                 <div id="sidebar-profile" class="relative flex items-center space-x-3 cursor-pointer" title="Mostrar opciones de perfil">
-                    <img id="sidebar-profile-img" src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-100">
+                    <img id="sidebar-profile-img" src="" alt="Profile" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-100">
                     <div class="flex-1">
                         <p id="sidebar-profile-name" class="font-medium">Juan Pérez</p>
                         <p id="sidebar-profile-role" class="text-xs text-indigo-300">Entrenador Certificado</p>
@@ -819,12 +819,10 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
 
     <script type="module">
     // filepath: c:\Users\joabe\OneDrive\Documents\GitHub\Verano\entrenadores.html
+    import { firebaseConfig } from './firebase-config.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
     import { 
-        initializeApp 
-    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-    
-    import { 
-        getFirestore, 
+        getFirestore,
         collection, 
         getDocs, 
         doc, 
@@ -834,38 +832,16 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
         serverTimestamp,
         addDoc
     } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
-
-    // Añadido: importaciones de Storage
-    import {
-        getStorage,
-        ref,
-        uploadBytes,
-        getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-storage.js";
-
-    // Añadido: importaciones de Auth (Firebase)
-    import {
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-storage.js";
+    import { 
         getAuth,
         onAuthStateChanged,
         signOut
     } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0",
-        authDomain: "gymrats-d16eb.firebaseapp.com",
-        projectId: "gymrats-d16eb",
-        storageBucket: "gymrats-d16eb.appspot.com",
-        messagingSenderId: "106526343668278361492",
-        appId: "1:106526343668278361492:web:abcd1234efgh5678"
-    };
-
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    // Añadido: inicializar storage
     const storage = getStorage(app);
-
-    // Añadido: inicializar auth y manejar estado de sesión
     const auth = getAuth(app);
 
     let currentClientId = null;
@@ -964,8 +940,8 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
             // Cargar imagen
             const imgElement = getElement('#client-modal-image');
             imgElement.src = client.fotoURL || (client.Genero === 'Femenino' ? 
-                'https://randomuser.me/api/portraits/women/44.jpg' : 
-                'https://randomuser.me/api/portraits/men/44.jpg');
+                '' : 
+                '');
             
             // Cargar métricas
             await loadClientMetrics(clientId);
@@ -1098,7 +1074,7 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
 
 		// Fallback: subir a Firebase Storage (implementación previa)
 		const filename = `${type}_${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-		const storageRef = ref(storage, `progresos/${clientId}/${filename}`);
+		const imageRef = storageRef(storage, `progresos/${clientId}/${filename}`); // storageRef is now imported from firebase-storage
 		const metadata = { contentType: file.type || 'image/jpeg' };
 
 		try {
@@ -1193,9 +1169,8 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
                 clientCard.className = 'bg-white rounded-lg shadow-md p-4 flex flex-col';
                 clientCard.innerHTML = `
                     <div class="flex-1 flex items-center space-x-4 mb-4">
-                        <img src="${client.fotoURL || 'https://randomuser.me/api/portraits/men/47.jpg'}" 
-                             alt="Client Image" class="w-16 h-16 rounded-full object-cover">
-                        <div class="flex-1">
+                        
+                             
                             <p class="text-md font-semibold text-gray-800">${nombreCompleto || 'Sin nombre'}</p>
                             <p class="text-sm text-gray-500">Género: ${client.Genero || 'No especificado'}</p>
                             <p class="text-sm text-gray-500">Teléfono: ${client.Telefono || 'No especificado'}</p>
@@ -1445,13 +1420,13 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
         if (!user) {
             alert('Debes iniciar sesión para subir certificaciones.');
             return;
-        }
+        } // storageRef is now imported from firebase-storage
         const uid = user.uid;
         const filename = `${type}_${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
-        const storageRef = ref(storage, `certificaciones/${uid}/${filename}`);
+        const certStorageRef = storageRef(storage, `certificaciones/${uid}/${filename}`); 
         try {
-            await uploadBytes(storageRef, file, { contentType: file.type || 'application/octet-stream' });
-            const url = await getDownloadURL(storageRef);
+            await uploadBytes(certStorageRef, file, { contentType: file.type || 'application/octet-stream' });
+            const url = await getDownloadURL(certStorageRef);
             // Guardar registro en Firestore (colección 'certificaciones')
             await addDoc(collection(db, 'certificaciones'), {
                 uid,

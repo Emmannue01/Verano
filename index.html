@@ -84,17 +84,17 @@
     </div>
 
     <script type="module">
-        // Importaciones de Firebase
+        import { firebaseConfig } from './firebase-config.js';
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { 
-            getAuth, 
+            getAuth,
             onAuthStateChanged,
             GoogleAuthProvider,
             signInWithPopup
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { 
-            getFirestore, 
-            doc, 
+            getFirestore,
+            doc,
             getDoc, 
             query, 
             collection, 
@@ -105,18 +105,6 @@
             Timestamp
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        
-  const firebaseConfig = {
-      // IMPORTANTE: Asegúrate de que esta configuración sea la correcta de tu proyecto
-      apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0", 
-      authDomain: "gymrats-d16eb.firebaseapp.com",
-      projectId: "gymrats-d16eb",
-      storageBucket: "gymrats-d16eb.appspot.com",
-      messagingSenderId: "106526343668278361492",
-      appId: "1:106526343668278361492:web:abcd1234efgh5678"
-  };
-
-        // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);

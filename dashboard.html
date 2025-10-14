@@ -1385,25 +1385,20 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
 
 </script>
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { app, db, auth } from './firebase-config.js';
   import { 
-    getFirestore, collection, getDocs, query, orderBy, limit, addDoc, Timestamp, doc, getDoc, where
+    collection,
+    getDocs,
+    query,
+    orderBy,
+    limit,
+    addDoc,
+    Timestamp,
+    doc,
+    getDoc,
+    where
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-  const firebaseConfig = {
-      // IMPORTANTE: Asegúrate de que esta configuración sea la correcta de tu proyecto
-      apiKey: "AIzaSyBE7XnFDoaC7qPY8nykIGI-SCCMM6P_iG0", 
-      authDomain: "gymrats-d16eb.firebaseapp.com",
-      projectId: "gymrats-d16eb",
-      storageBucket: "gymrats-d16eb.appspot.com",
-      messagingSenderId: "106526343668278361492",
-      appId: "1:106526343668278361492:web:abcd1234efgh5678" // Reemplazar con tu App ID real
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   let conteoTipos = { Basica: 0, Estandar: 0, Premium: 0, VIP: 0 };
 
@@ -1546,14 +1541,9 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
             miembrosTableBody.innerHTML += `
                 <tr class="fade-in">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10">
-                                <img class="h-10 w-10 rounded-full" src="https://i.pravatar.cc/40?u=${doc.id}" alt="">
-                            </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">${data.Nombre} ${data.Apellido || ''}</div>
-                                <div class="text-sm text-gray-500">${data.Email || 'Sin email'}</div>
-                            </div>
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">${data.Nombre} ${data.Apellido || ''}</div>
+                            <div class="text-sm text-gray-500">${data.Email || 'Sin email'}</div>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
