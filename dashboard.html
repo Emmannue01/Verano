@@ -96,12 +96,7 @@
                         <h1 class="text-xl font-semibold text-gray-800">Panel de Control</h1>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <div class="relative">
-                            <button class="text-gray-600 hover:text-gray-900">
-                                <i class="fas fa-bell text-xl"></i>
-                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-                            </button>
-                        </div>
+                        
                         <div class="relative">
                             <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none">
                                 <img id="userAvatar" class="h-8 w-8 rounded-full" src="https://i.pravatar.cc/32" alt="User profile">
@@ -1409,10 +1404,24 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
       const userDocRef = doc(db, "usuarios", user.uid);
       const userDoc = await getDoc(userDocRef);
 
-      if (userDoc.exists() && userDoc.data().rol === 'admin') {
+      let userData = null;
+      if (userDoc.exists()) {
+          userData = userDoc.data();
+      } else {
+          // Búsqueda alternativa por email
+          const q = query(collection(db, "usuarios"), where("Email", "==", user.email.toLowerCase()));
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+              const existingUserDoc = querySnapshot.docs[0];
+              userData = existingUserDoc.data();
+          }
+      }
+
+      if (userData && (userData.rol === 'admin' || userData.rol === 'administrador')) {
         // El usuario es administrador, puede quedarse.
         console.log("Acceso de admin concedido.");
         cargarUsuarios(); // Cargar los datos del dashboard
+        sincronizarEstadosDeMembresia();
 
         // Actualizar UI con datos del usuario
         const userNameSpan = document.getElementById('userName');
@@ -1705,7 +1714,7 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
     let tipo = "Basica";
     if (tipoSelect.includes('Básica') || tipoSelect.includes('basica')) tipo = "Basica";
     else if (tipoSelect.includes('Estándar') || tipoSelect.includes('Estandar')) tipo = "Estandar";
-    else if (tipoSelect.includes('Premium')) tipo = "premium";
+    else if (tipoSelect.includes('Premium')) tipo = "Premium";
     else if (tipoSelect.includes('VIP')) tipo = "VIP";
     const genero = form.querySelector('#Genero')?.value || "Masculino";    
     const fechaInicio = form.querySelector('input[type="date"]')?.value;

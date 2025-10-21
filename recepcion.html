@@ -312,8 +312,21 @@
                 const userDocRef = doc(db, "usuarios", user.uid);
                 const userDoc = await getDoc(userDocRef);
 
-                if (userDoc.exists() && (userDoc.data().rol === 'recepcion' || userDoc.data().rol === 'administrador')) {
-                    console.log("Acceso de recepción concedido.");
+                let userData = null;
+                if (userDoc.exists()) {
+                    userData = userDoc.data();
+                } else {
+                    // Búsqueda alternativa por email
+                    const q = query(collection(db, "usuarios"), where("Email", "==", user.email.toLowerCase()));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        const existingUserDoc = querySnapshot.docs[0];
+                        userData = existingUserDoc.data();
+                    }
+                }
+
+                if (userData && (userData.rol === 'recepcion' || userData.rol === 'admin' || userData.rol === 'administrador')) {
+                    console.log(`Acceso de ${userData.rol} concedido.`);
                     
                     // Actualizar UI con datos del usuario
                     const userNameSpan = document.getElementById('userName');

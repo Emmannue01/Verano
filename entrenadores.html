@@ -1251,6 +1251,7 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
     // Listener para mostrar nombre y foto de Google en el sidebar (y en el menú)
     onAuthStateChanged(auth, (user) => {
         const nameEl = document.getElementById('sidebar-profile-name');
+        const roleEl = document.getElementById('sidebar-profile-role');
         const imgEl = document.getElementById('sidebar-profile-img');
         const menuName = document.getElementById('menu-name');
         const menuEmail = document.getElementById('menu-email');
@@ -1258,13 +1259,36 @@ Notas: Descansar 60-90 segundos entre series. Mantener buena forma en todos los 
         if (user) {
             if (nameEl) nameEl.textContent = user.displayName || user.email || 'Usuario';
             if (imgEl) imgEl.src = user.photoURL || imgEl.src;
-            if (menuName) menuName.textContent = user.displayName || user.email || 'Usuario';
+            if (menuName) menuName.textContent = user.displayName || 'Usuario';
             if (menuEmail) menuEmail.textContent = user.email || '';
+
+            // Verificar rol para asegurar que es un entrenador
+            const checkRole = async () => {
+                const userDocRef = doc(db, "usuarios", user.uid);
+                let userDoc = await getDoc(userDocRef);
+                let userData = null;
+
+                if (userDoc.exists()) {
+                    userData = userDoc.data();
+                } else {
+                    const q = query(collection(db, "usuarios"), where("Email", "==", user.email.toLowerCase()));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        userData = querySnapshot.docs[0].data();
+                    }
+                }
+
+                if (userData && (userData.rol === 'entrenador' || userData.rol === 'admin' || userData.rol === 'administrador')) {
+                    if (roleEl) roleEl.textContent = 'Entrenador Certificado';
+                } else {
+                    // Si no es entrenador, redirigir
+                    window.location.href = 'index.html';
+                }
+            };
+            checkRole();
         } else {
-            if (nameEl) nameEl.textContent = 'Invitado';
-            if (imgEl) imgEl.src = 'https://randomuser.me/api/portraits/lego/1.jpg';
-            if (menuName) menuName.textContent = 'Invitado';
-            if (menuEmail) menuEmail.textContent = '';
+            // Si no hay usuario, redirigir al login
+            window.location.href = 'index.html';
         }
     });
     

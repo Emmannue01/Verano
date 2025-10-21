@@ -132,67 +132,46 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // Usuario autenticado, ahora verificamos su rol en Firestore
-                setLoading(true); // Mostrar spinner mientras se verifica
+                setLoading(true);
                 try {
+                    const userDocRef = doc(db, "usuarios", user.uid);
+                    const userDoc = await getDoc(userDocRef);
                     let userData;
-                    let userDoc;
-
-                    // 1. Buscar por email primero, es el caso más común para migrar.
-                    if (user.email) {
-                        const userEmail = user.email.toLowerCase();
-                        console.log(`Buscando usuario por email: ${userEmail}`);
-                        const q = query(collection(db, "usuarios"), where("Email", "==", userEmail));
+                    let finalUserDocRef = userDocRef;
+ 
+                    if (userDoc.exists()) {
+                        // 1. El usuario existe con el UID de autenticación.
+                        console.log(`Usuario encontrado por UID (${user.uid}).`);
+                        userData = userDoc.data();
+                    } else {
+                        // Búsqueda alternativa por email si no se encuentra por UID
+                        console.log(`Usuario no encontrado por UID. Buscando por email: ${user.email}`);
+                        const q = query(collection(db, "usuarios"), where("Email", "==", user.email.toLowerCase()));
                         const querySnapshot = await getDocs(q);
-
+                        
                         if (!querySnapshot.empty) {
-                            // 1a. Encontrado por email.
-                            const foundDoc = querySnapshot.docs[0];
-                            console.log(`Usuario encontrado por email con doc ID: ${foundDoc.id}.`);
-
-                            // Si el ID del documento no es el UID de Auth, migrarlo.
-                            if (foundDoc.id !== user.uid) {
-                                console.log(`El ID del documento (${foundDoc.id}) no coincide con el UID de Auth (${user.uid}). Migrando...`);
-                                const batch = writeBatch(db);
-                                const oldData = foundDoc.data();
-                                const newUserDocRef = doc(db, "usuarios", user.uid);
-
-                                batch.set(newUserDocRef, { ...oldData, uid: user.uid, Email: userEmail });
-                                batch.delete(foundDoc.ref);
-                                await batch.commit();
-                                
-                                userDoc = await getDoc(newUserDocRef);
-                                console.log("Migración completada.");
-                            } else {
-                                // El ID del documento ya es el UID de Auth, todo correcto.
-                                userDoc = foundDoc;
+                            const existingUserDoc = querySnapshot.docs[0];
+                            console.log(`Usuario encontrado por email. ID del documento: ${existingUserDoc.id}`);
+                            userData = existingUserDoc.data();
+                            finalUserDocRef = existingUserDoc.ref;
+                            
+                            // Opcional: Actualizar el documento con el UID de autenticación para futuros inicios de sesión más rápidos
+                            if (!userData.authUid) {
+                                await setDoc(finalUserDocRef, { authUid: user.uid }, { merge: true });
                             }
-                            userData = userDoc.data();
                         }
                     }
 
-                    // 2. Si no se encontró por email, buscar por UID como fallback.
                     if (!userData) {
-                        console.log("No se encontró por email, buscando por UID...");
-                        const userDocRef = doc(db, "usuarios", user.uid);
-                        userDoc = await getDoc(userDocRef);
-
-                        if (userDoc.exists()) {
-                            console.log(`Usuario encontrado por UID (${user.uid}).`);
-                            userData = userDoc.data();
-                        }
-                    }
-
-                    // 3. Si no se encontró por ningún método, es un usuario nuevo.
-                    if (!userData) {
+                        // 2. El usuario no existe, es un nuevo inicio de sesión.
                         console.log("Usuario no encontrado. Creando nuevo registro de cliente.");
                         const userEmail = user.email.toLowerCase();
-                        const userDocRef = doc(db, "usuarios", user.uid);
                         const fechaInicio = new Date();
                         const fechaFin = new Date();
                         fechaFin.setMonth(fechaFin.getMonth()); // Membresía de 1 mes por defecto
 
                         const newUser = {
-                            uid: '',
+                            uid: user.uid, // Usar el UID de autenticación
                             Nombre: user.displayName ? user.displayName.split(' ')[0] : 'Nuevo',
                             Apellido: user.displayName ? user.displayName.split(' ').slice(1).join(' ') : 'Usuario',
                             Email: userEmail,
@@ -200,21 +179,22 @@
                             Tipo: 'Basica',
                             Creado: Timestamp.fromDate(fechaInicio),
                             SuscripcionHasta: Timestamp.fromDate(fechaFin),
-                            Telefono: '',
-                            Genero: 'Otro'
+                            Telefono: user.phoneNumber || '',
+                            Genero: 'No especificado'
                         };
                         
-                        await setDoc(userDocRef, newUser);
+                        await setDoc(finalUserDocRef, newUser);
                         userData = newUser;
                         console.log("Nuevo cliente creado exitosamente.");
                     }
 
+                    // 3. Redirigir según el rol.
                     if (userData) {
-                        const userRole = userData.rol || 'cliente';
+                        const userRole = userData.rol;
                         console.log(`Usuario autenticado con rol: ${userRole}`);
                         switch (userRole) {
                             case 'admin': window.location.href = 'dashboard.html'; break;
-                            case 'recepcion': window.location.href = 'recepcion.html'; break;
+                            case 'recepcion': case 'administrador': window.location.href = 'recepcion.html'; break;
                             case 'entrenador': window.location.href = 'entrenadores.html'; break;
                             default: window.location.href = 'usuarios.html'; break;
                         }
