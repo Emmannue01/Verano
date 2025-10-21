@@ -351,7 +351,7 @@
                         <select id="nuevoMiembroRol" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <option value="cliente">Cliente</option>
                             <option value="recepcion">Recepción</option>
-                            <option value="administrador">Administrador</option>
+                            <option value="admin">Administrador</option>
                         </select>
                     </div>
                     <div>
@@ -1091,7 +1091,7 @@ async function editarMiembro(id) {
                 <option value="cliente"${member.rol === 'cliente' ? ' selected' : ''}>Cliente</option>
                 <option value="recepcion"${member.rol === 'recepcion' ? ' selected' : ''}>Recepción</option>
                 <option value="entrenador"${member.rol === 'entrenador' ? ' selected' : ''}>Entrenador</option>
-                <option value="administrador"${member.rol === 'administrador' ? ' selected' : ''}>Administrador</option>
+                <option value="admin"${member.rol === 'administrador' ? ' selected' : ''}>Administrador</option>
               </select>
             </div>
             <div>
@@ -1409,9 +1409,9 @@ document.getElementById('mobileReportes').addEventListener('click', function(e) 
       const userDocRef = doc(db, "usuarios", user.uid);
       const userDoc = await getDoc(userDocRef);
 
-      if (userDoc.exists() && userDoc.data().rol === 'administrador') {
+      if (userDoc.exists() && userDoc.data().rol === 'admin') {
         // El usuario es administrador, puede quedarse.
-        console.log("Acceso de administrador concedido.");
+        console.log("Acceso de admin concedido.");
         cargarUsuarios(); // Cargar los datos del dashboard
 
         // Actualizar UI con datos del usuario

@@ -213,7 +213,7 @@
                         const userRole = userData.rol || 'cliente';
                         console.log(`Usuario autenticado con rol: ${userRole}`);
                         switch (userRole) {
-                            case 'administrador': window.location.href = 'dashboard.html'; break;
+                            case 'admin': window.location.href = 'dashboard.html'; break;
                             case 'recepcion': window.location.href = 'recepcion.html'; break;
                             case 'entrenador': window.location.href = 'entrenadores.html'; break;
                             default: window.location.href = 'usuarios.html'; break;
